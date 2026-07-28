@@ -1,0 +1,136 @@
+version: '3.9'
+
+services:
+
+  # ─────────────────────────────────────────
+  # FRONTEND (Angular)
+  # ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./sprit-scan
+      dockerfile: Dockerfile
+    ports:
+      - '4200:4200'
+    volumes:
+      - ./sprit-scan:/app
+      - /app/node_modules
+    networks:
+      - external
+    depends_on:
+      - api-gateway
+
+  # ─────────────────────────────────────────
+  # API GATEWAY – einziger öffentlicher Eingang
+  # ─────────────────────────────────────────
+  api-gateway:
+    build:
+      context: ./sprit-scan/backend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - ALC_SERVICE_URL=http://alc-service:3002
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
+    networks:
+      - external
+      - internal
+    depends_on:
+      - auth-service
+      - alc-service
+    command: npm run start:dev
+
+  # ─────────────────────────────────────────
+  # AUTH SERVICE
+  # ─────────────────────────────────────────
+  auth-service:
+    build:
+      context: ./sprit-scan/backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DATABASE_URL=postgresql://authuser:authpassword@auth-db:5432/auth-db?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=changeme
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
+    networks:
+      - internal
+    depends_on:
+      - auth-db
+      - redis
+    command: sh -c "npx prisma generate && npx prisma db push && npm run start:dev"
+
+  # ─────────────────────────────────────────
+  # ALC SERVICE
+  # ─────────────────────────────────────────
+  alc-service:
+    build:
+      context: ./sprit-scan/backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - DATABASE_URL=postgresql://alcuser:alcpassword@alc-db:5432/alc-db?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
+    networks:
+      - internal
+    depends_on:
+      - alc-db
+      - redis
+    command: sh -c "npx prisma generate && npx prisma db push && npm run start:dev"
+
+  # ─────────────────────────────────────────
+  # DATENBANKEN (je Service eine eigene)
+  # ─────────────────────────────────────────
+  auth-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpassword
+      POSTGRES_DB: auth-db
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  alc-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: alcuser
+      POSTGRES_PASSWORD: alcpassword
+      POSTGRES_DB: alc-db
+    volumes:
+      - alc-db-data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  # ─────────────────────────────────────────
+  # REDIS – Session / Cache / Message Bus
+  # ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    networks:
+      - internal
+
+# ─────────────────────────────────────────
+# NETZWERKE
+# ─────────────────────────────────────────
+networks:
+  external:   # Frontend ↔ API Gateway
+  internal:   # Nur Service-zu-Service, nicht von außen erreichbar
+
+# ─────────────────────────────────────────
+# VOLUMES
+# ─────────────────────────────────────────
+volumes:
+  auth-db-data:
+  alc-db-data:
