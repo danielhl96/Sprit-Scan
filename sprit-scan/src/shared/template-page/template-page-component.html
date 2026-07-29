@@ -1,0 +1,26 @@
+@if (isMobile()) {
+  <div
+    class="min-h-screen flex flex-col w-[100dvw] h-[100dvh] bg-gradient-to-r from-red-400 to-white-400"
+  >
+    <div class="divider divider-warning text-white">{{ title }}</div>
+    <div class="flex flex-col space-y-4">
+      <ng-content></ng-content>
+    </div>
+  </div>
+} @else {
+  <!-- Desktop / Tablet: Hinweis auf mobile Nutzung -->
+  <div class="min-h-screen flex items-center justify-center bg-base-200 p-8">
+    <div class="card w-full max-w-xl bg-base-100 shadow-xl">
+      <div class="card-body items-center text-center gap-6">
+        <div class="text-6xl">📱</div>
+
+        <h1 class="card-title text-3xl">Sprit-Scan is optimized for mobile</h1>
+
+        <p class="text-base-content/70">
+          This application is designed for use on a smartphone. Open Sprit-Scan on your phone or
+          resize the browser window to continue.
+        </p>
+      </div>
+    </div>
+  </div>
+}

@@ -1,9 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { TemplatePageModule } from '../shared/template-page/template-page-module';
+import { TemplatePageComponent } from '../shared/template-page/template-page-component';
+import { ButtonComponent } from '../shared/button/button-component';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TemplatePageModule],
+  imports: [RouterOutlet, TemplatePageComponent, ButtonComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
