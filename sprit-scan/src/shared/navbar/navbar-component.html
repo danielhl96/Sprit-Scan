@@ -1,12 +1,12 @@
-<div class="w-full h-12 bg-red-500 top-0 fixed z-50">
+<div class="w-full h-12 bg-red-700 top-0 fixed z-50 shadow-md">
   <div class="flex items-center justify-between h-full px-3">
-    <span class="text-lg font-bold text-white">
+    <span class="text-lg font-bold text-amber-50">
       <img src="/appicon.svg" alt="Sprit-Scan Logo" class="h-9 w-12" />
     </span>
 
     <button
       type="button"
-      class="btn btn-ghost btn-sm btn-circle text-white hover:bg-red-500 mr-4"
+      class="btn btn-ghost btn-sm btn-circle text-amber-50 hover:bg-red-800 mr-4"
       [attr.aria-label]="menuOpen ? 'Menü schließen' : 'Menü öffnen'"
       (click)="toggleMenu()"
     >
@@ -42,31 +42,27 @@
     </button>
   </div>
   @if (menuOpen) {
-    <div class="absolute top-10 py-4 right-0 w-[50dvw] bg-red-500 z-50">
+    <div
+      class="absolute top-12 right-0 w-[60dvw] bg-amber-50 shadow-xl rounded-bl-lg overflow-hidden z-50"
+    >
       @for (item of elements; track item.route) {
         <a
-          class="flex bg-red-500 px-5 py-2 text-white hover:bg-red-500"
+          class="flex items-center gap-3 px-5 py-3 text-red-900 transition-colors hover:bg-amber-100 border-b border-amber-200 last:border-b-0"
           [routerLink]="item.route"
           (click)="onElementClick(item)"
         >
-          <span class="w-10 h-7 bg-gray-500 text-sm flex items-center justify-center font-semibold">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-5 h-5"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icon" />
-            </svg>
-          </span>
-          <span
-            class="w-20 h-7 bg-black text-md text-center flex items-center justify-center font-semibold"
-            >{{ item.name }}</span
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-5 h-5 shrink-0 text-red-700"
           >
+            <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icon" />
+          </svg>
+          <span class="text-sm font-medium">{{ item.name }}</span>
         </a>
-        <div class="w-[100dvw] mr-4 h-[1px] bg-black"></div>
       }
     </div>
   }

@@ -18,6 +18,7 @@ const ICONS = {
     'M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75',
   profile:
     'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21c-2.676 0-5.216-.584-7.499-1.882z',
+  scan: 'M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z',
 } as const;
 
 @Component({
@@ -29,6 +30,7 @@ const ICONS = {
 export class NavbarComponent {
   @Input() elements: NavbarElement[] = [
     { name: 'Home', route: '/', icon: ICONS.home },
+    { name: 'Scan', route: '/scan', icon: ICONS.scan },
     { name: 'Profile', route: '/profile', icon: ICONS.profile },
     { name: 'History', route: '/history', icon: ICONS.history },
     { name: 'Logout', route: '/logout', icon: ICONS.logout },
