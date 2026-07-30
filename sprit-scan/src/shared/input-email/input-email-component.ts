@@ -15,13 +15,13 @@ export class InputEmailComponent {
   checkEmailValidity(): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValid = emailRegex.test(this.email);
-    this.emailValidityChange.emit(isValid);
+
     return isValid;
   }
 
   onEmailChange(newEmail: string): void {
     this.email = newEmail;
     this.emailChange.emit(this.email);
-    this.checkEmailValidity();
+    this.emailValidityChange.emit(this.checkEmailValidity());
   }
 }

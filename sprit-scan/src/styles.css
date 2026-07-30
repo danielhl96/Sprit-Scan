@@ -1,2 +1,11 @@
 @import 'tailwindcss';
 @plugin 'daisyui';
+
+/* Schriftart projektweit setzen */
+@theme {
+  --font-sans: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+}

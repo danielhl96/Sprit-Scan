@@ -22,7 +22,6 @@ export class InputPasswordComponent {
     // Mind. 8 Zeichen, je ein Buchstabe, eine Ziffer und ein Sonderzeichen
     const passwordRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`])[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]{8,}$/;
-    this.passwordValidityChange.emit(passwordRegex.test(this.password));
     return passwordRegex.test(this.password);
   }
 
@@ -32,6 +31,7 @@ export class InputPasswordComponent {
 
   togglePasswordVisibility(): boolean {
     this.passwordVisible.set(!this.passwordVisible());
+    this.passwordValidityChange.emit(this.checkPasswordValidity());
     return this.passwordVisible();
   }
 }
