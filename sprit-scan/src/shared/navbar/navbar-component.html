@@ -42,14 +42,14 @@
     </button>
   </div>
   @if (menuOpen) {
-    <div class="absolute top-10 right-0 w-[50dvw] justify-end bg-red-500 z-50">
+    <div class="absolute top-10 py-4 right-0 w-[50dvw] bg-red-500 z-50">
       @for (item of elements; track item.route) {
         <a
           class="flex bg-red-500 px-5 py-2 text-white hover:bg-red-500"
           [routerLink]="item.route"
           (click)="onElementClick(item)"
         >
-          <span class="w-7 h-7 bg-gray-500 text-sm flex items-center justify-center font-semibold">
+          <span class="w-10 h-7 bg-gray-500 text-sm flex items-center justify-center font-semibold">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -62,10 +62,11 @@
             </svg>
           </span>
           <span
-            class="w-15 h-7 bg-black text-md text-center flex items-center justify-center font-semibold"
+            class="w-20 h-7 bg-black text-md text-center flex items-center justify-center font-semibold"
             >{{ item.name }}</span
           >
         </a>
+        <div class="w-[100dvw] mr-4 h-[1px] bg-black"></div>
       }
     </div>
   }
