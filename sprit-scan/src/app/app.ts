@@ -25,5 +25,12 @@ export class App {
   protected readonly title = signal('sprit-scan');
   protected email = '';
   protected password = '';
+  protected emailValid = false;
+  protected passwordValid = false;
   protected toggleModal = false;
+
+  /** Button ist nur aktiv, wenn beide Felder gültig sind */
+  protected get buttonDisabled(): boolean {
+    return !this.emailValid || !this.passwordValid;
+  }
 }

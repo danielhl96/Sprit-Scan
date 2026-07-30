@@ -26,6 +26,10 @@ export class InputPasswordComponent {
     return passwordRegex.test(this.password);
   }
 
+  get placeholderText(): string {
+    return this.placeholder || 'Enter your password';
+  }
+
   togglePasswordVisibility(): boolean {
     this.passwordVisible.set(!this.passwordVisible());
     return this.passwordVisible();
