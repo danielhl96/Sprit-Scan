@@ -1,10 +1,10 @@
 @if (isMobile()) {
-  <div
-    class="min-h-screen flex flex-col w-[100dvw] h-[100dvh] bg-gradient-to-r from-red-400 to-white-400"
-  >
-    <div class="divider divider-warning text-white">{{ title }}</div>
+  <div class="min-h-screen flex flex-col w-[100dvw] h-[100dvh] bg-white">
     <div class="flex flex-col space-y-4">
-      <ng-content></ng-content>
+      <div class="pt-12">
+        <div class="divider divider-error text-black">{{ title }}</div>
+        <ng-content></ng-content>
+      </div>
     </div>
   </div>
 } @else {

@@ -1,0 +1,17 @@
+<dialog class="modal" [class.modal-open]="toggleModal" [open]="toggleModal">
+  <div class="modal-box bg-red-400">
+    <button
+      type="button"
+      (click)="toggleChange()"
+      class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+    >
+      ✕
+    </button>
+    <ng-content></ng-content>
+  </div>
+
+  <!-- Klick auf den Hintergrund schließt das Modal -->
+  <form method="dialog" class="modal-backdrop">
+    <button type="button" (click)="toggleChange()">close</button>
+  </form>
+</dialog>

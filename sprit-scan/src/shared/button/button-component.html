@@ -1,11 +1,6 @@
 <button
-  class="btn btn-outline rounded-lg"
-  [class]="{
-    'btn-primary': buttonColor === 'primary',
-    'btn-error': buttonColor === 'error',
-    'btn-sm': buttonSize === 'sm',
-    'btn-lg': buttonSize === 'lg',
-  }"
+  class="btn btn-outline text-black rounded-lg"
+  [class]="[buttonColor, buttonBorderColor, 'btn-' + buttonSize]"
   (click)="onButtonClick()"
   [disabled]="buttonDisabled || loading"
 >

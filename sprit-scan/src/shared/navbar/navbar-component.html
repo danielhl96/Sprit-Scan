@@ -1,0 +1,72 @@
+<div class="w-full h-12 bg-red-500 top-0 fixed z-50">
+  <div class="flex items-center justify-between h-full px-3">
+    <span class="text-lg font-bold text-white">
+      <img src="/appicon.svg" alt="Sprit-Scan Logo" class="h-9 w-12" />
+    </span>
+
+    <button
+      type="button"
+      class="btn btn-ghost btn-sm btn-circle text-white hover:bg-red-500 mr-4"
+      [attr.aria-label]="menuOpen ? 'Menü schließen' : 'Menü öffnen'"
+      (click)="toggleMenu()"
+    >
+      @if (menuOpen) {
+        <!-- Heroicon: x-mark -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      } @else {
+        <!-- Heroicon: bars-3 -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          />
+        </svg>
+      }
+    </button>
+  </div>
+  @if (menuOpen) {
+    <div class="absolute top-10 right-0 w-[50dvw] justify-end bg-red-500 z-50">
+      @for (item of elements; track item.route) {
+        <a
+          class="flex bg-red-500 px-5 py-2 text-white hover:bg-red-500"
+          [routerLink]="item.route"
+          (click)="onElementClick(item)"
+        >
+          <span class="w-7 h-7 bg-gray-500 text-sm flex items-center justify-center font-semibold">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icon" />
+            </svg>
+          </span>
+          <span
+            class="w-15 h-7 bg-black text-md text-center flex items-center justify-center font-semibold"
+            >{{ item.name }}</span
+          >
+        </a>
+      }
+    </div>
+  }
+</div>

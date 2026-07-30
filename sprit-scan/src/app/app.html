@@ -1,3 +1,19 @@
 <app-template-page title="My Custom Title">
-  <app-button buttonColor="primary" buttonSize="sm" buttonText="Click Me"></app-button>
+  <app-navbar></app-navbar>
+
+  <app-button
+    (buttonClick)="toggleModal = !toggleModal"
+    buttonBorderColor="border-blue-400"
+    buttonSize="lg"
+    buttonText="Click Me"
+  ></app-button>
+  <app-input-email [(email)]="email"></app-input-email>
+
+  <app-input-password [(password)]="password"></app-input-password>
+
+  @if (toggleModal) {
+    <app-modal [(toggleModal)]="toggleModal">
+      <p>Modal Content</p>
+    </app-modal>
+  }
 </app-template-page>

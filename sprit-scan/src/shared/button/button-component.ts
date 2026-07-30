@@ -10,7 +10,8 @@ import { CommonModule } from '@angular/common';
 export class ButtonComponent {
   @Output() buttonClick = new EventEmitter<void>();
   @Input() buttonText = 'Click Me';
-  @Input() buttonColor: 'primary' | 'secondary' | 'accent' | 'error' | 'ghost' = 'primary';
+  @Input() buttonColor = 'btn-primary';
+  @Input() buttonBorderColor = 'border-primary';
   @Input() buttonSize: 'xs' | 'sm' | 'md' | 'lg' = 'md';
   @Input() buttonDisabled = false;
   @Input() buttonIcon = '';
