@@ -37,7 +37,7 @@ export class NavbarComponent {
     { name: 'Logout', route: '/logout', icon: ICONS.logout },
   ];
   @Output() elementClick = new EventEmitter<NavbarElement>();
-
+  @Input() navbarDisabled = false; // Input property to control the disabled state of the navbar
   listNavbarElements(): NavbarElement[] {
     return this.elements;
   }

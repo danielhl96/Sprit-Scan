@@ -5,7 +5,6 @@ import { ButtonComponent } from '../shared/button/button-component';
 import { InputEmailComponent } from '../shared/input-email/input-email-component';
 import { InputPasswordComponent } from '../shared/input-password/input-password-component';
 import { ModalComponent } from '../shared/modal/modal-component';
-import { NavbarComponent } from '../shared/navbar/navbar-component';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +15,6 @@ import { NavbarComponent } from '../shared/navbar/navbar-component';
     InputEmailComponent,
     InputPasswordComponent,
     ModalComponent,
-    NavbarComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

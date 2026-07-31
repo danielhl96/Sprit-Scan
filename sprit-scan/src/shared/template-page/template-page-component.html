@@ -1,9 +1,15 @@
 @if (isMobile()) {
   <div class="min-h-screen flex flex-col w-[100dvw] h-[100dvh] bg-white">
+    <app-navbar [navbarDisabled]="NavbarDisabled"> </app-navbar>
+
     <div class="flex flex-col space-y-4">
       <div class="pt-12">
         <div class="divider divider-error text-black">{{ title }}</div>
         <ng-content></ng-content>
+        <app-dock
+          [dockDisabled]="DockDisabled"
+          (dockElementClick)="onDockElementClick($event)"
+        ></app-dock>
       </div>
     </div>
   </div>

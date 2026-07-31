@@ -1,6 +1,4 @@
-<app-template-page title="My Custom Title">
-  <app-navbar></app-navbar>
-
+<app-template-page [NavbarDisabled]="false" [DockDisabled]="false" title="My Custom Title">
   <app-button
     (buttonClick)="toggleModal = !toggleModal"
     [buttonDisabled]="buttonDisabled"

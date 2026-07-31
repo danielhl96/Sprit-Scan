@@ -3,44 +3,46 @@
     <span class="text-lg font-bold text-amber-50">
       <img src="/appicon.svg" alt="Sprit-Scan Logo" class="h-9 w-12" />
     </span>
-
-    <button
-      type="button"
-      class="btn btn-ghost btn-sm btn-circle text-amber-50 hover:bg-red-800 mr-0"
-      [attr.aria-label]="menuOpen ? 'Menü schließen' : 'Menü öffnen'"
-      (click)="toggleMenu()"
-    >
-      @if (menuOpen) {
-        <!-- Heroicon: x-mark -->
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-        </svg>
-      } @else {
-        <!-- Heroicon: bars-3 -->
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
-      }
-    </button>
+    @if (!navbarDisabled) {
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm btn-circle text-amber-50 hover:bg-red-800 mr-0"
+        [attr.aria-label]="menuOpen ? 'Menü schließen' : 'Menü öffnen'"
+        (click)="toggleMenu()"
+      >
+        @if (menuOpen) {
+          <!-- Heroicon: x-mark -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        } @else {
+          <!-- Heroicon: bars-3 -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
+          </svg>
+        }
+      </button>
+    }
   </div>
+
   @if (menuOpen) {
     <div
       class="absolute top-12 right-0 w-[60dvw] bg-amber-50 shadow-xl rounded-bl-lg overflow-hidden z-50"
