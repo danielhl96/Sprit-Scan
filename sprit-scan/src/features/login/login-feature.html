@@ -1,0 +1,28 @@
+<app-template-page [NavbarDisabled]="true" [DockDisabled]="true" title="Login">
+  <div class="relative p-8 flex flex-col gap-2 items-center">
+    <app-input-email
+      [(email)]="emailinput"
+      (emailValidityChange)="emailValid.set($event)"
+    ></app-input-email>
+
+    <app-input-password
+      [(password)]="passwordinput"
+      (passwordValidityChange)="passwordValid.set($event)"
+      placeholder="Enter your password"
+    ></app-input-password>
+    <div class="absolute left-14 py-25 w-full flex flex-row gap-1">
+      <app-button
+        [buttonBorderColor]="'border-green-400'"
+        [buttonText]="'Login'"
+        [buttonDisabled]="LoginButtonDisabled()"
+        >Login</app-button
+      >
+      <app-button
+        [buttonColor]="'transparent'"
+        [buttonBorderColor]="'border-red-400'"
+        [buttonText]="'Register'"
+        >Register</app-button
+      >
+    </div>
+  </div></app-template-page
+>

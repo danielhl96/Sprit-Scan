@@ -17,6 +17,7 @@ export class InputPasswordComponent {
   onPasswordChange(newPassword: string): void {
     this.password = newPassword;
     this.passwordChange.emit(this.password);
+    this.passwordValidityChange.emit(this.checkPasswordValidity());
   }
   checkPasswordValidity(): boolean {
     // Mind. 8 Zeichen, je ein Buchstabe, eine Ziffer und ein Sonderzeichen
@@ -29,9 +30,12 @@ export class InputPasswordComponent {
     return this.placeholder || 'Enter your password';
   }
 
-  togglePasswordVisibility(): boolean {
+  togglePasswordVisibility(event?: MouseEvent): boolean {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.passwordVisible.set(!this.passwordVisible());
-    this.passwordValidityChange.emit(this.checkPasswordValidity());
     return this.passwordVisible();
   }
 }
