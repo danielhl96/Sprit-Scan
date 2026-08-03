@@ -1,5 +1,7 @@
 <app-template-page [NavbarDisabled]="true" [DockDisabled]="true" title="Login">
-  <div class="p-10 flex flex-col gap-2 items-center">
+  <div class="p-5 flex flex-col gap-2 items-center">
+    <img src="/appicon.svg" alt="Sprit-Scan Logo" class="h-40 w-40 mb-5" />
+
     <app-input-email
       [(email)]="emailinput"
       (emailValidityChange)="emailValid.set($event)"
@@ -15,15 +17,14 @@
         [buttonBorderColor]="'border-green-400'"
         [buttonText]="'Login'"
         [buttonDisabled]="LoginButtonDisabled()"
-        >Login</app-button
-      >
+      ></app-button>
       <app-button
         [buttonColor]="'transparent'"
         [buttonBorderColor]="'border-red-400'"
-        [buttonText]="'Register'"
-        >Register</app-button
-      >
+        [buttonText]="'Sign-up'"
+      ></app-button>
     </div>
+
     <div class="absolute bottom-1">
       <p class="text-sm text-black/50">
         <a class="text-red-400" href="/privacy-policy">Privacy Policy</a> and
