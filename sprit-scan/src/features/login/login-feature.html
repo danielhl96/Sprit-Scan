@@ -1,5 +1,5 @@
 <app-template-page [NavbarDisabled]="true" [DockDisabled]="true" title="Login">
-  <div class="h-full p-15 flex flex-col gap-2 items-center">
+  <div class="p-10 flex flex-col gap-2 items-center">
     <app-input-email
       [(email)]="emailinput"
       (emailValidityChange)="emailValid.set($event)"
@@ -23,6 +23,12 @@
         [buttonText]="'Register'"
         >Register</app-button
       >
+    </div>
+    <div class="absolute bottom-1">
+      <p class="text-sm text-black/50">
+        <a class="text-red-400" href="/privacy-policy">Privacy Policy</a> and
+        <a class="text-red-400" href="/terms-of-service">Terms of Service</a>.
+      </p>
     </div>
   </div>
 </app-template-page>
