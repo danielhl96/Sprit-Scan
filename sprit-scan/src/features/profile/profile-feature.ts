@@ -5,7 +5,8 @@ import { InputEmailComponent } from '../../shared/input-email/input-email-compon
 import { InputPasswordComponent } from '../../shared/input-password/input-password-component';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import { EditEmailModal } from './edit-email.modal';
-
+import { EditPasswordModal } from './edit-password-modal';
+import { DeleteModal } from './delete-modal';
 type UserProfile = {
   id: number;
   password: string;
@@ -21,6 +22,8 @@ type UserProfile = {
     InputPasswordComponent,
     ModalComponent,
     EditEmailModal,
+    EditPasswordModal,
+    DeleteModal,
   ],
   templateUrl: './profile-feature.html',
 })

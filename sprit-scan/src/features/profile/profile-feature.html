@@ -46,6 +46,7 @@
       </div>
     </div>
     <app-button
+      (buttonClick)="showDeleteModal.set(true)"
       buttonText="Delete account"
       buttonColor="btn-error"
       buttonBorderColor="border-error"
@@ -59,9 +60,13 @@
     (toggleModalChange)="showEmailModal.set($event)"
   ></edit-email-modal>
 
-  <app-modal
+  <edit-password-modal
     [toggleModal]="showPasswordModal()"
     (toggleModalChange)="showPasswordModal.set($event)"
-  >
-  </app-modal>
+  ></edit-password-modal>
+
+  <delete-modal
+    [toggleModal]="showDeleteModal()"
+    (toggleModalChange)="showDeleteModal.set($event)"
+  ></delete-modal>
 </app-template-page>
