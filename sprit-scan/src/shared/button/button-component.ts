@@ -15,6 +15,7 @@ export class ButtonComponent {
   @Input() buttonSize: 'xs' | 'sm' | 'md' | 'lg' = 'md';
   @Input() buttonDisabled = false;
   @Input() buttonIcon = '';
+  @Input() buttonSvgPath = '';
   @Input() loading = false;
 
   onButtonClick(): void {

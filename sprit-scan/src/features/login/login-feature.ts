@@ -1,8 +1,9 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { ButtonComponent } from '../../shared/button/button-component';
 import { InputEmailComponent } from '../../shared/input-email/input-email-component';
 import { InputPasswordComponent } from '../../shared/input-password/input-password-component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'login-feature',
@@ -15,6 +16,12 @@ export class LoginFeature {
   passwordinput = signal('');
   emailValid = signal(false);
   passwordValid = signal(false);
+
+  private router = inject(Router);
+
+  navigateToRegister() {
+    this.router.navigate(['/register']);
+  }
 
   /** Button ist nur aktiv, wenn beide Felder gültig sind */
   protected LoginButtonDisabled = computed(() => {

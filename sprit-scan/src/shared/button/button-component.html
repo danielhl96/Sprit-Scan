@@ -7,6 +7,18 @@
   @if (loading) {
     <span class="loading loading-spinner loading-sm"></span>
   } @else {
+    @if (buttonSvgPath) {
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-5 h-5"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="buttonSvgPath" />
+      </svg>
+    }
     @if (buttonIcon) {
       <span>{{ buttonIcon }}</span>
     }

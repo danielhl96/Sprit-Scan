@@ -1,0 +1,74 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <defs>
+    <!-- Glas -->
+    <linearGradient id="bottle" x2="1" y2="1">
+      <stop stop-color="#f2b45d" />
+      <stop offset=".45" stop-color="#9b4b15" />
+      <stop offset="1" stop-color="#5e2608" />
+    </linearGradient>
+
+    <!-- Handy -->
+    <linearGradient id="phone" x2="1" y2="1">
+      <stop stop-color="#555" />
+      <stop offset=".5" stop-color="#111" />
+      <stop offset="1" stop-color="#333" />
+    </linearGradient>
+
+    <!-- Login-Badge -->
+    <linearGradient id="loginBadge" x2="1" y2="1">
+      <stop stop-color="#ef4444" />
+      <stop offset="1" stop-color="#991b1b" />
+    </linearGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#000" flood-opacity=".18" />
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#f2b45d" flood-opacity=".18" />
+    </filter>
+  </defs>
+
+  <!-- Schatten Flasche -->
+  <ellipse cx="205" cy="430" rx="108" ry="22" fill="#000" opacity=".14" filter="url(#shadow)" />
+
+  <!-- Flasche -->
+  <g stroke="#24170c" stroke-width="6" filter="url(#softGlow)">
+    <path d="M140 190 C120 230 125 390 150 415 C175 440 265 440 290 415 C315 390 320 230 300 190 Z" fill="url(#bottle)" />
+    <path d="M185 190 L185 105 Q220 75 255 105 L255 190 Z" fill="url(#bottle)" />
+    <rect x="193" y="65" width="54" height="40" rx="8" fill="#2b2117" />
+    <rect x="155" y="255" width="130" height="90" rx="10" fill="#f7edc8" />
+  </g>
+
+  <!-- Handy -->
+  <g stroke="#111" stroke-width="6" filter="url(#shadow)">
+    <rect x="292" y="148" width="126" height="248" rx="34" fill="url(#phone)" />
+    <rect x="306" y="163" width="98" height="212" rx="24" fill="#9edcf0" />
+    <rect x="333" y="178" width="45" height="12" rx="8" fill="#050505" />
+
+    <!-- Login-UI: User -->
+    <circle cx="355" cy="224" r="14" fill="#e8f6fb" stroke="#ffffff" stroke-width="3" />
+    <path d="M336 250 C342 240 368 240 374 250" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Login-UI: Email + Passwort -->
+    <rect x="322" y="264" width="66" height="16" rx="7" fill="#dff3fa" stroke="#ffffff" stroke-width="3" />
+    <rect x="322" y="289" width="66" height="16" rx="7" fill="#dff3fa" stroke="#ffffff" stroke-width="3" />
+
+    <!-- Eingabewerte -->
+    <g stroke="none" fill="#334155" font-family="JetBrains Mono, ui-monospace, monospace" font-size="6.8" font-weight="700">
+      <text x="328" y="274.5">mail@x.de</text>
+      <text x="328" y="299.5">********</text>
+    </g>
+
+    <!-- Login-Button im Display -->
+    <rect x="326" y="316" width="58" height="18" rx="9" fill="#ef4444" stroke="#ffffff" stroke-width="3" />
+    <path d="M349 325 H365 M359 320 L365 325 L359 330" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Verbindung -->
+  <line x1="285" y1="302" x2="323" y2="282" stroke="#ff3030" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Login-Indikator: Enter-Symbol -->
+  <circle cx="432" cy="410" r="24" fill="url(#loginBadge)" filter="url(#shadow)" />
+  <path d="M421 410 H441 M434 402 L442 410 L434 418" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

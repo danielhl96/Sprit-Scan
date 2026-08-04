@@ -1,0 +1,35 @@
+<app-template-page [NavbarDisabled]="true" [DockDisabled]="true" title="Register">
+  <div class="p-5 flex flex-col gap-2 items-center">
+    <img src="/appicon-register-landing.svg" alt="Sprit-Scan Logo" class="h-45 w-45 mb-5" />
+    <app-input-email
+      [(email)]="emailinput"
+      (emailValidityChange)="emailValid.set($event)"
+    ></app-input-email>
+    <app-input-password
+      [(password)]="passwordinput"
+      (passwordValidityChange)="passwordValid.set($event)"
+      placeholder="Enter your password"
+    ></app-input-password>
+    <app-input-password
+      [(password)]="passwordConfirmInput"
+      (passwordValidityChange)="passwordConfirmValid.set($event)"
+      placeholder="Confirm your password"
+    ></app-input-password>
+    <div class="flex flex-row gap-1">
+      <app-button
+        [buttonBorderColor]="'border-green-400'"
+        [buttonColor]="'bg-transparent'"
+        [buttonSvgPath]="'M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0Z'"
+        [buttonText]="'Sign-up'"
+        [buttonDisabled]="RegisterButtonDisabled()"
+      ></app-button>
+      <app-button
+        (buttonClick)="navigateToLogin()"
+        [buttonColor]="'bg-transparent'"
+        [buttonBorderColor]="'border-red-400'"
+        [buttonSvgPath]="'M2.25 12 11.204 3.046a1.125 1.125 0 0 1 1.59 0L21.75 12M4.5 9.75V19.5A2.25 2.25 0 0 0 6.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25V9.75M9.75 21.75V15a2.25 2.25 0 0 1 2.25-2.25h0A2.25 2.25 0 0 1 14.25 15v6.75'"
+        [buttonText]="''"
+      ></app-button>
+    </div>
+  </div>
+</app-template-page>
