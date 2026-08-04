@@ -1,0 +1,29 @@
+<app-template-page [NavbarDisabled]="false" [DockDisabled]="false" title="Home">
+  <div class="p-10 flex flex-col gap-2 items-center">
+    <p class="text-lg text-black/50">Scan now:</p>
+    <button
+      type="button"
+      class="mb-5 rounded-2xl border-2 border-white-100 bg-amber-50/70 p-3 shadow-md hover:shadow-lg active:scale-95 transition cursor-pointer"
+      aria-label="Start scan"
+    >
+      <img src="/appicon.svg" alt="Sprit-Scan Logo" class="h-[20dvh] w-[60dvw]" />
+    </button>
+  </div>
+
+  <h1 class="text-black font-bold text-center">Your last scans:</h1>
+  <div class="w-full flex flex-col items-center overflow-y-auto max-h-[25dvh]">
+    @if (Scans.length > 0) {
+      <div class="grid grid-cols-2 grid-rows-2 mb-2 gap-2">
+        @for (scan of Scans; track scan.id) {
+          <div
+            class="h-[10dvh] w-[40dvw] border-1 border-red-400 rounded-lg flex flex-col items-center justify-center"
+          >
+            <p class="text-black text-center">{{ scan.name }}</p>
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="text-black text-center">No scans yet</p>
+    }
+  </div>
+</app-template-page>

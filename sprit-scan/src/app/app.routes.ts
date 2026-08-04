@@ -10,6 +10,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../features/register/register-feature').then((m) => m.RegisterFeature),
   },
+
+  {
+    path: 'home',
+    loadComponent: () => import('../features/home/home-feature').then((m) => m.HomeFeature),
+  },
   {
     path: '',
     pathMatch: 'full',

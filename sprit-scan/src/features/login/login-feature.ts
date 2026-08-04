@@ -22,6 +22,9 @@ export class LoginFeature {
   navigateToRegister() {
     this.router.navigate(['/register']);
   }
+  navgiateToHome() {
+    this.router.navigate(['/home']);
+  }
 
   /** Button ist nur aktiv, wenn beide Felder gültig sind */
   protected LoginButtonDisabled = computed(() => {
