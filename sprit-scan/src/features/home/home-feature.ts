@@ -3,7 +3,6 @@ import { TemplatePageComponent } from '../../shared/template-page/template-page-
 import { ButtonComponent } from '../../shared/button/button-component';
 import { InputEmailComponent } from '../../shared/input-email/input-email-component';
 import { InputPasswordComponent } from '../../shared/input-password/input-password-component';
-import { Router } from '@angular/router';
 
 type LastScan = {
   id: number;

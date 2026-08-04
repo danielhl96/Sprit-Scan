@@ -16,6 +16,11 @@ export const routes: Routes = [
     loadComponent: () => import('../features/home/home-feature').then((m) => m.HomeFeature),
   },
   {
+    path: 'profile',
+    loadComponent: () =>
+      import('../features/profile/profile-feature').then((m) => m.ProfileFeature),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'login',

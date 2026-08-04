@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 export type NavbarElement = {
   name: string;
@@ -29,8 +30,10 @@ const ICONS = {
   imports: [CommonModule, RouterLink],
 })
 export class NavbarComponent {
+  router = inject(Router);
+
   @Input() elements: NavbarElement[] = [
-    { name: 'Home', route: '/', icon: ICONS.home },
+    { name: 'Home', route: '/home', icon: ICONS.home },
     { name: 'Scan', route: '/scan', icon: ICONS.scan },
     { name: 'Profile', route: '/profile', icon: ICONS.profile },
     { name: 'History', route: '/history', icon: ICONS.history },
@@ -42,6 +45,10 @@ export class NavbarComponent {
     return this.elements;
   }
 
+  navgigateToRoute(route: string): void {
+    this.router.navigate([route]);
+  }
+
   menuOpen = false;
 
   toggleMenu(): void {
@@ -50,6 +57,7 @@ export class NavbarComponent {
 
   onElementClick(element: NavbarElement): void {
     this.elementClick.emit(element);
+    this.navgigateToRoute(element.route);
     this.menuOpen = false;
   }
 }
