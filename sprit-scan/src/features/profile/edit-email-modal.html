@@ -1,0 +1,26 @@
+<app-modal [toggleModal]="toggleModal()" (toggleModalChange)="toggleModalChange.emit($event)">
+  <div class="flex flex-col gap-3 items-center">
+    <app-input-email [email]="email()" (emailChange)="onEmailChange($event)"></app-input-email>
+    <app-input-password
+      [password]="password()"
+      (passwordChange)="onPasswordChange($event)"
+    ></app-input-password>
+    <div class="flex flex-row gap-1">
+      <app-button
+        buttonText="Save"
+        buttonColor="btn-success"
+        buttonBorderColor="border-success"
+        buttonSize="md"
+        (buttonClick)="onSaveEmail()"
+        [buttonDisabled]="!email() || !password()"
+      ></app-button>
+      <app-button
+        buttonText="Cancel"
+        buttonColor="btn-error"
+        buttonBorderColor="border-error"
+        buttonSize="md"
+        (buttonClick)="toggleModalChange.emit(false)"
+      ></app-button>
+    </div>
+  </div>
+</app-modal>
