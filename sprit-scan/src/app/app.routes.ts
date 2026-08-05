@@ -21,6 +21,11 @@ export const routes: Routes = [
       import('../features/profile/profile-feature').then((m) => m.ProfileFeature),
   },
   {
+    path: 'history',
+    loadComponent: () =>
+      import('../features/history/history-feature').then((m) => m.HistoryFeature),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'login',

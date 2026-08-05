@@ -1,34 +1,81 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, output } from '@angular/core';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
-import { ButtonComponent } from '../../shared/button/button-component';
-import { InputEmailComponent } from '../../shared/input-email/input-email-component';
-import { InputPasswordComponent } from '../../shared/input-password/input-password-component';
-
-type LastScan = {
+import { ModalComponent } from '../../shared/modal/modal-component';
+type HistoryEntry = {
   id: number;
   name: string;
   date: string;
+  description: string;
+  taste?: string;
+  origin?: string;
+  recommendation?: string;
+  year?: string;
+  customerreview?: string;
+  rawmaterials?: string;
 };
-
 @Component({
   selector: 'home-feature',
-  imports: [TemplatePageComponent, ButtonComponent, InputEmailComponent, InputPasswordComponent],
+  imports: [TemplatePageComponent, ModalComponent],
   templateUrl: './home-feature.html',
 })
 export class HomeFeature {
   protected readonly title = signal('sprit-scan');
-  lastScans = signal<LastScan[]>([
-    { id: 1, name: 'Jack Daniels', date: '2024-06-01' },
-    { id: 2, name: 'Bree', date: '2024-06-02' },
-    { id: 3, name: 'Averna', date: '2024-06-03' },
-    { id: 4, name: 'Jack Daniels', date: '2024-06-04' },
-    { id: 5, name: 'Bree', date: '2024-06-05' },
-    { id: 6, name: 'Averna', date: '2024-06-06' },
-    { id: 7, name: 'Jack Daniels', date: '2024-06-07' },
-    { id: 8, name: 'Bree', date: '2024-06-08' },
+  toggleModal = signal(false);
+  toggleModalChange = output<boolean>();
+  selectedEntry = signal<HistoryEntry | null>(null);
+
+  lastScans = signal<HistoryEntry[]>([
+    {
+      id: 1,
+      name: 'Jack Daniels',
+      date: '2024-06-01',
+      taste: 'Smooth',
+      origin: 'USA',
+      recommendation: 'Best served neat',
+      year: '2024',
+      customerreview: 'Excellent whiskey!',
+      rawmaterials: 'Corn, Barley, Rye',
+      description: 'Scanned Jack Daniels',
+    },
+    {
+      id: 2,
+      name: 'Bree',
+      date: '2024-06-02',
+      taste: 'Fruity',
+      origin: 'France',
+      recommendation: 'Best served chilled',
+      year: '2024',
+      customerreview: 'Refreshing and light!',
+      rawmaterials: 'Grapes, Sugar, Water',
+      description: 'Scanned Bree',
+    },
+    {
+      id: 3,
+      name: 'Averna',
+      date: '2024-06-03',
+      taste: 'Bitter',
+      origin: 'Italy',
+      recommendation: 'Best served on the rocks',
+      year: '2024',
+      customerreview: 'Bitter and strong!',
+      rawmaterials: 'Herbs, Roots, Citrus',
+      description: 'Scanned Averna',
+    },
+    {
+      id: 4,
+      name: 'Don Papa Sherry Cask',
+      date: '2024-06-04',
+      taste: 'Smooth',
+      origin: 'Philippines',
+      recommendation: 'Best served neat',
+      year: '2024',
+      customerreview: 'Rich and flavorful!',
+      rawmaterials: 'Sugarcane, Oak',
+      description: 'Scanned Don Papa Sherry Cask',
+    },
   ]);
 
-  get Scans(): LastScan[] {
+  get Scans(): HistoryEntry[] {
     return this.lastScans();
   }
 }

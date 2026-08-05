@@ -1,9 +1,6 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { ButtonComponent } from '../../shared/button/button-component';
-import { InputEmailComponent } from '../../shared/input-email/input-email-component';
-import { InputPasswordComponent } from '../../shared/input-password/input-password-component';
-import { ModalComponent } from '../../shared/modal/modal-component';
 import { EditEmailModal } from './edit-email.modal';
 import { EditPasswordModal } from './edit-password-modal';
 import { DeleteModal } from './delete-modal';
@@ -15,16 +12,7 @@ type UserProfile = {
 
 @Component({
   selector: 'profile-feature',
-  imports: [
-    TemplatePageComponent,
-    ButtonComponent,
-    InputEmailComponent,
-    InputPasswordComponent,
-    ModalComponent,
-    EditEmailModal,
-    EditPasswordModal,
-    DeleteModal,
-  ],
+  imports: [TemplatePageComponent, ButtonComponent, EditEmailModal, EditPasswordModal, DeleteModal],
   templateUrl: './profile-feature.html',
 })
 export class ProfileFeature {

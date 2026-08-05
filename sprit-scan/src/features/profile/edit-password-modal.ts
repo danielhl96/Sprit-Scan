@@ -1,12 +1,11 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { ButtonComponent } from '../../shared/button/button-component';
-import { InputEmailComponent } from '../../shared/input-email/input-email-component';
 import { InputPasswordComponent } from '../../shared/input-password/input-password-component';
 import { ModalComponent } from '../../shared/modal/modal-component';
 
 @Component({
   selector: 'edit-password-modal',
-  imports: [ButtonComponent, InputEmailComponent, InputPasswordComponent, ModalComponent],
+  imports: [ButtonComponent, InputPasswordComponent, ModalComponent],
   templateUrl: './edit-password-modal.html',
 })
 export class EditPasswordModal {

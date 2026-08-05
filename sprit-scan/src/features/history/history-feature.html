@@ -1,0 +1,59 @@
+<app-template-page title="History" [NavbarDisabled]="false" [DockDisabled]="false">
+  <div class="flex flex-col gap-2 items-center w-full overflow-y-auto max-h-[50dvh] p-5">
+    <div class="relative w-[75dvw] mb-2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-5 h-5 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m21 21-4.35-4.35m1.85-5.4a7.25 7.25 0 1 1-14.5 0 7.25 7.25 0 0 1 14.5 0Z"
+        />
+      </svg>
+
+      <input
+        type="text"
+        placeholder="Search..."
+        class="w-full text-black pl-10 pr-2 py-2 border-2 border-black rounded-lg"
+        (input)="inputSearchValue($any($event.target).value)"
+      />
+    </div>
+    @if (HistoryEntry().length > 0) {
+      <div class="grid grid-cols-2 grid-rows-2 mb-2 gap-2">
+        @for (entry of HistoryEntry(); track entry.id) {
+          <div
+            (click)="selectModal(entry.id)"
+            class="items-center border-1 border-red-400 rounded-lg p-2"
+          >
+            <p class="text-black text-center">{{ entry.name }}</p>
+            <p class="text-black text-xs text-center">{{ entry.date }}</p>
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="text-black text-center">No history entries yet</p>
+    }
+  </div>
+  <app-modal [toggleModal]="toggleModal()" (toggleModalChange)="toggleModal.set($event)">
+    <div class="flex flex-col gap-1">
+      @if (selectedEntry(); as entry) {
+        <p class="text-black text-center text-lg font-bold">History details</p>
+        <p class="text-black text-sm">Name: {{ entry.name }}</p>
+        <p class="text-black text-sm">Date: {{ entry.date }}</p>
+        <p class="text-black text-sm">Origin: {{ entry.origin }}</p>
+        <p class="text-black text-sm">Taste: {{ entry.taste }}</p>
+        <p class="text-black text-sm">Raw Materials: {{ entry.rawmaterials }}</p>
+        <p class="text-black text-sm">Recommendation: {{ entry.recommendation }}</p>
+        <p class="text-black text-sm">Year: {{ entry.year }}</p>
+        <p class="text-black text-sm">Customer Review: {{ entry.customerreview }}</p>
+      } @else {
+        <p class="text-black text-center">No history entry selected</p>
+      }
+    </div>
+  </app-modal>
+</app-template-page>

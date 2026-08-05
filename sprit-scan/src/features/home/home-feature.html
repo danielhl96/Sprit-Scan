@@ -17,8 +17,10 @@
         @for (scan of Scans; track scan.id) {
           <div
             class="h-[10dvh] w-[40dvw] border-1 border-red-400 rounded-lg flex flex-col items-center justify-center"
+            (click)="selectedEntry.set(scan); toggleModal.set(true)"
           >
             <p class="text-black text-center">{{ scan.name }}</p>
+            <p class="text-black text-xs text-center">{{ scan.date }}</p>
           </div>
         }
       </div>
@@ -26,4 +28,20 @@
       <p class="text-black text-center">No scans yet</p>
     }
   </div>
+
+  <app-modal [toggleModal]="toggleModal()" (toggleModalChange)="toggleModal.set($event)">
+    <div class="flex flex-col gap-1">
+      @if (selectedEntry(); as entry) {
+        <p class="text-black text-center text-lg font-bold">History details</p>
+        <p class="text-black text-sm">Name: {{ entry.name }}</p>
+        <p class="text-black text-sm">Date: {{ entry.date }}</p>
+        <p class="text-black text-sm">Origin: {{ entry.origin }}</p>
+        <p class="text-black text-sm">Taste: {{ entry.taste }}</p>
+        <p class="text-black text-sm">Raw Materials: {{ entry.rawmaterials }}</p>
+        <p class="text-black text-sm">Recommendation: {{ entry.recommendation }}</p>
+        <p class="text-black text-sm">Year: {{ entry.year }}</p>
+        <p class="text-black text-sm">Customer Review: {{ entry.customerreview }}</p>
+      }
+    </div>
+  </app-modal>
 </app-template-page>
