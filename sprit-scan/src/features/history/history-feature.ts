@@ -1,7 +1,7 @@
 import { Component, computed, output, signal } from '@angular/core';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
-import { ResultModal } from '../../shared/resultmodal/result-modal';
+import { Result } from '../../shared/result/result';
 
 type HistoryEntry = {
   id: number;
@@ -20,7 +20,7 @@ type HistoryEntry = {
 
 @Component({
   selector: 'history-feature',
-  imports: [ModalComponent, TemplatePageComponent, ResultModal],
+  imports: [ModalComponent, TemplatePageComponent, Result],
   templateUrl: './history-feature.html',
   standalone: true,
 })

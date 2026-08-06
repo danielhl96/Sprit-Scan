@@ -19,14 +19,12 @@ type HistoryEntry = {
 };
 
 @Component({
-  selector: 'result-modal',
+  selector: 'result',
   standalone: true,
   imports: [CommonModule, ModalComponent],
-  templateUrl: './result-modal.html',
+  templateUrl: './result.html',
 })
-export class ResultModal {
-  toggleModal = signal(false);
-  setToggleModal = signal(false);
+export class Result {
   entry = input<HistoryEntry>({
     id: 0,
     name: '',

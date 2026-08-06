@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject, output } from '@angular/core';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { ModalComponent } from '../../shared/modal/modal-component';
+import { Result } from '../../shared/result/result';
 type HistoryEntry = {
   id: number;
   name: string;
@@ -15,7 +16,7 @@ type HistoryEntry = {
 };
 @Component({
   selector: 'home-feature',
-  imports: [TemplatePageComponent, ModalComponent],
+  imports: [TemplatePageComponent, ModalComponent, Result],
   templateUrl: './home-feature.html',
 })
 export class HomeFeature {
