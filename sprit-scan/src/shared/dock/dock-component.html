@@ -1,6 +1,6 @@
 @if (!dockDisabled) {
   <div class="w-full h-12 bg-red-700 fixed bottom-0 z-50 shadow-md">
-    <div class="overflow-x-auto flex items-center justify-between h-full px-3">
+    <div class="overflow-x-auto overflow-y-hidden flex items-center justify-between h-full px-3">
       @for (item of DockElements; track item.route) {
         <a
           class="flex flex-col items-center gap-1 px-5 py-2 rounded-md transition-colors"
