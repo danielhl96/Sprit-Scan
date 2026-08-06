@@ -1,7 +1,7 @@
-import { Component, computed, input, output, signal } from '@angular/core';
-
+import { Component, computed, output, signal } from '@angular/core';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
+import { ResultModal } from '../../shared/resultmodal/result-modal';
 
 type HistoryEntry = {
   id: number;
@@ -14,11 +14,13 @@ type HistoryEntry = {
   year?: string;
   customerreview?: string;
   rawmaterials?: string;
+  alternative?: string;
+  price?: string;
 };
 
 @Component({
   selector: 'history-feature',
-  imports: [ModalComponent, TemplatePageComponent],
+  imports: [ModalComponent, TemplatePageComponent, ResultModal],
   templateUrl: './history-feature.html',
   standalone: true,
 })
@@ -34,12 +36,14 @@ export class HistoryFeature {
       name: 'Jack Daniels',
       date: '2024-06-01',
       description: 'Scanned Jack Daniels',
+      alternative: 'Jack Daniels',
       taste: 'Smooth',
       origin: 'USA',
       recommendation: 'Best served neat',
       year: '2024',
       customerreview: 'Excellent whiskey!',
       rawmaterials: 'Corn, Barley, Rye',
+      price: '$30',
     },
     {
       id: 2,
@@ -52,6 +56,8 @@ export class HistoryFeature {
       year: '2024',
       customerreview: 'Refreshing and light!',
       rawmaterials: 'Grapes, Sugar, Water',
+      alternative: 'Bree',
+      price: '$25',
     },
     {
       id: 3,
@@ -64,6 +70,8 @@ export class HistoryFeature {
       year: '2024',
       customerreview: 'Bitter and strong!',
       rawmaterials: 'Herbs, Roots, Citrus',
+      alternative: 'Averna',
+      price: '$28',
     },
     {
       id: 4,
@@ -76,6 +84,7 @@ export class HistoryFeature {
       year: '2024',
       customerreview: 'Classic taste!',
       rawmaterials: 'Corn, Barley, Rye',
+      alternative: 'Jack Daniels',
     },
     {
       id: 5,

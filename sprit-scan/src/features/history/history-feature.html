@@ -39,18 +39,54 @@
       <p class="text-black text-center">No history entries yet</p>
     }
   </div>
+
+  <result-modal
+    [toggleModal]="toggleModal()"
+    (toggleModalChange)="toggleModal.set($event)"
+    [entry]="selectedEntry() as entry"
+  ></result-modal>
+
   <app-modal [toggleModal]="toggleModal()" (toggleModalChange)="toggleModal.set($event)">
     <div class="flex flex-col gap-1">
       @if (selectedEntry(); as entry) {
         <p class="text-black text-center text-lg font-bold">History details</p>
-        <p class="text-black text-sm">Name: {{ entry.name }}</p>
-        <p class="text-black text-sm">Date: {{ entry.date }}</p>
-        <p class="text-black text-sm">Origin: {{ entry.origin }}</p>
-        <p class="text-black text-sm">Taste: {{ entry.taste }}</p>
-        <p class="text-black text-sm">Raw Materials: {{ entry.rawmaterials }}</p>
-        <p class="text-black text-sm">Recommendation: {{ entry.recommendation }}</p>
-        <p class="text-black text-sm">Year: {{ entry.year }}</p>
-        <p class="text-black text-sm">Customer Review: {{ entry.customerreview }}</p>
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/bottle-icon.svg" alt="name" class="inline w-4 h-4" />
+          <span>Name: {{ entry.name }}</span>
+        </p>
+
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/origin-icon.svg" alt="origin" class="inline w-4 h-4" />
+          <span>Origin: {{ entry.origin }}</span>
+        </p>
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/alternative-icon.svg" alt="alternative" class="inline w-4 h-4" />
+          <span>Alternative: {{ entry.alternative }}</span>
+        </p>
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/price-icon.svg" alt="price" class="inline w-4 h-4" />
+          <span>Price: {{ entry.price }}</span>
+        </p>
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/taste-icon.svg" alt="taste" class="inline w-4 h-4" />
+          <span>Taste: {{ entry.taste }}</span>
+        </p>
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/grape-icon.svg" alt="raw materials" class="inline w-4 h-4" />
+          <span>Raw Materials: {{ entry.rawmaterials }}</span>
+        </p>
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/meal-icon.svg" alt="recommendation" class="inline w-4 h-4" />
+          <span>Recommendation: {{ entry.recommendation }}</span>
+        </p>
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/date-icon.svg" alt="date" class="inline w-4 h-4" />
+          <span>Year: {{ entry.year }}</span>
+        </p>
+        <p class="text-black text-sm flex items-center gap-2">
+          <img src="/star-icon.svg" alt="customer review" class="inline w-4 h-4" />
+          <span>Customer Review: {{ entry.customerreview }}</span>
+        </p>
       } @else {
         <p class="text-black text-center">No history entry selected</p>
       }
