@@ -1,0 +1,7 @@
+<input
+  type="file"
+  id="fileInput"
+  (change)="handleFileSelected($any($event.target).files[0])"
+  accept=".png"
+  hidden
+/>

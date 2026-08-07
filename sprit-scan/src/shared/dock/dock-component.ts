@@ -68,6 +68,10 @@ export class DockComponent implements OnInit, OnDestroy {
     this.routeSubscription?.unsubscribe();
   }
 
+  openFileInput(): void {
+    document.getElementById('fileInput')?.click();
+  }
+
   private updateMarkedRoute(url: string): void {
     const currentPath = this.getPathWithoutQueryOrHash(url);
 
@@ -89,6 +93,11 @@ export class DockComponent implements OnInit, OnDestroy {
   @Input() dockDisabled = true; // Input property to control the disabled state of the dock
 
   onDockElementClick(element: DockElement): void {
+    if (element.route === '/scan') {
+      this.openFileInput();
+      return;
+    }
+
     this.dockElementClick.emit(element.route);
     this.updateMarkedRoute(element.route);
     this.navigateToRoute(element.route);

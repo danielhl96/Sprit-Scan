@@ -2,6 +2,7 @@ import { Component, signal, computed, inject, output } from '@angular/core';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import { Result } from '../../shared/result/result';
+import { ScanFeature } from '../scan/scan-feature';
 type HistoryEntry = {
   id: number;
   name: string;
@@ -16,7 +17,7 @@ type HistoryEntry = {
 };
 @Component({
   selector: 'home-feature',
-  imports: [TemplatePageComponent, ModalComponent, Result],
+  imports: [TemplatePageComponent, ModalComponent, Result, ScanFeature],
   templateUrl: './home-feature.html',
 })
 export class HomeFeature {
@@ -78,5 +79,9 @@ export class HomeFeature {
 
   get Scans(): HistoryEntry[] {
     return this.lastScans();
+  }
+
+  openFileInput() {
+    document.getElementById('fileInput')?.click();
   }
 }

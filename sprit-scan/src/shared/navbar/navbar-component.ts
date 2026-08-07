@@ -2,6 +2,7 @@ import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
+import { ScanFeature } from '../../features/scan/scan-feature';
 
 export type NavbarElement = {
   name: string;
@@ -27,7 +28,7 @@ const ICONS = {
   selector: 'app-navbar',
   templateUrl: './navbar-component.html',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ScanFeature],
 })
 export class NavbarComponent {
   router = inject(Router);
@@ -56,8 +57,17 @@ export class NavbarComponent {
   }
 
   onElementClick(element: NavbarElement): void {
+    if (element.route === '/scan') {
+      this.openFileInput();
+      this.menuOpen = false;
+      return;
+    }
     this.elementClick.emit(element);
     this.navgigateToRoute(element.route);
     this.menuOpen = false;
+  }
+
+  openFileInput(): void {
+    document.getElementById('fileInput')?.click();
   }
 }

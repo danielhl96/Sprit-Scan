@@ -1,10 +1,12 @@
 <app-template-page [NavbarDisabled]="false" [DockDisabled]="false" title="Home">
   <div class="p-10 flex flex-col gap-2 items-center">
     <p class="text-lg text-black/50">Scan now:</p>
+    <scan-feature></scan-feature>
     <button
       type="button"
       class="mb-5 rounded-2xl border-2 border-white-100 bg-amber-50/70 p-3 shadow-md hover:shadow-lg active:scale-95 transition cursor-pointer"
       aria-label="Start scan"
+      (click)="openFileInput()"
     >
       <img src="/appicon.svg" alt="Sprit-Scan Logo" class="h-[20dvh] w-[60dvw]" />
     </button>
