@@ -25,6 +25,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../features/history/history-feature').then((m) => m.HistoryFeature),
   },
+  {
+    path: 'ai-expert',
+    loadComponent: () =>
+      import('../features/ai-expert/ai-expert-feature').then((m) => m.AiExpertFeature),
+  },
 
   {
     path: '',

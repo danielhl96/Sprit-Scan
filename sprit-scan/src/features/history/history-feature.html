@@ -1,5 +1,5 @@
 <app-template-page title="History" [NavbarDisabled]="false" [DockDisabled]="false">
-  <div class="flex flex-col gap-2 items-center w-full overflow-y-auto max-h-[50dvh] p-5">
+  <div class="flex flex-col gap-2 items-center w-full p-5">
     <div class="relative w-[75dvw] mb-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,7 @@
       />
     </div>
     @if (HistoryEntry().length > 0) {
-      <div class="grid grid-cols-2 grid-rows-2 mb-2 gap-2">
+      <div class="grid grid-cols-2 grid-rows-2 mb-2 gap-2 overflow-y-auto max-h-[40dvh]">
         @for (entry of HistoryEntry(); track entry.id) {
           <div
             (click)="selectModal(entry.id)"
