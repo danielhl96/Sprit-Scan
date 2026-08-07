@@ -60,6 +60,7 @@ export class NavbarComponent {
     if (element.route === '/scan') {
       this.openFileInput();
       this.menuOpen = false;
+      this.navgigateToRoute(this.router.url); // Stay on the current route after opening the file input);
       return;
     }
     this.elementClick.emit(element);

@@ -25,6 +25,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../features/history/history-feature').then((m) => m.HistoryFeature),
   },
+
   {
     path: '',
     pathMatch: 'full',
