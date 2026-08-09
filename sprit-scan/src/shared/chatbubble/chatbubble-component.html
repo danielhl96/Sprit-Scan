@@ -1,0 +1,12 @@
+<div [class]="isUserMessage() ? 'flex flex-col items-end' : 'flex flex-col items-start'">
+  <div class="relative p-2 w-[50dvw] h-[10dvh] border-1 border-blue-500 rounded-md">
+    <p class="text-black text-sm">{{ message() }}</p>
+    <div
+      [class]="
+        isUserMessage()
+          ? 'absolute left-30 top-20 inline-block w-0 h-0 border-solid border-t-[20px] border-r-[20px] border-l-0 border-b-0 border-l-transparent border-r-transparent border-t-blue-500 border-b-transparent'
+          : 'absolute left-10 top-20 w-0 h-0 border-solid border-t-0 border-r-[20px] border-l-0 border-b-[20px] border-l-transparent border-r-blue-500 border-t-transparent border-b-transparent'
+      "
+    ></div>
+  </div>
+</div>
