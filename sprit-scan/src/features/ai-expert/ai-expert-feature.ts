@@ -2,6 +2,8 @@ import { signal, computed, inject, Component, viewChild, ElementRef, effect } fr
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { ButtonComponent } from '../../shared/button/button-component';
 import { ChatBubbleComponent } from '../../shared/chatbubble/chatbubble-component';
+import { NotificationService } from '../../shared/notification/notification-service';
+import { not } from 'rxjs/internal/util/not';
 @Component({
   selector: 'ai-expert-feature',
   imports: [TemplatePageComponent, ButtonComponent, ChatBubbleComponent],
@@ -13,6 +15,7 @@ export class AiExpertFeature {
   >([]);
   userInput = signal('');
   isLoading = signal(false);
+  notify = inject(NotificationService);
 
   // Reference to the scrollable chat container
   chatContainer = viewChild<ElementRef<HTMLDivElement>>('chatContainer');
@@ -40,6 +43,7 @@ export class AiExpertFeature {
       { message: newInput, isUserMessage: true, id: history.length },
     ]);
     this.userInput.set(''); // Clear the input after sending
+    this.notify.showNotification('Image uploaded successfully!', 'success');
   }
 
   handleImageSelected(file: File | undefined) {
