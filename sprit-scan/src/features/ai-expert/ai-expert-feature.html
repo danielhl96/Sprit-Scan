@@ -1,6 +1,7 @@
 <app-template-page [NavbarDisabled]="false" [DockDisabled]="false" title="AI-Expert ">
   <div class="flex flex-col gap-3 items-center p-5">
     <div
+      #chatContainer
       class="flex flex-col w-[90dvw] h-[60dvh] border-1 border-red-400 rounded-md bg-white p-3 gap-5 overflow-y-auto"
     >
       <chatbubble-component
@@ -11,25 +12,60 @@
       @for (message of chatHistory(); track message.id) {
         <chatbubble-component
           [message]="message.message"
+          [imageUrl]="message.imageUrl || ''"
           [isUserMessage]="message.isUserMessage"
         ></chatbubble-component>
       }
     </div>
 
-    <div class="flex flex-row gap-0">
-      <input
-        type="text"
-        placeholder="Ask a question..."
-        class="input bg-white flex border-lg border-black border-r-0 rounded-l-lg text-black items-center"
-        (input)="userInput.set($any($event.target).value)"
-      />
+    <div class="flex flex-row gap-1">
+      <div class="relative flex items-center">
+        <input
+          type="text"
+          placeholder="Ask a question..."
+          class="input bg-white flex rounded-lg border-black text-black items-center pr-10"
+          (input)="userInput.set($any($event.target).value)"
+          [value]="userInput()"
+        />
+        <!-- Hidden file input for image upload -->
+        <input
+          #imageInput
+          type="file"
+          accept="image/*"
+          class="hidden"
+          (change)="handleImageSelected($any($event.target).files[0])"
+        />
+        <!-- Paperclip button -->
+        <button
+          type="button"
+          class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition cursor-pointer"
+          aria-label="Bild hochladen"
+          (click)="imageInput.click()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-5 h-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"
+            />
+          </svg>
+        </button>
+      </div>
       <app-button
-        [buttonBorderColor]="'border-black'"
+        [buttonDisabled]="userInput().length === 0"
+        [buttonBorderColor]="'border-black '"
         [buttonColor]="'bg-transparent'"
         [buttonSvgPath]="'M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0Z'"
         [buttonSize]="'md'"
         [buttonText]="' '"
-        (click)="setUserInput(userInput())"
+        (buttonClick)="setUserInput(userInput())"
       ></app-button>
     </div>
   </div>

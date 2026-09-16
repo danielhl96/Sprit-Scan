@@ -1,11 +1,22 @@
 <div [class]="isUserMessage() ? 'flex flex-col items-end' : 'flex flex-col items-start'">
-  <div class="relative p-2 w-[50dvw] h-[10dvh] border-1 border-red-500 rounded-md">
-    <p class="text-black text-sm">{{ message() }}</p>
+  <div class="relative w-[50dvw] h-[10dvh]">
+    <div class="p-2 w-full h-full border-1 border-red-500 rounded-md overflow-y-auto">
+      @if (imageUrl()) {
+        <img
+          [src]="imageUrl()"
+          alt="uploaded image"
+          class="max-w-10 max-h-10 object-contain rounded-md"
+        />
+      }
+      @if (message()) {
+        <p class="text-black text-sm">{{ message() }}</p>
+      }
+    </div>
     <div
       [class]="
         isUserMessage()
-          ? 'absolute left-30 top-20 inline-block w-0 h-0 border-solid border-t-[20px] border-r-[20px] border-l-0 border-b-0 border-l-transparent border-r-transparent border-t-red-500 border-b-transparent'
-          : 'absolute left-10 top-20 w-0 h-0 border-solid border-t-0 border-r-[20px] border-l-0 border-b-[20px] border-l-transparent border-r-red-500 border-t-transparent border-b-transparent'
+          ? 'absolute left-30 top-full inline-block w-0 h-0 border-solid border-t-[20px] border-r-[20px] border-l-0 border-b-0 border-l-transparent border-r-transparent border-t-red-500 border-b-transparent'
+          : 'absolute left-10 top-full w-0 h-0 border-solid border-t-0 border-r-[20px] border-l-0 border-b-[20px] border-l-transparent border-r-red-500 border-t-transparent border-b-transparent'
       "
     ></div>
   </div>

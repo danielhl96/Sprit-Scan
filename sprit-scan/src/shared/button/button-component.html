@@ -1,6 +1,10 @@
 <button
-  class="btn btn-outline text-black rounded-lg"
-  [class]="[buttonColor, buttonBorderColor, 'btn-' + buttonSize]"
+  class="btn text-black rounded-lg border-1"
+  [class]="[
+    buttonColor,
+    buttonDisabled || loading ? 'border-transparent' : buttonBorderColor,
+    'btn-' + buttonSize,
+  ]"
   (click)="onButtonClick()"
   [disabled]="buttonDisabled || loading"
 >
@@ -15,12 +19,13 @@
         stroke-width="1.5"
         stroke="currentColor"
         class="w-5 h-5"
+        [class.text-gray-400]="buttonDisabled"
       >
         <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="buttonSvgPath" />
       </svg>
     }
     @if (buttonIcon) {
-      <span>{{ buttonIcon }}</span>
+      <span [class.text-gray-400]="buttonDisabled">{{ buttonIcon }}</span>
     }
     {{ buttonText }}
   }

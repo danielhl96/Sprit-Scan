@@ -10,4 +10,5 @@ import { CommonModule } from '@angular/common';
 export class ChatBubbleComponent {
   message = input('');
   isUserMessage = input(false);
+  imageUrl = input('');
 }
