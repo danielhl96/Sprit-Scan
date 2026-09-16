@@ -10,7 +10,7 @@ export class NotificationService {
 
   private hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  showNotification(message: string, type: NotificationType = 'info', duration = 3000): void {
+  showNotification(message: string, type: NotificationType = 'info', duration = 2000): void {
     this.message.set(message);
     this.type.set(type);
     this.isVisible.set(true);
