@@ -3,6 +3,7 @@ import { TemplatePageComponent } from '../../shared/template-page/template-page-
 import { ModalComponent } from '../../shared/modal/modal-component';
 import { Result } from '../../shared/result/result';
 import { ScanFeature } from '../scan/scan-feature';
+
 type HistoryEntry = {
   id: number;
   name: string;

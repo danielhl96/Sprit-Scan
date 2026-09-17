@@ -1,0 +1,29 @@
+@if (animationVisible()) {
+  <!-- Dark backdrop that covers the whole screen like a modal -->
+  <div class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"></div>
+
+  <!-- Centered content above the backdrop -->
+  <div class="fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 transform space-y-2">
+    @if (imageUrl()) {
+      <div class="scan-wrapper relative overflow-hidden rounded-md">
+        <img
+          [src]="imageUrl()"
+          alt="uploaded image"
+          class="max-w-70 max-h-70 object-contain rounded-md"
+        />
+        <!-- Moving shadow that sweeps across the image -->
+        <div class="scan-shadow pointer-events-none absolute inset-0"></div>
+        <!-- Bright light beam that runs up and down -->
+        <div class="scan-beam pointer-events-none absolute left-0 right-0"></div>
+        <app-button
+          [buttonText]="'Stop'"
+          [buttonBorderColor]="'border-black '"
+          [buttonColor]="'bg-red-500'"
+          class="fixed left-1/2 z-50 -translate-x-1/2 transform"
+          (click)="closeAnimation()"
+        >
+        </app-button>
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,55 @@
+/* Wrapper needs relative positioning so overlays align to the image */
+.scan-wrapper {
+  display: inline-block;
+  line-height: 0;
+}
+
+/* Bright light beam that sweeps up and down the image */
+.scan-beam {
+  height: 12px;
+  background: linear-gradient(
+    to bottom,
+    rgba(239, 68, 68, 0) 0%,
+    rgba(239, 68, 68, 0.6) 50%,
+    rgba(239, 68, 68, 0) 100%
+  );
+  box-shadow:
+    0 0 12px 4px rgba(239, 68, 68, 0.7),
+    0 0 24px 8px rgba(239, 68, 68, 0.4);
+  animation: scan-beam-move 3.5s ease-in-out infinite;
+}
+
+/* Soft shadow band that follows the beam to create a "scanning" depth effect */
+.scan-shadow {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0.2) 30%,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 0, 0, 0.2) 70%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
+  animation: scan-shadow-pulse 3.5s ease-in-out infinite;
+}
+
+@keyframes scan-beam-move {
+  0% {
+    top: 0;
+  }
+  50% {
+    top: calc(100% - 12px);
+  }
+  100% {
+    top: 0;
+  }
+}
+
+@keyframes scan-shadow-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}

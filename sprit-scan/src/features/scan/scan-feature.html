@@ -2,6 +2,7 @@
   type="file"
   id="fileInput"
   (change)="handleFileSelected($any($event.target).files[0])"
-  accept=".png"
+  accept=".png, .jpg, .jpeg, .webp"
   hidden
 />
+<app-scan-animation [imageUrl]="imageUrl()"></app-scan-animation>
