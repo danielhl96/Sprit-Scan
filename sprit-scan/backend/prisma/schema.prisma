@@ -1,0 +1,21 @@
+// Prisma schema for the AUTH microservice.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// The single table the auth service owns.
+// It only stores what auth needs: the user's id, email and password hash.
+model User {
+  userId   String @id @default(uuid())
+  email    String @unique
+  password String
+
+  @@map("users")
+}
