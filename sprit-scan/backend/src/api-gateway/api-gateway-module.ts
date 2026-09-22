@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { ApiGatewayController } from './api-gateway.controller';
 import { ApiGatewayService } from './api-gateway.service';
@@ -27,6 +29,18 @@ import { AiController } from './routes/ai.controller';
         maxRedirects: 5,
       }),
     }),
+    // Rate limiting: protect the gateway from abuse / too many requests.
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: config.get<number>('gateway.rateTtl') ?? 60000,
+            limit: config.get<number>('gateway.rateLimit') ?? 100,
+          },
+        ],
+      }),
+    }),
   ],
   controllers: [
     ApiGatewayController,
@@ -35,6 +49,14 @@ import { AiController } from './routes/ai.controller';
     HistoryController,
     AiController,
   ],
-  providers: [ApiGatewayService, ProxyService],
+  providers: [
+    ApiGatewayService,
+    ProxyService,
+    // Apply the throttler globally to every route.
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class ApiGatewayModule {}

@@ -33,4 +33,7 @@ export const gatewayConfig = registerAs('gateway', () => ({
     .split(',')
     .map((origin) => origin.trim()),
   httpTimeout: parseInt(process.env.HTTP_TIMEOUT ?? '5000', 10),
+  // Rate limiting: allow `rateLimit` requests per `rateTtl` milliseconds per client (IP).
+  rateTtl: parseInt(process.env.RATE_LIMIT_TTL ?? '60000', 10),
+  rateLimit: parseInt(process.env.RATE_LIMIT_MAX ?? '100', 10),
 }));
