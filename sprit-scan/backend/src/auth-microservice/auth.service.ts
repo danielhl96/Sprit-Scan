@@ -1,13 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
+import { jwtConstants } from './constants';
+
+type acesses_token = string;
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  async login(email: string, password: string) {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ access_token: string }> {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -18,21 +29,36 @@ export class AuthService {
     if (!passwordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
-    return { userId: user.userId, email: user.email };
+    const token = this.jwtService.sign(
+      {
+        userId: user.userId,
+        email: user.email,
+      },
+      { expiresIn: '2h', secret: jwtConstants.secret },
+    );
+    return { access_token: token };
   }
 
-  async register(email: string, password: string) {
-    const existing = await this.prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      throw new ConflictException('User already exists');
-    }
-
-    // Never store the plain password – hash it with argon2 first.
+  async register(email: string, password: string): Promise<string> {
     const hashedPassword = await argon2.hash(password);
-    return this.prisma.user.create({
-      data: { email, password: hashedPassword },
-    });
+
+    try {
+      await this.prisma.user.create({
+        data: { email, password: hashedPassword },
+      });
+      return 'User registered successfully';
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === 'P2002'
+      ) {
+        throw new ConflictException('User already exists');
+      }
+
+      throw new InternalServerErrorException('User registration failed');
+    }
   }
 
   logout(): void {
