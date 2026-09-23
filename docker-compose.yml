@@ -36,6 +36,7 @@ services:
       - PROFILE_SERVICE_URL=http://profile-service:3002
       - HISTORY_SERVICE_URL=http://history-service:3003
       - AI_SERVICE_URL=http://ai-service:3004
+      - REDIS_URL=redis://redis:6379
       - HTTP_TIMEOUT=5000
     networks:
       - external

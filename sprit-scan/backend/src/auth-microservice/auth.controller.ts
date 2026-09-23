@@ -1,5 +1,16 @@
-import { Controller, Post, HttpStatus, HttpCode, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  HttpStatus,
+  HttpCode,
+  Body,
+  Req,
+  Res,
+} from '@nestjs/common';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
+
+import { redisClient } from 'src/redis/redis';
 
 @Controller('auth')
 export class AuthController {
@@ -15,11 +26,5 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: { email: string; password: string }) {
     return this.authService.register(registerDto.email, registerDto.password);
-  }
-
-  @Post('logout')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  logout() {
-    this.authService.logout();
   }
 }

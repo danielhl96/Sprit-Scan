@@ -11,6 +11,7 @@ import {
 import type { Request, Response } from 'express';
 import type { Method } from 'axios';
 import { ProxyService } from '../proxy/proxy.service';
+import { redisClient } from 'src/redis/redis';
 
 /**
  * Forwards every request under `/api/auth/*` to the auth-microservice.
@@ -36,6 +37,17 @@ export class AuthController {
     };
   }
 
+  private readCookie(req: Request, name: string): string | undefined {
+    const raw = req.headers.cookie;
+    if (!raw) {
+      return undefined;
+    }
+
+    const pairs = raw.split(';').map((part) => part.trim());
+    const found = pairs.find((part) => part.startsWith(`${name}=`));
+    return found?.slice(name.length + 1);
+  }
+
   @All('*path')
   async forward(
     @Req() req: Request,
@@ -44,6 +56,23 @@ export class AuthController {
     @Body() body: unknown,
     @Res({ passthrough: true }) res: Response,
   ) {
+    if (req.method === 'POST' && path === 'logout') {
+      const token = this.readCookie(req, 'access_token');
+      if (token) {
+        const payload = JSON.parse(
+          Buffer.from(token.split('.')[1], 'base64').toString(),
+        );
+        const ttl = payload.exp - Math.floor(Date.now() / 1000);
+        if (ttl > 0) {
+          await redisClient.set(`blacklist_${token}`, 'true', { EX: ttl });
+          console.log(`Token blacklisted for ${ttl} seconds`);
+        }
+      }
+      res.clearCookie('access_token');
+      res.status(HttpStatus.NO_CONTENT);
+      return;
+    }
+
     const response = await this.proxy.forward<unknown>('auth', {
       method: req.method as Method,
       // Auth microservice routes are mounted under /auth/*
@@ -58,12 +87,6 @@ export class AuthController {
         res.cookie('access_token', token, this.getCookieOptions());
       }
       return { message: 'Login successful' };
-    }
-
-    if (req.method === 'POST' && path === 'logout') {
-      res.clearCookie('access_token', this.getCookieOptions());
-      res.status(HttpStatus.NO_CONTENT);
-      return;
     }
 
     return response;
