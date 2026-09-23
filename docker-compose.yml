@@ -37,9 +37,6 @@ services:
       - HISTORY_SERVICE_URL=http://history-service:3003
       - AI_SERVICE_URL=http://ai-service:3004
       - HTTP_TIMEOUT=5000
-    volumes:
-      - ./sprit-scan/backend:/app
-      - /app/node_modules
     networks:
       - external
       - internal
@@ -63,15 +60,12 @@ services:
       - DATABASE_URL=postgresql://authuser:authpassword@auth-db:5432/auth-db?sslmode=disable
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=changeme
-    volumes:
-      - ./sprit-scan/backend:/app
-      - /app/node_modules
     networks:
       - internal
     depends_on:
       - auth-db
       - redis
-    command: sh -c "npx prisma generate && npx prisma db push && npm run start:dev"
+    command: sh -c "npx prisma generate && npx prisma db push && npx ts-node src/auth-microservice/main.ts"
 
   # ─────────────────────────────────────────
   # PROFILE SERVICE
@@ -85,9 +79,6 @@ services:
       - PORT=3002
       - DATABASE_URL=postgresql://profileuser:profilepassword@profile-db:5432/profile-db?sslmode=disable
       - REDIS_URL=redis://redis:6379
-    volumes:
-      - ./sprit-scan/backend:/app
-      - /app/node_modules
     networks:
       - internal
     depends_on:
@@ -107,9 +98,6 @@ services:
       - PORT=3003
       - DATABASE_URL=postgresql://historyuser:historypassword@history-db:5432/history-db?sslmode=disable
       - REDIS_URL=redis://redis:6379
-    volumes:
-      - ./sprit-scan/backend:/app
-      - /app/node_modules
     networks:
       - internal
     depends_on:
@@ -128,9 +116,6 @@ services:
       - NODE_ENV=development
       - PORT=3004
       - REDIS_URL=redis://redis:6379
-    volumes:
-      - ./sprit-scan/backend:/app
-      - /app/node_modules
     networks:
       - internal
     depends_on:

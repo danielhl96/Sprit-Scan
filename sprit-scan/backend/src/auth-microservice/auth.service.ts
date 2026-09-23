@@ -61,7 +61,5 @@ export class AuthService {
     }
   }
 
-  logout(): void {
-    // Implement your logout logic here
-  }
+  async logout(): Promise<void> {}
 }
