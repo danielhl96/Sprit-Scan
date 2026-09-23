@@ -48,6 +48,27 @@ export class AuthController {
     return found?.slice(name.length + 1);
   }
 
+  private getForwardHeaders(req: Request): Record<string, string> {
+    const headers: Record<string, string> = {};
+
+    const authorization = req.headers.authorization;
+    if (typeof authorization === 'string') {
+      headers.authorization = authorization;
+    }
+
+    const cookie = req.headers.cookie;
+    if (typeof cookie === 'string') {
+      headers.cookie = cookie;
+    }
+
+    const contentType = req.headers['content-type'];
+    if (typeof contentType === 'string') {
+      headers['content-type'] = contentType;
+    }
+
+    return headers;
+  }
+
   @All('*path')
   async forward(
     @Req() req: Request,
@@ -79,6 +100,7 @@ export class AuthController {
       path: `/auth/${path ?? ''}`,
       data: body,
       params: query,
+      headers: this.getForwardHeaders(req),
     });
 
     if (req.method === 'POST' && path === 'login') {

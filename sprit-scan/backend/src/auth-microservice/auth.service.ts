@@ -61,5 +61,17 @@ export class AuthService {
     }
   }
 
-  async logout(): Promise<void> {}
+  async deleteUser(userId: string, password: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { userId } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const passwordValid = await argon2.verify(user.password, password);
+    if (!passwordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    await this.prisma.user.delete({ where: { userId } });
+  }
 }
