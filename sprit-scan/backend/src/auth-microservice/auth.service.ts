@@ -4,7 +4,7 @@ import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
-import { jwtConstants } from './constants';
+import { jwtConstants } from '../constants/constants';
 
 type acesses_token = string;
 

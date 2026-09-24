@@ -1,0 +1,30 @@
+// Prisma schema for the HISTORY microservice.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_History")
+}
+model History {
+  id             String   @id @default(uuid())
+  userId         String
+  name           String
+  date           DateTime
+  description    String
+  taste          String?
+  origin         String?
+  recommendation String?
+  year           String?
+  customerReview String?  @map("customerreview")
+  rawMaterials   String?  @map("rawmaterials")
+  alternative    String?
+  price          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("history")
+}

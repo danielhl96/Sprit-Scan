@@ -19,7 +19,7 @@ export class HistoryController {
   ) {
     return this.proxy.forward('history', {
       method: req.method as Method,
-      path: `/${path ?? ''}`,
+      path: `/history/${path ?? ''}`,
       data: body,
       params: query,
     });
