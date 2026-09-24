@@ -11,15 +11,10 @@ import {
   Param,
   Get,
 } from '@nestjs/common';
-import type { Request } from 'express';
+
+import type { AuthenticatedRequest } from '../types';
 import { HistoryService } from './history.service';
-type AuthenticatedRequest = Request & {
-  user?: JwtPayload;
-};
-type JwtPayload = {
-  userId: string;
-  email?: string;
-};
+
 @Controller('history')
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
