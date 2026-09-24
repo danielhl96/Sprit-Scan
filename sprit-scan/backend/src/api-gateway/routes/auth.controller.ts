@@ -37,17 +37,6 @@ export class AuthController {
     };
   }
 
-  private readCookie(req: Request, name: string): string | undefined {
-    const raw = req.headers.cookie;
-    if (!raw) {
-      return undefined;
-    }
-
-    const pairs = raw.split(';').map((part) => part.trim());
-    const found = pairs.find((part) => part.startsWith(`${name}=`));
-    return found?.slice(name.length + 1);
-  }
-
   private getForwardHeaders(req: Request): Record<string, string> {
     const headers: Record<string, string> = {};
 
@@ -78,7 +67,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     if (req.method === 'POST' && path === 'logout') {
-      const token = this.readCookie(req, 'access_token');
+      const token = req.cookies?.access_token as string | undefined;
       if (token) {
         const payload = JSON.parse(
           Buffer.from(token.split('.')[1], 'base64').toString(),

@@ -13,15 +13,7 @@ import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginUserDto, RegisterUserDto, DeleteUserDto } from './auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-
-type JwtPayload = {
-  userId: string;
-  email?: string;
-};
-
-type AuthenticatedRequest = Request & {
-  user?: JwtPayload;
-};
+import type { AuthenticatedRequest } from '../types';
 
 @Controller('auth')
 export class AuthController {
