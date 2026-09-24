@@ -13,19 +13,48 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { HistoryService } from './history.service';
-
+type AuthenticatedRequest = Request & {
+  user?: JwtPayload;
+};
+type JwtPayload = {
+  userId: string;
+  email?: string;
+};
 @Controller('history')
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
+  private requireUserId(req: AuthenticatedRequest): string {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('Missing user in token');
+    }
+    return userId;
+  }
+
   @Post('entry')
   @HttpCode(HttpStatus.CREATED)
-  async createHistoryEntry(@Req() req: Request, @Body() body: any) {}
+  async createHistoryEntry(
+    @Req() req: AuthenticatedRequest,
+    @Body() body: any,
+  ) {
+    const userId = this.requireUserId(req);
+    return this.historyService.createHistoryEntry(userId, body);
+  }
 
   @Get('entries')
   @HttpCode(HttpStatus.OK)
-  async getHistoryEntries(@Req() req: Request) {}
+  async getHistoryEntries(@Req() req: AuthenticatedRequest) {
+    const userId = this.requireUserId(req);
+    return this.historyService.getHistoryEntries(userId);
+  }
   @Delete('entry/:id')
   @HttpCode(HttpStatus.OK)
-  async deleteHistoryEntry(@Param('id') id: string, @Req() req: Request) {}
+  async deleteHistoryEntry(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    const userId = this.requireUserId(req);
+    return this.historyService.deleteHistoryEntry(userId, id);
+  }
 }

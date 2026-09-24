@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/history-client';
 
 /**
  * PrismaService wraps the generated PrismaClient and makes it injectable.
