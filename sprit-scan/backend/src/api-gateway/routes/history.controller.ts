@@ -1,9 +1,9 @@
 import { All, Body, Controller, Param, Query, Req } from '@nestjs/common';
-import type { Request } from 'express';
 import type { Method } from 'axios';
 import { ProxyService } from '../proxy/proxy.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtValiGuard } from '../guards/jwt-vali.guard';
+import type { AuthenticatedRequest } from 'src/types';
 
 /**
  * Forwards every request under `/api/history/*` to the history-microservice.
@@ -17,13 +17,14 @@ export class HistoryController {
    * Build a safe subset of incoming headers to pass to the history microservice.
    *
    * Why these headers:
-   * - authorization: forwards the Bearer token so JWT guards in the microservice can authenticate the user.
+   * - authorization: optional downstream JWT re-validation.
    * - cookie: forwards cookies when downstream logic depends on cookie-based auth/session data.
    * - content-type: preserves the body format (e.g. application/json) for correct request parsing.
+   * - x-user-id / x-user-email: trusted user context from gateway JWT validation.
    *
    * We intentionally do not forward all headers to avoid leaking unnecessary client/proxy metadata.
    */
-  private getForwardHeaders(req: Request): Record<string, string> {
+  private getForwardHeaders(req: AuthenticatedRequest): Record<string, string> {
     const headers: Record<string, string> = {};
 
     const authorization = req.headers.authorization;
@@ -41,12 +42,20 @@ export class HistoryController {
       headers['content-type'] = contentType;
     }
 
+    if (typeof req.user?.userId === 'string' && req.user.userId.length > 0) {
+      headers['x-user-id'] = req.user.userId;
+    }
+
+    if (typeof req.user?.email === 'string' && req.user.email.length > 0) {
+      headers['x-user-email'] = req.user.email;
+    }
+
     return headers;
   }
 
   @All('*path')
   forward(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('path') path: string | string[],
     @Query() query: Record<string, unknown>,
     @Body() body: unknown,

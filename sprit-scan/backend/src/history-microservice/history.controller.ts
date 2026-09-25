@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Req,
-  UseGuards,
   UnauthorizedException,
   Param,
   Get,
@@ -21,9 +20,17 @@ export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
   private requireUserId(req: AuthenticatedRequest): string {
-    const userId = req.user?.userId;
+    const headerUserId = req.headers['x-user-id'];
+    const forwardedUserId =
+      typeof headerUserId === 'string'
+        ? headerUserId
+        : Array.isArray(headerUserId)
+          ? headerUserId[0]
+          : undefined;
+
+    const userId = forwardedUserId ?? req.user?.userId;
     if (!userId) {
-      throw new UnauthorizedException('Missing user in token');
+      throw new UnauthorizedException('Missing user context');
     }
     return userId;
   }
