@@ -13,6 +13,7 @@ import { AuthController } from './routes/auth.controller';
 import { ProfileController } from './routes/profile.controller';
 import { HistoryController } from './routes/history.controller';
 import { AiController } from './routes/ai.controller';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -40,6 +41,11 @@ import { AiController } from './routes/ai.controller';
           },
         ],
       }),
+    }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '2h' },
     }),
   ],
   controllers: [

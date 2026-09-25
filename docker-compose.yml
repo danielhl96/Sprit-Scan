@@ -97,14 +97,14 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3003
-      - DATABASE_URL=postgresql://historyuser:historypassword@history-db:5432/history-db?sslmode=disable
+      - DATABASE_URL_HISTORY=postgresql://historyuser:historypassword@history-db:5432/history-db?sslmode=disable
       - REDIS_URL=redis://redis:6379
     networks:
       - internal
     depends_on:
       - history-db
       - redis
-    command: sh -c "npx prisma generate && npx prisma db push && npm run start:dev"
+    command: sh -c "node node_modules/prisma/build/index.js generate --schema src/history-microservice/prisma/schema.prisma && node node_modules/prisma/build/index.js db push --schema src/history-microservice/prisma/schema.prisma && npx ts-node src/history-microservice/main.ts"
 
   # ─────────────────────────────────────────
   # AI SERVICE
@@ -171,8 +171,11 @@ services:
 # NETZWERKE
 # ─────────────────────────────────────────
 networks:
-  external:   # Frontend ↔ API Gateway
-  internal:   # Nur Service-zu-Service, nicht von außen erreichbar
+  external: 
+    driver: bridge   # Frontend ↔ API Gateway
+  internal:    # Nur Service-zu-Service, nicht von außen erreichbar
+    driver: bridge   
+    internal: true
 
 # ─────────────────────────────────────────
 # VOLUMES

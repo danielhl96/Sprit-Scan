@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { HistoryController } from './history.controller';
-import { HistoryService } from './history.service';
+import { ProfileController } from './profile.controller';
+import { ProfileService } from './profile.service';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule],
-  controllers: [HistoryController],
-  providers: [HistoryService],
+  controllers: [ProfileController],
+  providers: [ProfileService],
 })
-export class HistoryModule {}
+export class ProfileModule {}

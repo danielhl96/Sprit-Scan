@@ -1,12 +1,21 @@
-import { All, Body, Controller, Param, Query, Req } from '@nestjs/common';
+import {
+  All,
+  Body,
+  Controller,
+  Param,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import type { Method } from 'axios';
 import { ProxyService } from '../proxy/proxy.service';
-
+import { JwtValiGuard } from '../guards/jwt-vali.guard';
 /**
  * Forwards every request under `/api/ai/*` to the ai-microservice.
  */
 @Controller('api/ai')
+@UseGuards(JwtValiGuard)
 export class AiController {
   constructor(private readonly proxy: ProxyService) {}
 

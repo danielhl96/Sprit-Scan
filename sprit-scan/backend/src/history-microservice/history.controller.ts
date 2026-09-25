@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 
 import type { AuthenticatedRequest } from '../types';
+
 import { HistoryService } from './history.service';
 
 @Controller('history')

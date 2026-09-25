@@ -2,11 +2,14 @@ import { All, Body, Controller, Param, Query, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import type { Method } from 'axios';
 import { ProxyService } from '../proxy/proxy.service';
+import { UseGuards } from '@nestjs/common';
+import { JwtValiGuard } from '../guards/jwt-vali.guard';
 
 /**
  * Forwards every request under `/api/profile/*` to the profile-microservice.
  */
 @Controller('api/profile')
+@UseGuards(JwtValiGuard)
 export class ProfileController {
   constructor(private readonly proxy: ProxyService) {}
 
