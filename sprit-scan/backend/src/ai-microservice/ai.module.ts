@@ -8,4 +8,4 @@ import { AiService } from './ai.service';
   controllers: [AiController],
   providers: [AiService],
 })
-export class AuthModule {}
+export class AiModule {}
