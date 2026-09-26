@@ -8,23 +8,6 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = parseInt(configService.get<string>('PORT') ?? '3001', 10);
-  const corsOrigin = (
-    configService.get<string>('CORS_ORIGIN') ?? 'http://localhost:4200'
-  )
-    .split(',')
-    .map((origin) => origin.trim());
-
-  // Backward-compatible fallback if CORS_ORIGIN is empty/invalid.
-  const allowedOrigins =
-    corsOrigin.filter(Boolean).length > 0
-      ? corsOrigin
-      : ['http://localhost:4200'];
-
-  // Allow the Angular frontend to call the gateway.
-  app.enableCors({
-    origin: allowedOrigins,
-    credentials: true,
-  });
 
   // Validate/transform incoming payloads globally.
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));

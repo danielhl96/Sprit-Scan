@@ -8,21 +8,6 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = parseInt(configService.get<string>('PORT') ?? '3003', 10);
-  const corsOrigin = (
-    configService.get<string>('CORS_ORIGIN') ?? 'http://localhost:4200'
-  )
-    .split(',')
-    .map((origin) => origin.trim());
-
-  const allowedOrigins =
-    corsOrigin.filter(Boolean).length > 0
-      ? corsOrigin
-      : ['http://localhost:4200'];
-
-  app.enableCors({
-    origin: allowedOrigins,
-    credentials: true,
-  });
 
   // Apply request validation globally:
   // - transform: converts plain JSON payloads into DTO class instances/types
