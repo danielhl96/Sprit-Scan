@@ -20,3 +20,19 @@ export class DeleteUserDto {
   @IsNotEmpty()
   password: string;
 }
+
+export class ChangeEmailDto {
+  @IsEmail()
+  newEmail: string;
+
+  @IsNotEmpty()
+  password: string;
+}
+
+export class ChangePasswordDto {
+  @IsNotEmpty()
+  oldPassword: string;
+
+  @IsNotEmpty()
+  newPassword: string;
+}

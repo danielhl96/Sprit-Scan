@@ -33,7 +33,7 @@ services:
       - PORT=3000
       - CORS_ORIGIN=http://localhost:4200
       - AUTH_SERVICE_URL=http://auth-service:3001
-      - PROFILE_SERVICE_URL=http://profile-service:3002
+      - JWT_SECRET=your_jwt_secret_key_here
       - HISTORY_SERVICE_URL=http://history-service:3003
       - AI_SERVICE_URL=http://ai-service:3004
       - REDIS_URL=redis://redis:6379
@@ -43,7 +43,7 @@ services:
       - internal
     depends_on:
       - auth-service
-      - profile-service
+   
       - history-service
       - ai-service
     command: npm run start:dev
@@ -67,25 +67,6 @@ services:
       - auth-db
       - redis
     command: sh -c "npx prisma generate && npx prisma db push && npx ts-node src/auth-microservice/main.ts"
-
-  # ─────────────────────────────────────────
-  # PROFILE SERVICE
-  # ─────────────────────────────────────────
-  profile-service:
-    build:
-      context: ./sprit-scan/backend
-      dockerfile: Dockerfile
-    environment:
-      - NODE_ENV=development
-      - PORT=3002
-      - DATABASE_URL=postgresql://profileuser:profilepassword@profile-db:5432/profile-db?sslmode=disable
-      - REDIS_URL=redis://redis:6379
-    networks:
-      - internal
-    depends_on:
-      - profile-db
-      - redis
-    command: sh -c "npx prisma generate && npx prisma db push && npm run start:dev"
 
   # ─────────────────────────────────────────
   # HISTORY SERVICE
@@ -137,16 +118,6 @@ services:
     networks:
       - internal
 
-  profile-db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: profileuser
-      POSTGRES_PASSWORD: profilepassword
-      POSTGRES_DB: profile-db
-    volumes:
-      - profile-db-data:/var/lib/postgresql/data
-    networks:
-      - internal
 
   history-db:
     image: postgres:15-alpine
@@ -167,20 +138,15 @@ services:
     networks:
       - internal
 
-# ─────────────────────────────────────────
-# NETZWERKE
-# ─────────────────────────────────────────
+# Networks
 networks:
-  external: 
-    driver: bridge   # Frontend ↔ API Gateway
-  internal:    # Nur Service-zu-Service, nicht von außen erreichbar
-    driver: bridge   
+  external:
+    driver: bridge
+  internal:
+    driver: bridge
     internal: true
 
-# ─────────────────────────────────────────
-# VOLUMES
-# ─────────────────────────────────────────
+# Volumes
 volumes:
   auth-db-data:
-  profile-db-data:
   history-db-data:

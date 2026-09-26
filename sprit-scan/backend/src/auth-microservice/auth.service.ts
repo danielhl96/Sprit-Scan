@@ -18,7 +18,9 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<{ access_token: string }> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -43,7 +45,7 @@ export class AuthService {
 
     try {
       await this.prisma.user.create({
-        data: { email, password: hashedPassword },
+        data: { email: email.toLowerCase(), password: hashedPassword },
       });
       return 'User registered successfully';
     } catch (error: unknown) {
@@ -58,6 +60,61 @@ export class AuthService {
 
       throw new InternalServerErrorException('User registration failed');
     }
+  }
+
+  async changeEmail(
+    userId: string,
+    newEmail: string,
+    password: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { userId } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const passwordValid = await argon2.verify(user.password, password);
+    if (!passwordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    try {
+      await this.prisma.user.update({
+        where: { userId },
+        data: { email: newEmail.toLowerCase() },
+      });
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === 'P2002'
+      ) {
+        throw new ConflictException('Email already in use');
+      }
+      throw new InternalServerErrorException('Failed to change email');
+    }
+  }
+
+  async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { userId } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const passwordValid = await argon2.verify(user.password, oldPassword);
+    if (!passwordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const hashedNewPassword = await argon2.hash(newPassword);
+    await this.prisma.user.update({
+      where: { userId },
+      data: { password: hashedNewPassword },
+    });
   }
 
   async deleteUser(userId: string, password: string): Promise<void> {

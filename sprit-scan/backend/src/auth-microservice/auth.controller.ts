@@ -8,10 +8,17 @@ import {
   Req,
   UseGuards,
   UnauthorizedException,
+  Put,
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { LoginUserDto, RegisterUserDto, DeleteUserDto } from './auth.dto';
+import {
+  LoginUserDto,
+  RegisterUserDto,
+  DeleteUserDto,
+  ChangePasswordDto,
+  ChangeEmailDto,
+} from './auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import type { AuthenticatedRequest } from '../types';
 
@@ -30,6 +37,43 @@ export class AuthController {
   async register(@Body() registerDto: RegisterUserDto) {
     return this.authService.register(registerDto.email, registerDto.password);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Put('email')
+  @UseGuards(JwtAuthGuard)
+  async changeEmail(
+    @Req() req: AuthenticatedRequest,
+    @Body() changeEmailDto: ChangeEmailDto,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('Missing user in token');
+    }
+    return this.authService.changeEmail(
+      userId,
+      changeEmailDto.newEmail,
+      changeEmailDto.password,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Put('password')
+  @UseGuards(JwtAuthGuard)
+  async changePassword(
+    @Req() req: AuthenticatedRequest,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('Missing user in token');
+    }
+    return this.authService.changePassword(
+      userId,
+      changePasswordDto.oldPassword,
+      changePasswordDto.newPassword,
+    );
+  }
+
   @HttpCode(HttpStatus.OK)
   @Delete('user/')
   @UseGuards(JwtAuthGuard)

@@ -83,10 +83,14 @@ export class AuthController {
       return;
     }
 
+    const normalizedPath = Array.isArray(path)
+      ? path.join('/')
+      : (path ?? '').split(',').join('/');
+
     const response = await this.proxy.forward<unknown>('auth', {
       method: req.method as Method,
       // Auth microservice routes are mounted under /auth/*
-      path: `/auth/${path ?? ''}`,
+      path: `/auth/${normalizedPath}`,
       data: body,
       params: query,
       headers: this.getForwardHeaders(req),
