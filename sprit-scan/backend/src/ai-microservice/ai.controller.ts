@@ -12,14 +12,18 @@ import {
   Get,
 } from '@nestjs/common';
 
-import type { AuthenticatedRequest } from '../types';
+import type {
+  AuthenticatedRequest,
+  DataBodyExpert,
+  DataBodySpirits,
+} from '../types';
 
 @Controller('ai')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
   @HttpCode(HttpStatus.OK)
   @Post('expert')
-  async expert(@Req() req: AuthenticatedRequest, @Body() body: any) {
+  async expert(@Req() req: AuthenticatedRequest, @Body() body: DataBodyExpert) {
     const userId = req.user?.userId;
     if (!userId) {
       throw new UnauthorizedException('Missing user context');
@@ -29,7 +33,10 @@ export class AiController {
 
   @HttpCode(HttpStatus.OK)
   @Post('spirits')
-  async assistant(@Req() req: AuthenticatedRequest, @Body() body: any) {
+  async assistant(
+    @Req() req: AuthenticatedRequest,
+    @Body() body: DataBodySpirits,
+  ) {
     const userId = req.user?.userId;
     if (!userId) {
       throw new UnauthorizedException('Missing user context');

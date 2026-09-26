@@ -4,6 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 
+import type { DataBodyExpert, DataBodySpirits } from '../types';
+
 type SpiritStandardized = {
   name: string;
   description: string;
@@ -27,7 +29,7 @@ type OpenAiChatCompletionResponse = {
 
 @Injectable()
 export class AiService {
-  async expert(userId: string, body: any) {
+  async expert(userId: string, body: DataBodyExpert) {
     const prompt = this.extractPrompt(body);
 
     const systemPrompt =
@@ -43,7 +45,7 @@ export class AiService {
     return { message: content };
   }
 
-  async spirits(userId: string, body: any) {
+  async spirits(userId: string, body: DataBodySpirits) {
     const { imageUrl, prompt } = this.extractSpiritsInput(body);
 
     const systemPrompt = [
@@ -89,15 +91,8 @@ export class AiService {
     return this.normalizeSpiritResponse(parsed);
   }
 
-  private extractPrompt(body: unknown): string {
-    if (
-      typeof body === 'object' &&
-      body !== null &&
-      'prompt' in body &&
-      typeof (body as { prompt?: unknown }).prompt === 'string'
-    ) {
-      return ((body as { prompt: string }).prompt || '').trim();
-    }
+  private extractPrompt(body: DataBodyExpert): string {
+    if (body.prompt.length > 0) return body.prompt.trim();
 
     throw new BadRequestException(
       'Request body must contain a string field "prompt"',
@@ -206,8 +201,8 @@ export class AiService {
     data: Partial<SpiritStandardized>,
   ): SpiritStandardized {
     return {
-      name: this.requiredText(data.name, 'Unbekannt'),
-      description: this.requiredText(data.description, 'Keine Beschreibung'),
+      name: this.requiredText(data.name, 'Unknown Spirit'),
+      description: this.requiredText(data.description, 'No Description'),
       taste: this.optionalText(data.taste),
       origin: this.optionalText(data.origin),
       recommendation: this.optionalText(data.recommendation),
