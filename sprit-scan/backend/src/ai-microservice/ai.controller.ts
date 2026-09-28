@@ -4,12 +4,9 @@ import {
   Post,
   HttpStatus,
   HttpCode,
-  Delete,
   Body,
   Req,
   UnauthorizedException,
-  Param,
-  Get,
 } from '@nestjs/common';
 
 import type {

@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import type { DataBodyExpert, DataBodySpirits } from '../types';
 
@@ -29,6 +30,8 @@ type OpenAiChatCompletionResponse = {
 
 @Injectable()
 export class AiService {
+  constructor(private readonly configService: ConfigService) {}
+
   async expert(userId: string, body: DataBodyExpert) {
     const prompt = this.extractPrompt(body);
 
@@ -147,7 +150,7 @@ export class AiService {
     temperature: number;
     responseFormat?: { type: 'json_object' };
   }): Promise<string> {
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = this.configService.get<string>('OPENAI_API_KEY');
     if (!apiKey) {
       throw new InternalServerErrorException(
         'OPENAI_API_KEY is not configured',
