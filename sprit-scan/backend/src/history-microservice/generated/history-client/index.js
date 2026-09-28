@@ -139,7 +139,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/danielhennies/Sprit-Scan/sprit-scan/backend/src/history-microservice/generated/history-client",
+      "value": "/app/src/history-microservice/generated/history-client",
       "fromEnvVar": null
     },
     "config": {
@@ -148,17 +148,16 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "darwin-arm64",
+        "value": "linux-musl-arm64-openssl-3.0.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/danielhennies/Sprit-Scan/sprit-scan/backend/src/history-microservice/prisma/schema.prisma",
+    "sourceFilePath": "/app/src/history-microservice/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../../.env",
-    "schemaEnvPath": "../../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "5.22.0",
@@ -167,17 +166,16 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "DATABASE_URL_History",
+        "fromEnvVar": "DATABASE_URL_HISTORY",
         "value": null
       }
     }
   },
-  "inlineSchema": "// Prisma schema for the HISTORY microservice.\n// Docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/history-client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL_History\")\n}\n\nmodel History {\n  id             String   @id @default(uuid())\n  userId         String\n  name           String\n  date           DateTime\n  description    String\n  taste          String?\n  origin         String?\n  recommendation String?\n  year           String?\n  customerReview String?  @map(\"customerreview\")\n  rawMaterials   String?  @map(\"rawmaterials\")\n  alternative    String?\n  price          String?\n  createdAt      DateTime @default(now())\n  updatedAt      DateTime @updatedAt\n\n  @@map(\"history\")\n}\n",
-  "inlineSchemaHash": "88559f7288237601e6c00d4223a5d331b949ee562472d6b4d07724429c8d76b1",
+  "inlineSchema": "// Prisma schema for the HISTORY microservice.\n// Docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/history-client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL_HISTORY\")\n}\n\nmodel History {\n  id             String   @id @default(uuid())\n  userId         String\n  name           String\n  date           DateTime\n  description    String\n  taste          String?\n  origin         String?\n  recommendation String?\n  year           String?\n  customerReview String?  @map(\"customerreview\")\n  rawMaterials   String?  @map(\"rawmaterials\")\n  alternative    String?\n  price          String?\n  createdAt      DateTime @default(now())\n  updatedAt      DateTime @updatedAt\n\n  @@map(\"history\")\n}\n",
+  "inlineSchemaHash": "54909843e530d995096d168a747a9ab4a575ad3b54be28ec0c94fd3fe146624d",
   "copyEngine": true
 }
 
@@ -215,8 +213,8 @@ exports.PrismaClient = PrismaClient
 Object.assign(exports, Prisma)
 
 // file annotations for bundling tools to include these files
-path.join(__dirname, "libquery_engine-darwin-arm64.dylib.node");
-path.join(process.cwd(), "src/history-microservice/generated/history-client/libquery_engine-darwin-arm64.dylib.node")
+path.join(__dirname, "libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node");
+path.join(process.cwd(), "src/history-microservice/generated/history-client/libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "src/history-microservice/generated/history-client/schema.prisma")

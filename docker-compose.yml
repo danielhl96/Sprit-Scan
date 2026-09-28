@@ -28,6 +28,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
     environment:
       - NODE_ENV=development
       - PORT=3000
@@ -43,10 +46,9 @@ services:
       - internal
     depends_on:
       - auth-service
-   
       - history-service
       - ai-service
-    command: npm run start:dev
+    command: sh -c "node --watch -r ts-node/register -r tsconfig-paths/register src/api-gateway/main.ts"
 
   # ─────────────────────────────────────────
   # AUTH SERVICE
@@ -58,15 +60,18 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3001
+      - JWT_SECRET=your_jwt_secret_key_here
       - DATABASE_URL=postgresql://authuser:authpassword@auth-db:5432/auth-db?sslmode=disable
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=changeme
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
     networks:
       - internal
     depends_on:
       - auth-db
       - redis
-    command: sh -c "npx prisma generate && npx prisma db push && npx ts-node src/auth-microservice/main.ts"
+    command: sh -c "npx prisma generate && npx prisma db push && node --watch -r ts-node/register -r tsconfig-paths/register src/auth-microservice/main.ts"
 
   # ─────────────────────────────────────────
   # HISTORY SERVICE
@@ -80,12 +85,16 @@ services:
       - PORT=3003
       - DATABASE_URL_HISTORY=postgresql://historyuser:historypassword@history-db:5432/history-db?sslmode=disable
       - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=your_jwt_secret_key_here
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
     networks:
       - internal
     depends_on:
       - history-db
       - redis
-    command: sh -c "node node_modules/prisma/build/index.js generate --schema src/history-microservice/prisma/schema.prisma && node node_modules/prisma/build/index.js db push --schema src/history-microservice/prisma/schema.prisma && npx ts-node src/history-microservice/main.ts"
+    command: sh -c "node node_modules/prisma/build/index.js generate --schema src/history-microservice/prisma/schema.prisma && node node_modules/prisma/build/index.js db push --schema src/history-microservice/prisma/schema.prisma && node --watch -r ts-node/register -r tsconfig-paths/register src/history-microservice/main.ts"
 
   # ─────────────────────────────────────────
   # AI SERVICE
@@ -98,11 +107,16 @@ services:
       - NODE_ENV=development
       - PORT=3004
       - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=your_jwt_secret_key_here
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
     networks:
-      - internal
+      - external
     depends_on:
       - redis
-    command: npm run start:dev
+    command: sh -c "node --watch -r ts-node/register -r tsconfig-paths/register src/ai-microservice/main.ts"
 
   # ─────────────────────────────────────────
   # DATENBANKEN (je Service eine eigene)

@@ -11,7 +11,7 @@ import {
 import type { Request, Response } from 'express';
 import type { Method } from 'axios';
 import { ProxyService } from '../proxy/proxy.service';
-import { redisClient } from 'src/redis/redis';
+import { redisClient } from '../../redis/redis';
 
 /**
  * Forwards every request under `/api/auth/*` to the auth-microservice.

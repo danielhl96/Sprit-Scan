@@ -3,7 +3,7 @@ import type { Method } from 'axios';
 import { ProxyService } from '../proxy/proxy.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtValiGuard } from '../guards/jwt-vali.guard';
-import type { AuthenticatedRequest } from 'src/types';
+import type { AuthenticatedRequest } from '../../types';
 
 /**
  * Forwards every request under `/api/history/*` to the history-microservice.
