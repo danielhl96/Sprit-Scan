@@ -15,7 +15,7 @@ services:
       - ./sprit-scan:/app
       - /app/node_modules
     networks:
-      - external
+      - app-network
     depends_on:
       - api-gateway
 
@@ -42,7 +42,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - HTTP_TIMEOUT=5000
     networks:
-      - external
+      - app-network
       - internal
     depends_on:
       - auth-service
@@ -113,7 +113,7 @@ services:
       - ./sprit-scan/backend:/app
       - /app/node_modules
     networks:
-      - external
+      - app-network
     depends_on:
       - redis
     command: sh -c "node --watch -r ts-node/register -r tsconfig-paths/register src/ai-microservice/main.ts"
@@ -150,12 +150,12 @@ services:
   redis:
     image: redis:7-alpine
     networks:
-      - internal
+      - app-network
 
 # Networks
 networks:
-  external:
-    driver: bridge
+  app-network:
+    driver: bridge 
   internal:
     driver: bridge
     internal: true

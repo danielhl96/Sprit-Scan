@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AxiosError, AxiosRequestConfig, Method } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { ServiceName, ServiceUrls } from '../config/services.config';
-
+import { ResilienceService } from '../../resilience/resilience.service';
 export interface ProxyRequestOptions {
   /** HTTP method to use against the microservice. */
   method: Method;
@@ -25,6 +25,7 @@ export interface ProxyRequestOptions {
  */
 @Injectable()
 export class ProxyService {
+  private readonly resilience: ResilienceService;
   private readonly logger = new Logger(ProxyService.name);
 
   constructor(
@@ -65,10 +66,12 @@ export class ProxyService {
     this.logger.debug(`→ ${options.method} ${url}`);
 
     try {
-      const response = await firstValueFrom(
-        this.httpService.request<T>(config),
-      );
-      return response.data;
+      return await this.resilience.resiliencePolicy.execute(async () => {
+        const response = await firstValueFrom(
+          this.httpService.request<T>(config),
+        );
+        return response.data;
+      });
     } catch (error) {
       throw this.handleError(service, error as AxiosError);
     }

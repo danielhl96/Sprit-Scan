@@ -14,8 +14,11 @@ import type {
   DataBodyExpert,
   DataBodySpirits,
 } from '../types';
+import { UseGuards } from '@nestjs/common';
+import { JwtValiGuard } from './guards/jwt-vali.guard';
 
 @Controller('ai')
+@UseGuards(JwtValiGuard)
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 

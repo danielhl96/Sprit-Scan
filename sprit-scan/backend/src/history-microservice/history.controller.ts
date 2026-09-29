@@ -14,8 +14,10 @@ import {
 import type { AuthenticatedRequest } from '../types';
 
 import { HistoryService } from './history.service';
-
+import { UseGuards } from '@nestjs/common';
+import { JwtValiGuard } from './guards/jwt-vali.guard';
 @Controller('history')
+@UseGuards(JwtValiGuard)
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
