@@ -118,6 +118,7 @@ services:
       - /app/node_modules
     networks:
       - app-network
+      - kafka-network
     depends_on:
       - redis
       - kafka
@@ -140,7 +141,7 @@ services:
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
       - CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
     networks:
-      - app-network
+      - kafka-network
 
   # ─────────────────────────────────────────
   # DATENBANKEN (je Service eine eigene)
@@ -181,6 +182,9 @@ networks:
   app-network:
     driver: bridge 
   internal:
+    driver: bridge
+    internal: true
+  kafka-network:
     driver: bridge
     internal: true
 
