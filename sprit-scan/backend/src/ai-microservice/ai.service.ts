@@ -92,6 +92,8 @@ export class AiService {
       ],
     });
 
+    console.log('OpenAI response content:', content);
+
     let parsed: Partial<SpiritStandardized>;
     try {
       parsed = JSON.parse(content) as Partial<SpiritStandardized>;
@@ -100,7 +102,7 @@ export class AiService {
         'OpenAI did not return valid JSON',
       );
     }
-
+    console.log('Parsed OpenAI response:', parsed);
     const result = this.normalizeSpiritResponse(parsed);
 
     this.kafkaProducer.publish('ai.result.created', {
