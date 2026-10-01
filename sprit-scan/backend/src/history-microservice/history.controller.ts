@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 
 import type { AuthenticatedRequest } from '../types';
+import { HistoryEntryDto } from './history.dto';
 
 import { HistoryService } from './history.service';
 import { UseGuards } from '@nestjs/common';
@@ -41,7 +42,7 @@ export class HistoryController {
   @HttpCode(HttpStatus.CREATED)
   async createHistoryEntry(
     @Req() req: AuthenticatedRequest,
-    @Body() body: any,
+    @Body() body: HistoryEntryDto,
   ) {
     const userId = this.requireUserId(req);
     return this.historyService.createHistoryEntry(userId, body);

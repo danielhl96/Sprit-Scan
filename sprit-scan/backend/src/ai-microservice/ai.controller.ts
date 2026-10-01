@@ -16,6 +16,7 @@ import type {
 } from '../types';
 import { UseGuards } from '@nestjs/common';
 import { JwtValiGuard } from './guards/jwt-vali.guard';
+import { DataBodyExpertDto, DataBodySpiritsDto } from './ai.dto';
 
 @Controller('ai')
 @UseGuards(JwtValiGuard)
@@ -40,7 +41,10 @@ export class AiController {
 
   @HttpCode(HttpStatus.OK)
   @Post('expert')
-  async expert(@Req() req: AuthenticatedRequest, @Body() body: DataBodyExpert) {
+  async expert(
+    @Req() req: AuthenticatedRequest,
+    @Body() body: DataBodyExpertDto,
+  ) {
     const userId = this.requireUserId(req);
     return this.aiService.expert(userId, body);
   }
@@ -49,7 +53,7 @@ export class AiController {
   @Post('spirits')
   async assistant(
     @Req() req: AuthenticatedRequest,
-    @Body() body: DataBodySpirits,
+    @Body() body: DataBodySpiritsDto,
   ) {
     const userId = this.requireUserId(req);
     return this.aiService.spirits(userId, body);

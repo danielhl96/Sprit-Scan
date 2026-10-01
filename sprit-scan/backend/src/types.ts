@@ -15,5 +15,4 @@ export type DataBodyExpert = {
 export type DataBodySpirits = {
   imageUrl?: string;
   base64Image?: string;
-  prompt: string;
 };

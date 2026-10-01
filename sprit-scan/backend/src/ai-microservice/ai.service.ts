@@ -49,7 +49,7 @@ export class AiService {
   }
 
   async spirits(userId: string, body: DataBodySpirits) {
-    const { imageUrl, prompt } = this.extractSpiritsInput(body);
+    const { imageUrl } = this.extractSpiritsInput(body);
 
     const systemPrompt = [
       'You are an assistant for structured spirits data extraction.',
@@ -104,7 +104,6 @@ export class AiService {
 
   private extractSpiritsInput(body: unknown): {
     imageUrl: string;
-    prompt?: string;
   } {
     if (typeof body !== 'object' || body === null) {
       throw new BadRequestException('Request body is required');
@@ -117,13 +116,8 @@ export class AiService {
       imageMimeType?: unknown;
     };
 
-    const prompt =
-      typeof data.prompt === 'string' && data.prompt.trim().length > 0
-        ? data.prompt.trim()
-        : undefined;
-
     if (typeof data.imageUrl === 'string' && data.imageUrl.trim().length > 0) {
-      return { imageUrl: data.imageUrl.trim(), prompt };
+      return { imageUrl: data.imageUrl.trim() };
     }
 
     if (
@@ -135,7 +129,7 @@ export class AiService {
           ? data.imageMimeType
           : 'image/jpeg';
       const imageUrl = `data:${mimeType};base64,${data.imageBase64.trim()}`;
-      return { imageUrl, prompt };
+      return { imageUrl };
     }
 
     throw new BadRequestException(
