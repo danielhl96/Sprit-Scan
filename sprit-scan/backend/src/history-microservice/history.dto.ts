@@ -2,8 +2,6 @@ import { IsNotEmpty } from 'class-validator';
 
 export class HistoryEntryDto {
   @IsNotEmpty()
-  userId: string;
-  @IsNotEmpty()
   name: string;
   @IsNotEmpty()
   date: Date;

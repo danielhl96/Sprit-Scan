@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, ValidateIf } from 'class-validator';
 
 export class DataBodyExpertDto {
   @IsNotEmpty()
@@ -6,6 +6,11 @@ export class DataBodyExpertDto {
 }
 
 export class DataBodySpiritsDto {
+  @ValidateIf((o) => !o.imageUrl)
   @IsNotEmpty()
-  base64Image: string;
+  imageBase64?: string;
+
+  @ValidateIf((o) => !o.imageBase64)
+  @IsNotEmpty()
+  imageUrl?: string;
 }

@@ -25,12 +25,12 @@ export interface ProxyRequestOptions {
  */
 @Injectable()
 export class ProxyService {
-  private readonly resilience: ResilienceService;
   private readonly logger = new Logger(ProxyService.name);
 
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly resilience: ResilienceService,
   ) {}
 
   /** Resolve the configured base URL for a given microservice. */

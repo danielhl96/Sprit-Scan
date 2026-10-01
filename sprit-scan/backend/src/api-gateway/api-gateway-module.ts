@@ -14,6 +14,7 @@ import { ProfileController } from './routes/profile.controller';
 import { HistoryController } from './routes/history.controller';
 import { AiController } from './routes/ai.controller';
 import { JwtModule } from '@nestjs/jwt';
+import { ResilienceService } from '../resilience/resilience.service';
 
 @Module({
   imports: [
@@ -58,6 +59,8 @@ import { JwtModule } from '@nestjs/jwt';
   providers: [
     ApiGatewayService,
     ProxyService,
+    ResilienceService,
+
     // Apply the throttler globally to every route.
     {
       provide: APP_GUARD,

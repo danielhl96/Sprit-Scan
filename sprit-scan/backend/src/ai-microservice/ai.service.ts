@@ -68,10 +68,7 @@ export class AiService {
       userContent: [
         {
           type: 'text',
-          text:
-            prompt && prompt.length > 0
-              ? `Task: ${prompt}`
-              : 'Task: Analyze this spirit bottle image and extract standardized product information.',
+          text: 'Task: Analyze this spirit bottle image and extract standardized product information.',
         },
         {
           type: 'image_url',
