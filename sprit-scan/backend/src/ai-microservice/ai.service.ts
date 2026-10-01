@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AiKafkaProducerService } from './ai-kafka-producer.service';
 
 import type { DataBodyExpert, DataBodySpirits } from '../types';
 
@@ -30,7 +31,10 @@ type OpenAiChatCompletionResponse = {
 
 @Injectable()
 export class AiService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly kafkaProducer: AiKafkaProducerService,
+  ) {}
 
   async expert(userId: string, body: DataBodyExpert) {
     const prompt = this.extractPrompt(body);
@@ -45,7 +49,16 @@ export class AiService {
       temperature: 0.4,
     });
 
-    return { message: content };
+    const result = { message: content };
+
+    this.kafkaProducer.publish('ai.result.created', {
+      type: 'expert',
+      userId,
+      result,
+      createdAt: new Date().toISOString(),
+    });
+
+    return result;
   }
 
   async spirits(userId: string, body: DataBodySpirits) {
@@ -88,7 +101,16 @@ export class AiService {
       );
     }
 
-    return this.normalizeSpiritResponse(parsed);
+    const result = this.normalizeSpiritResponse(parsed);
+
+    this.kafkaProducer.publish('ai.result.created', {
+      type: 'spirits',
+      userId,
+      result,
+      createdAt: new Date().toISOString(),
+    });
+
+    return result;
   }
 
   private extractPrompt(body: DataBodyExpert): string {

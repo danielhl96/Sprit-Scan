@@ -4,6 +4,7 @@ import { HistoryController } from './history.controller';
 import { HistoryService } from './history.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
+import { HistoryConsumerController } from './history-consumer.controller';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: '2h' },
     }),
   ],
-  controllers: [HistoryController],
+  controllers: [HistoryController, HistoryConsumerController],
   providers: [HistoryService],
 })
 export class HistoryModule {}

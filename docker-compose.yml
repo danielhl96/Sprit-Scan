@@ -86,11 +86,13 @@ services:
       - DATABASE_URL_HISTORY=postgresql://historyuser:historypassword@history-db:5432/history-db?sslmode=disable
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=your_jwt_secret_key_here
+      - KAFKA_GROUP_ID=history-service-consumer
+      - KAFKA_BROKERS=kafka:9092
     volumes:
       - ./sprit-scan/backend:/app
       - /app/node_modules
     networks:
-      - internal
+      - app-network
     depends_on:
       - history-db
       - redis
@@ -109,6 +111,8 @@ services:
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=your_jwt_secret_key_here
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_CLIENT_ID=ai-microservice
     volumes:
       - ./sprit-scan/backend:/app
       - /app/node_modules
@@ -116,7 +120,27 @@ services:
       - app-network
     depends_on:
       - redis
+      - kafka
     command: sh -c "node --watch -r ts-node/register -r tsconfig-paths/register src/ai-microservice/main.ts"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.7.1
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
+    networks:
+      - app-network
 
   # ─────────────────────────────────────────
   # DATENBANKEN (je Service eine eigene)
@@ -142,7 +166,7 @@ services:
     volumes:
       - history-db-data:/var/lib/postgresql/data
     networks:
-      - internal
+      - app-network
 
   # ─────────────────────────────────────────
   # REDIS – Session / Cache / Message Bus

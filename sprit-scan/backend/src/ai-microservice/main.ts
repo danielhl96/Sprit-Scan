@@ -6,7 +6,7 @@ import { AiModule } from './ai.module';
 async function bootstrap() {
   const app = await NestFactory.create(AiModule);
   const configService = app.get(ConfigService);
-  const port = parseInt(configService.get<string>('PORT') ?? '3001', 10);
+  const port = parseInt(configService.get<string>('PORT') ?? '3004', 10);
 
   // Validate/transform incoming payloads globally.
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
