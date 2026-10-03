@@ -1,8 +1,8 @@
 <label
   class="input bg-white flex border-lg border-black text-black rounded-lg items-center w-[70dvw]"
   [class]="{
-    'border-red-400': email && !checkEmailValidity(),
-    'border-green-400': email && checkEmailValidity(),
+    'border-red-400': email && !checkEmailValidity() && validEmailOn,
+    'border-green-400': email && checkEmailValidity() && validEmailOn,
   }"
 >
   <span class="text-black">
@@ -31,6 +31,6 @@
     (input)="onEmailChange($any($event.target).value)"
   />
 </label>
-@if (email && !checkEmailValidity()) {
+@if (email && !checkEmailValidity() && validEmailOn) {
   <span class="text-center text-error text-sm">Invalid email address</span>
 }

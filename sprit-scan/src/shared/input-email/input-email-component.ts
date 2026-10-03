@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 })
 export class InputEmailComponent {
   @Input() email: string = '';
+  @Input() validEmailOn: boolean = true;
   @Output() emailChange = new EventEmitter<string>();
   @Output() emailValidityChange = new EventEmitter<boolean>();
 

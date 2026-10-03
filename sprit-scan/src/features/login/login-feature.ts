@@ -4,6 +4,8 @@ import { ButtonComponent } from '../../shared/button/button-component';
 import { InputEmailComponent } from '../../shared/input-email/input-email-component';
 import { InputPasswordComponent } from '../../shared/input-password/input-password-component';
 import { Router } from '@angular/router';
+import { LoginFeatureService } from './login-feature.service';
+import { NotificationService } from '../../shared/notification/notification-service';
 
 @Component({
   selector: 'login-feature',
@@ -12,6 +14,9 @@ import { Router } from '@angular/router';
 })
 export class LoginFeature {
   protected readonly title = signal('sprit-scan');
+  LoginFeatureService: LoginFeatureService = inject(LoginFeatureService);
+  NotificationService = inject(NotificationService);
+
   emailinput = signal('');
   passwordinput = signal('');
   emailValid = signal(false);
@@ -24,6 +29,22 @@ export class LoginFeature {
   }
   navgiateToHome() {
     this.router.navigate(['/home']);
+  }
+
+  protected login() {
+    this.LoginFeatureService.login(this.emailinput(), this.passwordinput()).subscribe({
+      next: (response) => {
+        console.log('Login successful', response);
+        this.navgiateToHome();
+      },
+      error: (error) => {
+        console.error('Login failed:', error);
+        this.NotificationService.showNotification(
+          'Login failed. Please check your credentials.',
+          'error',
+        );
+      },
+    });
   }
 
   /** Button ist nur aktiv, wenn beide Felder gültig sind */
