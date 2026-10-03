@@ -14,13 +14,19 @@ export class JwtValiGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    let token: string | undefined;
+
+    if (typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else {
+      token = req.cookies?.access_token as string | undefined;
+    }
+
+    if (!token) {
       throw new UnauthorizedException(
         'Missing or invalid Authorization header',
       );
     }
-
-    const token = authHeader.substring(7);
 
     try {
       const payload = this.jwtService.verify(token, {

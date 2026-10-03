@@ -3,7 +3,7 @@ import { TemplatePageComponent } from '../../shared/template-page/template-page-
 import { ButtonComponent } from '../../shared/button/button-component';
 import { ChatBubbleComponent } from '../../shared/chatbubble/chatbubble-component';
 import { NotificationService } from '../../shared/notification/notification-service';
-import { not } from 'rxjs/internal/util/not';
+import { AiFeatureService } from './ai-expert-feature.service';
 @Component({
   selector: 'ai-expert-feature',
   imports: [TemplatePageComponent, ButtonComponent, ChatBubbleComponent],
@@ -20,7 +20,7 @@ export class AiExpertFeature {
   // Reference to the scrollable chat container
   chatContainer = viewChild<ElementRef<HTMLDivElement>>('chatContainer');
 
-  constructor() {
+  constructor(private aiFeatureService: AiFeatureService) {
     // Whenever chatHistory changes, scroll smoothly to the newest message
     effect(() => {
       // Track chatHistory so the effect re-runs on updates
@@ -43,7 +43,19 @@ export class AiExpertFeature {
       { message: newInput, isUserMessage: true, id: history.length },
     ]);
     this.userInput.set(''); // Clear the input after sending
-    this.notify.showNotification('Image uploaded successfully!', 'success');
+    this.aiFeatureService.expert(newInput).subscribe({
+      next: (response: any) => {
+        console.log('AI response received:', response);
+        this.chatHistory.update((history) => [
+          ...history,
+          { message: response.message, isUserMessage: false, id: history.length },
+        ]);
+      },
+      error: (error) => {
+        console.error('Error from AI service:', error);
+        this.notify.showNotification('Error from AI service: ' + error.message, 'error');
+      },
+    });
   }
 
   handleImageSelected(file: File | undefined) {
@@ -64,6 +76,22 @@ export class AiExpertFeature {
         },
       ]);
       this.userInput.set(''); // Clear the input after sending
+      this.aiFeatureService.sprits(dataUrl).subscribe({
+        next: (response: any) => {
+          console.log('AI response for image received:', response);
+          this.chatHistory.update((history) => [
+            ...history,
+            { message: response.description, isUserMessage: false, id: history.length },
+          ]);
+        },
+        error: (error) => {
+          console.error('Error from AI service for image:', error);
+          this.notify.showNotification(
+            'Error from AI service for image: ' + error.message,
+            'error',
+          );
+        },
+      });
     };
     reader.readAsDataURL(file);
   }

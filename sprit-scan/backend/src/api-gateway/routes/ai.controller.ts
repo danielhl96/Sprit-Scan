@@ -26,6 +26,11 @@ export class AiController {
     const authorization = req.headers.authorization;
     if (typeof authorization === 'string') {
       headers.authorization = authorization;
+    } else {
+      const cookieToken = req.cookies?.access_token as string | undefined;
+      if (cookieToken) {
+        headers.authorization = `Bearer ${cookieToken}`;
+      }
     }
 
     const cookie = req.headers.cookie;
