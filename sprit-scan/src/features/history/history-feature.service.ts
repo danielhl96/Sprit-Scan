@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { NG_APP_ROOT_DOMAIN } from '../../app/api/api-root-domain';
 export type HistoryEntry = {
   id: number;
   name: string;
@@ -21,6 +21,6 @@ export class HistoryFeatureService {
   constructor(private httpClientService: HttpClient) {}
 
   getHistory() {
-    return this.httpClientService.get<HistoryEntry[]>('http://localhost:3000/api/history/entries');
+    return this.httpClientService.get<HistoryEntry[]>(NG_APP_ROOT_DOMAIN + 'history/entries');
   }
 }

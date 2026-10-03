@@ -4,7 +4,6 @@ import { TemplatePageComponent } from '../../shared/template-page/template-page-
 import { Result } from '../../shared/result/result';
 import { HistoryFeatureService, HistoryEntry } from './history-feature.service';
 
-
 @Component({
   selector: 'history-feature',
   imports: [ModalComponent, TemplatePageComponent, Result],
@@ -19,7 +18,6 @@ export class HistoryFeature {
   private readonly historyFeatureService = inject(HistoryFeatureService);
 
   ngOnInit(): void {
-    // Hier wird Ihre Funktion beim Start aufgerufen
     this.historyFeatureService.getHistory().subscribe({
       next: (entries) => {
         this.listOfHistoryEntries.set(entries);
@@ -40,7 +38,6 @@ export class HistoryFeature {
   selectModal(id: number) {
     this.selectedEntry.set(this.listOfHistoryEntries().find((entry) => entry.id === id) || null);
     if (this.selectedEntry()) {
-      console.log('Selected Entry:', this.selectedEntry());
       this.toggleModal.set(true);
     }
   }

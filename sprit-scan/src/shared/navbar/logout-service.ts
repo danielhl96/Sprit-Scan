@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { NG_APP_ROOT_DOMAIN } from '../../app/api/api-root-domain';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,7 @@ export class LogoutService {
   ) {}
 
   logout() {
-    this.http.post('http://localhost:3000/api/auth/logout', {}).subscribe({
+    this.http.post(NG_APP_ROOT_DOMAIN + 'auth/logout', {}).subscribe({
       next: () => {
         this.router.navigate(['/login']);
       },

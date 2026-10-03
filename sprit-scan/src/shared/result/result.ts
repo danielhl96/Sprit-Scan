@@ -1,7 +1,5 @@
 import { Component, signal, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonComponent } from '../button/button-component';
-import { ModalComponent } from '../modal/modal-component';
 
 type HistoryEntry = {
   id: number;
@@ -21,7 +19,7 @@ type HistoryEntry = {
 @Component({
   selector: 'result',
   standalone: true,
-  imports: [CommonModule, ModalComponent],
+  imports: [CommonModule],
   templateUrl: './result.html',
 })
 export class Result {

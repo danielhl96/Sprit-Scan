@@ -34,7 +34,6 @@ export class LoginFeature {
   protected login() {
     this.LoginFeatureService.login(this.emailinput(), this.passwordinput()).subscribe({
       next: (response) => {
-        console.log('Login successful', response);
         this.navgiateToHome();
       },
       error: (error) => {

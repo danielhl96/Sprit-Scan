@@ -1,8 +1,9 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { ButtonComponent } from '../../shared/button/button-component';
 import { InputPasswordComponent } from '../../shared/input-password/input-password-component';
 import { ModalComponent } from '../../shared/modal/modal-component';
-
+import { EditPasswordService } from './edit-password.service';
+import { NotificationService } from '../../shared/notification/notification-service';
 @Component({
   selector: 'edit-password-modal',
   imports: [ButtonComponent, InputPasswordComponent, ModalComponent],
@@ -11,7 +12,8 @@ import { ModalComponent } from '../../shared/modal/modal-component';
 export class EditPasswordModal {
   toggleModal = input(false);
   toggleModalChange = output<boolean>();
-
+  editPasswordService: EditPasswordService = inject(EditPasswordService);
+  notificationService: NotificationService = inject(NotificationService);
   email = signal('');
   newPassword = signal('');
   currentPassword = signal('');
@@ -40,8 +42,19 @@ export class EditPasswordModal {
     return this.newPassword() !== this.currentPassword();
   });
 
-  onSaveEmail(): void {
-    console.log('Save Email clicked');
+  protected onSavePassword(): void {
     this.toggleModalChange.emit(false);
+    this.editPasswordService.editPassword(this.newPassword(), this.currentPassword()).subscribe({
+      next: (response) => {
+        this.notificationService.showNotification('Password updated successfully', 'success');
+        this.toggleModalChange.emit(false);
+      },
+      error: (error) => {
+        this.notificationService.showNotification(
+          'Failed to update password. ' + error.message,
+          'error',
+        );
+      },
+    });
   }
 }

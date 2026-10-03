@@ -32,11 +32,13 @@ export class RegisterFeature {
   register() {
     this.RegisterFeatureService.register(this.emailinput(), this.passwordinput()).subscribe({
       next: (response) => {
-        console.log('Registration successful', response);
+        this.NotificationService.showNotification(
+          'Registration successful. Please log in.',
+          'success',
+        );
         this.navigateToLogin();
       },
       error: (error) => {
-        console.error('Registration failed:', error);
         this.NotificationService.showNotification(error.message, 'error');
       },
     });

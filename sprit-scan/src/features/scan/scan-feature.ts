@@ -14,7 +14,7 @@ export class ScanFeature {
   imageUrl = signal<string>('');
   private readonly scanAnimationService = inject(ScanAnimationService);
   private readonly aiFeatureService = inject(AiFeatureService);
-  handleFileSelected(file: File): void {
+  protected handleFileSelected(file: File): void {
     this.scannedFile.set(file);
 
     // Revoke any previous object URL to avoid memory leaks
@@ -22,12 +22,13 @@ export class ScanFeature {
     if (previousUrl) {
       URL.revokeObjectURL(previousUrl);
     }
-    // Create a browser URL that points to the uploaded file's content
     this.imageUrl.set(URL.createObjectURL(file));
+    this.scanFile(this.imageUrl());
+  }
 
+  protected scanFile(imageUrl: string) {
     this.scanAnimationService.showAnimation(true);
-    console.log('File selected:', file);
-    this.aiFeatureService.sprits(this.imageUrl()).subscribe({
+    this.aiFeatureService.sprits(imageUrl).subscribe({
       next: (response: any) => {
         console.log('AI response received:', response);
         this.scanAnimationService.showAnimation(false);
