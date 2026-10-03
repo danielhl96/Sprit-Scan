@@ -32,7 +32,6 @@ export class AiController {
         headers.authorization = `Bearer ${cookieToken}`;
       }
     }
-
     const cookie = req.headers.cookie;
     if (typeof cookie === 'string') {
       headers.cookie = cookie;

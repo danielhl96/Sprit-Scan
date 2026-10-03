@@ -5,6 +5,7 @@ import { AxiosError, AxiosRequestConfig, Method } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { ServiceName, ServiceUrls } from '../config/services.config';
 import { ResilienceService } from '../../resilience/resilience.service';
+import { Request } from 'express';
 export interface ProxyRequestOptions {
   /** HTTP method to use against the microservice. */
   method: Method;
@@ -16,6 +17,8 @@ export interface ProxyRequestOptions {
   params?: Record<string, unknown>;
   /** Optional headers forwarded to the microservice. */
   headers?: Record<string, string>;
+
+  Request?: Request; // Optional property to include the original request object
 }
 
 /**
@@ -60,7 +63,12 @@ export class ProxyService {
       method: options.method,
       data: options.data,
       params: options.params,
-      headers: options.headers,
+      headers: {
+        ...options.headers,
+        ...(options.Request?.headers.cookie
+          ? { cookie: options.Request.headers.cookie }
+          : {}),
+      },
     };
 
     this.logger.debug(`→ ${options.method} ${url}`);

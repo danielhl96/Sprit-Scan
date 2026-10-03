@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 import { ScanFeature } from '../../features/scan/scan-feature';
 import { ICONS } from '../icons';
+import { LogoutService } from './logout-service';
 
 export type NavbarElement = {
   name: string;
@@ -20,7 +21,7 @@ export type NavbarElement = {
 })
 export class NavbarComponent {
   router = inject(Router);
-
+  logoutService = inject(LogoutService);
   @Input() elements: NavbarElement[] = [
     { name: 'Home', route: '/home', icon: ICONS.home },
     { name: 'Scan', route: '/scan', icon: ICONS.scan },
@@ -53,6 +54,14 @@ export class NavbarComponent {
       this.navgigateToRoute(this.router.url); // Stay on the current route after opening the file input);
       return;
     }
+
+    if (element.route === '/logout') {
+      this.navgigateToRoute(element.route);
+      this.logoutService.logout();
+      this.menuOpen = false;
+      return;
+    }
+
     this.elementClick.emit(element);
     this.navgigateToRoute(element.route);
     this.menuOpen = false;

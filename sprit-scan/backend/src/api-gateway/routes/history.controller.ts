@@ -27,14 +27,14 @@ export class HistoryController {
   private getForwardHeaders(req: AuthenticatedRequest): Record<string, string> {
     const headers: Record<string, string> = {};
 
-    const authorization = req.headers.authorization;
-    if (typeof authorization === 'string') {
-      headers.authorization = authorization;
-    }
-
     const cookie = req.headers.cookie;
     if (typeof cookie === 'string') {
       headers.cookie = cookie;
+    } else {
+      const cookieToken = req.cookies?.access_token as string | undefined;
+      if (cookieToken) {
+        headers.authorization = `Bearer ${cookieToken}`;
+      }
     }
 
     const contentType = req.headers['content-type'];

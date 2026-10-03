@@ -10,7 +10,6 @@ import { ProxyService } from './proxy/proxy.service';
 import { gatewayConfig, servicesConfig } from './config/services.config';
 
 import { AuthController } from './routes/auth.controller';
-import { ProfileController } from './routes/profile.controller';
 import { HistoryController } from './routes/history.controller';
 import { AiController } from './routes/ai.controller';
 import { JwtModule } from '@nestjs/jwt';
@@ -52,7 +51,6 @@ import { ResilienceService } from '../resilience/resilience.service';
   controllers: [
     ApiGatewayController,
     AuthController,
-    ProfileController,
     HistoryController,
     AiController,
   ],
