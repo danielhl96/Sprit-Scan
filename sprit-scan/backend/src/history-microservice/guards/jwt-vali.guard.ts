@@ -12,15 +12,14 @@ export class JwtValiGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token =
+      req.cookies?.access_token || req.headers.authorization?.split(' ')[1];
+    console.log('JwtValiGuard: token:', token); // Debugging line
+    if (!token) {
       throw new UnauthorizedException(
         'Missing or invalid Authorization header',
       );
     }
-
-    const token = authHeader.substring(7);
 
     try {
       const payload = this.jwtService.verify(token, {

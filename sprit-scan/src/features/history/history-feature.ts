@@ -1,22 +1,9 @@
-import { Component, computed, output, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { Result } from '../../shared/result/result';
+import { HistoryFeatureService, HistoryEntry } from './history-feature.service';
 
-type HistoryEntry = {
-  id: number;
-  name: string;
-  date: string;
-  description: string;
-  taste?: string;
-  origin?: string;
-  recommendation?: string;
-  year?: string;
-  customerreview?: string;
-  rawmaterials?: string;
-  alternative?: string;
-  price?: string;
-};
 
 @Component({
   selector: 'history-feature',
@@ -29,112 +16,22 @@ export class HistoryFeature {
   inputSearch = signal('');
   selectedEntry = signal<HistoryEntry | null>(null);
 
+  private readonly historyFeatureService = inject(HistoryFeatureService);
+
+  ngOnInit(): void {
+    // Hier wird Ihre Funktion beim Start aufgerufen
+    this.historyFeatureService.getHistory().subscribe({
+      next: (entries) => {
+        this.listOfHistoryEntries.set(entries);
+      },
+      error: (error) => {
+        console.error('Error fetching history entries:', error);
+      },
+    });
+  }
+
   toggleModalChange = output<boolean>();
-  listOfHistoryEntries = signal<HistoryEntry[]>([
-    {
-      id: 1,
-      name: 'Jack Daniels',
-      date: '2024-06-01',
-      description: 'Scanned Jack Daniels',
-      alternative: 'Jack Daniels',
-      taste: 'Smooth',
-      origin: 'USA',
-      recommendation: 'Best served neat',
-      year: '2024',
-      customerreview: 'Excellent whiskey!',
-      rawmaterials: 'Corn, Barley, Rye',
-      price: '$30',
-    },
-    {
-      id: 2,
-      name: 'Bree',
-      date: '2024-06-02',
-      description: 'Scanned Bree',
-      taste: 'Fruity',
-      origin: 'France',
-      recommendation: 'Best served chilled',
-      year: '2024',
-      customerreview: 'Refreshing and light!',
-      rawmaterials: 'Grapes, Sugar, Water',
-      alternative: 'Bree',
-      price: '$25',
-    },
-    {
-      id: 3,
-      name: 'Averna',
-      date: '2024-06-03',
-      description: 'Scanned Averna',
-      taste: 'Bitter',
-      origin: 'Italy',
-      recommendation: 'Best served on the rocks',
-      year: '2024',
-      customerreview: 'Bitter and strong!',
-      rawmaterials: 'Herbs, Roots, Citrus',
-      alternative: 'Averna',
-      price: '$28',
-    },
-    {
-      id: 4,
-      name: 'Jack Daniels',
-      date: '2024-06-04',
-      description: 'Scanned Jack Daniels',
-      taste: 'Smooth',
-      origin: 'USA',
-      recommendation: 'Best served neat',
-      year: '2024',
-      customerreview: 'Classic taste!',
-      rawmaterials: 'Corn, Barley, Rye',
-      alternative: 'Jack Daniels',
-    },
-    {
-      id: 5,
-      name: 'Bree',
-      date: '2024-06-05',
-      description: 'Scanned Bree',
-      taste: 'Fruity',
-      origin: 'France',
-      recommendation: 'Best served chilled',
-      year: '2024',
-      customerreview: 'Light and refreshing!',
-      rawmaterials: 'Grapes, Sugar, Water',
-    },
-    {
-      id: 6,
-      name: 'Averna',
-      date: '2024-06-06',
-      description: 'Scanned Averna',
-      taste: 'Bitter',
-      origin: 'Italy',
-      recommendation: 'Best served on the rocks',
-      year: '2024',
-      customerreview: 'Strong and bold!',
-      rawmaterials: 'Herbs, Roots, Citrus',
-    },
-    {
-      id: 7,
-      name: 'Jack Daniels',
-      date: '2024-06-07',
-      description: 'Scanned Jack Daniels',
-      taste: 'Smooth',
-      origin: 'USA',
-      recommendation: 'Best served neat',
-      year: '2024',
-      customerreview: 'Rich and flavorful!',
-      rawmaterials: 'Corn, Barley, Rye',
-    },
-    {
-      id: 8,
-      name: 'Bree',
-      date: '2024-06-08',
-      description: 'Scanned Bree',
-      taste: 'Sweet',
-      origin: 'France',
-      recommendation: 'Best served chilled',
-      year: '2024',
-      customerreview: 'Great product!',
-      rawmaterials: 'Grapes, Sugar, Water',
-    },
-  ]);
+  listOfHistoryEntries = signal<HistoryEntry[]>([]);
 
   inputSearchValue(value: string) {
     this.inputSearch.set(value);

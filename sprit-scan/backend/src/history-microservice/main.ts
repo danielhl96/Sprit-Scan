@@ -18,7 +18,6 @@ async function bootstrap() {
     },
   });
 
-  await app.startAllMicroservices();
   const configService = app.get(ConfigService);
   const port = parseInt(configService.get<string>('PORT') ?? '3003', 10);
 
@@ -27,11 +26,18 @@ async function bootstrap() {
   // - whitelist: strips properties that are not declared in the DTO
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
+  // Start the HTTP listener first so the API gateway can reach this service
+  // immediately. The Kafka consumer group join/rebalance can take 20-30s,
+  // which previously blocked app.listen() and caused ECONNREFUSED on every
+  // service restart.
   await app.listen(port);
   Logger.log(
     `🚀 History Microservice is running on http://localhost:${port}`,
     'Bootstrap',
   );
+
+  await app.startAllMicroservices();
+  Logger.log('✅ Kafka consumer connected', 'Bootstrap');
 }
 
 void bootstrap();
