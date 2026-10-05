@@ -1,12 +1,16 @@
 import { HttpHandlerFn, HttpRequest } from '@angular/common/http';
+import { inject } from '@angular/core/primitives/di';
+import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
 export function errorInterceptor(req: HttpRequest<any>, next: HttpHandlerFn) {
+  const router = inject(Router);
   return next(req).pipe(
     catchError((error) => {
       if (error.status === 401) {
         // Handle unauthorized error (e.g., redirect to login)
         console.error('Unauthorized request. Redirecting to login.');
+        router.navigate(['/login']);
         return throwError(() => new Error('Unauthorized request. Redirecting to login.'));
       } else if (error.status === 403) {
         // Handle forbidden error (e.g., show access denied message)

@@ -32,6 +32,13 @@ export class AuthController {
     return this.authService.login(loginDto.email, loginDto.password);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post('me')
+  @UseGuards(JwtAuthGuard)
+  async getMe() {
+    return true;
+  }
+
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
   async register(@Body() registerDto: RegisterUserDto) {

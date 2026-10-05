@@ -85,7 +85,7 @@ export class AuthController {
       }
       res.clearCookie('access_token');
       res.status(HttpStatus.NO_CONTENT);
-      return res;
+      return;
     }
 
     const normalizedPath = Array.isArray(path)
@@ -109,6 +109,6 @@ export class AuthController {
       return { message: 'Login successful' };
     }
 
-    return res.send(response);
+    return response;
   }
 }

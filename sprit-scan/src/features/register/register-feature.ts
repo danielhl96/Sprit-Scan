@@ -6,7 +6,6 @@ import { InputPasswordComponent } from '../../shared/input-password/input-passwo
 import { Router } from '@angular/router';
 import { RegisterFeatureService } from './register-feature.service';
 import { NotificationService } from '../../shared/notification/notification-service';
-import { not } from 'rxjs/internal/util/not';
 @Component({
   selector: 'register-feature',
   imports: [TemplatePageComponent, ButtonComponent, InputEmailComponent, InputPasswordComponent],
@@ -39,7 +38,8 @@ export class RegisterFeature {
         this.navigateToLogin();
       },
       error: (error) => {
-        this.NotificationService.showNotification(error.message, 'error');
+        const message = error?.error?.message ?? error?.message ?? 'Registration failed';
+        this.NotificationService.showNotification(message, 'error');
       },
     });
   }

@@ -164,6 +164,7 @@ export class AiService {
     userContent: string | Array<Record<string, unknown>>;
     temperature: number;
     responseFormat?: { type: 'json_object' };
+    allowWebSearchFallback?: boolean;
   }): Promise<string> {
     const apiKey = this.configService.get<string>('OPENAI_API_KEY');
     if (!apiKey) {
@@ -174,29 +175,144 @@ export class AiService {
 
     const model = process.env.OPENAI_MODEL ?? 'gpt-4o-mini';
 
+    let primaryContent: string | undefined;
+    let primaryError: unknown;
+
+    try {
+      primaryContent = await this.executeOpenAiChatCompletion(apiKey, {
+        model,
+        temperature: options.temperature,
+        ...(options.responseFormat
+          ? { response_format: options.responseFormat }
+          : {}),
+        messages: this.buildMessages(options),
+      });
+    } catch (error) {
+      primaryError = error;
+    }
+
+    const shouldTryWebSearch =
+      options.allowWebSearchFallback !== false &&
+      (!primaryContent ||
+        this.needsWebSearchFallback(primaryContent, options.responseFormat));
+
+    if (shouldTryWebSearch) {
+      const webSearchModel =
+        process.env.OPENAI_WEB_MODEL ?? 'gpt-4o-search-preview';
+
+      try {
+        const webContent = await this.executeOpenAiChatCompletion(apiKey, {
+          model: webSearchModel,
+          temperature: options.temperature,
+          ...(options.responseFormat
+            ? { response_format: options.responseFormat }
+            : {}),
+          web_search_options: {
+            search_context_size: 'medium',
+          },
+          messages: this.buildMessages(options, true),
+        });
+
+        if (webContent.trim().length > 0) {
+          return webContent;
+        }
+      } catch {
+        // Fall back to primary content if available.
+      }
+    }
+
+    if (primaryContent) {
+      return primaryContent;
+    }
+
+    if (primaryError instanceof Error) {
+      throw new InternalServerErrorException(primaryError.message);
+    }
+
+    throw new InternalServerErrorException('OpenAI returned empty content');
+  }
+
+  private buildMessages(
+    options: {
+      userId: string;
+      systemPrompt: string;
+      userContent: string | Array<Record<string, unknown>>;
+    },
+    withWebSearchInstruction = false,
+  ): Array<Record<string, unknown>> {
+    const systemPrompt = withWebSearchInstruction
+      ? `${options.systemPrompt} If required facts are missing or uncertain, use web search and then answer.`
+      : options.systemPrompt;
+
+    return [
+      { role: 'system', content: systemPrompt },
+      {
+        role: 'user',
+        content:
+          typeof options.userContent === 'string'
+            ? `UserId: ${options.userId}. Task: ${options.userContent}`
+            : options.userContent,
+      },
+    ];
+  }
+
+  private needsWebSearchFallback(
+    content: string,
+    responseFormat?: { type: 'json_object' },
+  ): boolean {
+    if (responseFormat?.type === 'json_object') {
+      try {
+        const parsed = JSON.parse(content) as {
+          name?: unknown;
+          description?: unknown;
+        };
+        const name =
+          typeof parsed.name === 'string'
+            ? parsed.name.trim().toLowerCase()
+            : '';
+        const description =
+          typeof parsed.description === 'string'
+            ? parsed.description.trim().toLowerCase()
+            : '';
+
+        if (!name || !description) {
+          return true;
+        }
+
+        const weakValues = ['unknown', 'n/a', 'no description', 'none'];
+        return (
+          weakValues.includes(name) ||
+          weakValues.includes(description) ||
+          description.length < 8
+        );
+      } catch {
+        return true;
+      }
+    }
+
+    const normalized = content.toLowerCase();
+    return [
+      "i don't know",
+      'i do not know',
+      'not enough information',
+      'cannot determine',
+      'unable to determine',
+      'no reliable information',
+      'cannot access',
+    ].some((phrase) => normalized.includes(phrase));
+  }
+
+  private async executeOpenAiChatCompletion(
+    apiKey: string,
+    body: Record<string, unknown>,
+  ): Promise<string> {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        temperature: options.temperature,
-        ...(options.responseFormat
-          ? { response_format: options.responseFormat }
-          : {}),
-        messages: [
-          { role: 'system', content: options.systemPrompt },
-          {
-            role: 'user',
-            content:
-              typeof options.userContent === 'string'
-                ? `UserId: ${options.userId}. Task: ${options.userContent}`
-                : options.userContent,
-          },
-        ],
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
