@@ -20,6 +20,10 @@ import { JwtModule } from '@nestjs/jwt';
               .split(',')
               .map((broker) => broker.trim())
               .filter(Boolean),
+            retry: {
+              initialRetryTime: 1000,
+              retries: 20,
+            },
           },
           producerOnlyMode: true,
         },

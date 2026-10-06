@@ -6,3 +6,9 @@
   hidden
 />
 <app-scan-animation [imageUrl]="imageUrl()"></app-scan-animation>
+
+<app-modal [toggleModal]="toggleModal()" (toggleModalChange)="toggleModal.set($event)">
+  @if (selectedEntry(); as entry) {
+    <result [entry]="entry"></result>
+  }
+</app-modal>
