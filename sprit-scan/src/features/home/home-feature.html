@@ -11,26 +11,33 @@
       <img src="/appicon-landing.svg" alt="Sprit-Scan Logo" class="h-[20dvh] w-[60dvw]" />
     </button>
   </div>
-
-  <h1 class="text-black font-bold text-center">Your last scans:</h1>
-  <div class="w-full flex flex-col items-center overflow-y-auto max-h-[25dvh]">
-    @if (Scans.length > 0) {
-      <div class="grid grid-cols-2 grid-rows-2 mb-2 gap-2">
-        @for (scan of Scans; track scan.id) {
-          <div
-            class="h-[10dvh] w-[40dvw] rounded-2xl border-1 bg-red-50/70 border-red-400 shadow-xl active:scale-95 transition cursor-pointer flex flex-col items-center justify-center"
-            (click)="selectedEntry.set(scan); toggleModal.set(true)"
-          >
-            <p class="text-black text-xs text-center">{{ scan.name }}</p>
-            <p class="text-black text-xs text-center">{{ scan.date }}</p>
-          </div>
-        }
-      </div>
-    } @else {
-      <p class="text-black text-center">No scans yet</p>
-    }
-  </div>
-
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center gap-2">
+      <p class="text-black text-center">Loading your last scans...</p>
+      <div
+        class="w-10 h-10 border-4 border-red-400 border-t-amber-50 border-b-transparent rounded-full animate-spin"
+      ></div>
+    </div>
+  } @else {
+    <h1 class="text-black font-bold text-center">Your last scans:</h1>
+    <div class="w-full flex flex-col items-center overflow-y-auto max-h-[25dvh]">
+      @if (Scans.length > 0) {
+        <div class="grid grid-cols-2 grid-rows-2 mb-2 gap-2">
+          @for (scan of Scans; track scan.id) {
+            <div
+              class="h-[10dvh] w-[40dvw] rounded-2xl border-1 bg-red-50/70 border-red-400 shadow-xl active:scale-95 transition cursor-pointer flex flex-col items-center justify-center"
+              (click)="selectedEntry.set(scan); toggleModal.set(true)"
+            >
+              <p class="text-black text-center">{{ scan.name }}</p>
+              <p class="text-black text-xs text-center">{{ scan.date | date: 'dd.MM.yyyy' }}</p>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-black text-center">No scans yet</p>
+      }
+    </div>
+  }
   <app-modal [toggleModal]="toggleModal()" (toggleModalChange)="toggleModal.set($event)">
     <div class="flex flex-col gap-1">
       @if (selectedEntry(); as entry) {

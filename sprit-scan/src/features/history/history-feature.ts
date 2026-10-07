@@ -1,4 +1,5 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { Result } from '../../shared/result/result';
@@ -6,7 +7,7 @@ import { HistoryFeatureService, HistoryEntry } from './history-feature.service';
 
 @Component({
   selector: 'history-feature',
-  imports: [ModalComponent, TemplatePageComponent, Result],
+  imports: [ModalComponent, TemplatePageComponent, Result, DatePipe],
   templateUrl: './history-feature.html',
   standalone: true,
 })
