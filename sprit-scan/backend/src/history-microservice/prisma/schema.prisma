@@ -29,3 +29,13 @@ model History {
 
   @@map("history")
 }
+
+// Stores the IDs of already processed Kafka events to guarantee
+// idempotent consumption (deduplication of at-least-once delivery).
+model ProcessedEvent {
+  eventId     String   @id
+  topic       String
+  processedAt DateTime @default(now())
+
+  @@map("processed_events")
+}

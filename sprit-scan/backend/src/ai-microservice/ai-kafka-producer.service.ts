@@ -6,6 +6,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AiKafkaProducerService implements OnModuleInit, OnModuleDestroy {
@@ -36,7 +37,7 @@ export class AiKafkaProducerService implements OnModuleInit, OnModuleDestroy {
       );
       return;
     }
-    this.client.emit(topic, payload);
+    this.client.emit(topic, { eventId: randomUUID(), ...payload });
   }
 
   private async tryConnect(): Promise<void> {

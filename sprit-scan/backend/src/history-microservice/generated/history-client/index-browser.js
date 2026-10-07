@@ -140,6 +140,12 @@ exports.Prisma.HistoryScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ProcessedEventScalarFieldEnum = {
+  eventId: 'eventId',
+  topic: 'topic',
+  processedAt: 'processedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -157,7 +163,8 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  History: 'History'
+  History: 'History',
+  ProcessedEvent: 'ProcessedEvent'
 };
 
 /**

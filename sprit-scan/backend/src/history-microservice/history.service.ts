@@ -28,26 +28,51 @@ type CreateHistoryEntryInput = Omit<
 export class HistoryService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Returns true when an event with the given id was already processed.
+   * Used by the Kafka consumer to deduplicate at-least-once deliveries.
+   */
+  async hasProcessedEvent(eventId: string): Promise<boolean> {
+    const existing = await this.prisma.processedEvent.findUnique({
+      where: { eventId },
+    });
+    return existing !== null;
+  }
+
   async createHistoryEntry(
     userId: string,
     data: Partial<CreateHistoryEntryInput>,
+    event?: { eventId?: string; topic: string },
   ): Promise<void> {
-    await this.prisma.history.create({
-      data: {
-        userId,
-        name: this.requiredText(data.name, 'Unknown Spirit'),
-        description: this.requiredText(data.description, 'No Description'),
-        taste: this.optionalTextOrNull(data.taste),
-        origin: this.optionalTextOrNull(data.origin),
-        recommendation: this.optionalTextOrNull(data.recommendation),
-        year: this.optionalTextOrNull(data.year),
-        customerReview: this.optionalTextOrNull(data.customerReview),
-        rawMaterials: this.optionalTextOrNull(data.rawMaterials),
-        alternative: this.optionalTextOrNull(data.alternative),
-        price: this.optionalTextOrNull(data.price),
-        date: this.toValidDate(data.date),
-      },
-    });
+    const historyData = {
+      userId,
+      name: this.requiredText(data.name, 'Unknown Spirit'),
+      description: this.requiredText(data.description, 'No Description'),
+      taste: this.optionalTextOrNull(data.taste),
+      origin: this.optionalTextOrNull(data.origin),
+      recommendation: this.optionalTextOrNull(data.recommendation),
+      year: this.optionalTextOrNull(data.year),
+      customerReview: this.optionalTextOrNull(data.customerReview),
+      rawMaterials: this.optionalTextOrNull(data.rawMaterials),
+      alternative: this.optionalTextOrNull(data.alternative),
+      price: this.optionalTextOrNull(data.price),
+      date: this.toValidDate(data.date),
+    };
+
+    // When an eventId is present, store the entry and the processed-event
+    // marker in a single transaction. The unique eventId prevents duplicates
+    // even if the same Kafka message is delivered more than once.
+    if (event?.eventId) {
+      await this.prisma.$transaction([
+        this.prisma.history.create({ data: historyData }),
+        this.prisma.processedEvent.create({
+          data: { eventId: event.eventId, topic: event.topic },
+        }),
+      ]);
+      return;
+    }
+
+    await this.prisma.history.create({ data: historyData });
   }
 
   private requiredText(value: unknown, fallback: string): string {

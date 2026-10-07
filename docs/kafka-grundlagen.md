@@ -109,7 +109,146 @@ export class HistoryConsumerController {
 }
 ```
 
-## 3. Erklärung der verwendeten Funktionen & Konstanten
+## 3. Wie wird eine Nachricht gesendet und empfangen?
+
+Dieser Abschnitt beschreibt den kompletten Weg einer Nachricht – Schritt für Schritt – vom Producer bis zum Consumer.
+
+### Schritt 1: Producer sendet (`emit`)
+
+Der Producer ruft `client.emit(topic, payload)` auf. Dabei passiert Folgendes:
+
+1. Das `payload`-Objekt wird **serialisiert** (zu JSON/Bytes umgewandelt).
+2. Der Client wählt eine **Partition** des Topics aus. Ohne expliziten Key geschieht das per Round-Robin; mit Key (`{ key, value }`) landen gleiche Keys immer in derselben Partition (wichtig für Reihenfolge).
+3. Die Nachricht wird über das Netzwerk an den **Broker** geschickt.
+4. Der Broker **persistiert** die Nachricht ans Ende der Partition (append-only Log) und vergibt ihr einen fortlaufenden **Offset** (z. B. 0, 1, 2, …).
+
+```typescript
+// Fire-and-forget: sendet ein Event, wartet nicht auf Verarbeitung
+this.kafkaProducer.publish('ai.result.created', {
+  type: 'spirits',
+  userId,
+  result,
+  createdAt: new Date().toISOString(),
+});
+```
+
+Wichtig: `emit()` ist **asynchron und fire-and-forget**. Der Producer wartet nur auf die Bestätigung des Brokers ("geschrieben"), **nicht** darauf, dass ein Consumer die Nachricht verarbeitet hat. Sender und Empfänger sind entkoppelt.
+
+### Schritt 2: Nachricht liegt im Topic
+
+Die Nachricht liegt jetzt dauerhaft (bis zur **Retention**, Standard 7 Tage) in der Partition. Sie wird **nicht** gelöscht, nachdem ein Consumer sie gelesen hat – anders als bei klassischen Message-Queues. Dadurch können mehrere Consumer-Gruppen dieselbe Nachricht unabhängig voneinander lesen.
+
+### Schritt 3: Consumer empfängt (`poll`)
+
+Der Consumer **holt** Nachrichten aktiv ab (Pull-Modell), er bekommt sie nicht "zugepusht":
+
+1. Der Consumer fragt den Broker regelmäßig: "Gibt es ab meinem aktuellen Offset neue Nachrichten?" (intern: `poll`).
+2. Der Broker liefert einen Batch neuer Nachrichten zurück.
+3. kafkajs/NestJS **deserialisiert** jede Nachricht und ruft die passende `@EventPattern`-Methode auf.
+
+```typescript
+@EventPattern('ai.result.created')
+async handleHistoryEvent(data: any) {
+  // 'data' ist die bereits deserialisierte Nachricht
+  const { userId, result } = data;
+  await this.historyService.createHistoryEntry(userId, result);
+}
+```
+
+### Schritt 4: Offset committen (Fortschritt speichern)
+
+Nachdem der Handler **erfolgreich** durchgelaufen ist (keine Exception), committet der Consumer den **Offset**: "Bis hier habe ich verarbeitet." Der Offset wird im internen Topic `__consumer_offsets` gespeichert.
+
+- Beim nächsten `poll` liest der Consumer ab dem committeten Offset weiter – die alte Nachricht kommt nicht erneut.
+- **Wirft der Handler eine Exception**, wird **nicht** committet → dieselbe Nachricht wird erneut geliefert (siehe Abschnitt 4).
+
+### Zusammengefasst als Ablauf
+
+```
+Producer                 Broker (Topic/Partition)              Consumer
+   |                            |                                 |
+   | emit('ai.result.created')  |                                 |
+   |--------------------------->| append @ offset N               |
+   |   (ack: geschrieben)       |                                 |
+   |<---------------------------|                                 |
+   |                            |         poll (ab offset N)       |
+   |                            |<--------------------------------|
+   |                            | Batch [offset N ...]            |
+   |                            |-------------------------------->|
+   |                            |                   handler(data) |
+   |                            |         commit offset N+1       |
+   |                            |<--------------------------------|
+```
+
+## 4. Zustellgarantien und Retries
+
+Kafka arbeitet standardmäßig mit **At-least-once**-Zustellung: Jede Nachricht kommt **mindestens einmal** an – unter Umständen aber auch **mehrfach**. Das ist zentral zu verstehen, weil es direkt beeinflusst, wie robust ein Consumer gebaut sein muss.
+
+### Kafka hat kein klassisches "Zustell-Limit"
+
+Anders als RabbitMQ oder SQS zählt Kafka **keine Zustellversuche** und kennt kein "nach 3 Versuchen verwerfen". Stattdessen gilt das **Offset-Prinzip**:
+
+1. Jeder Consumer merkt sich per Offset, bis wohin er verarbeitet hat.
+2. Solange der Offset **nicht committet** wird, liest der Consumer dieselbe Nachricht beim nächsten `poll` **wieder**.
+3. Das wiederholt sich **praktisch unbegrenzt**, bis der Offset committet wird oder die Nachricht durch die Retention gelöscht wird.
+
+### Was "unbegrenzt" praktisch begrenzt
+
+| Grenze | Standardwert | Bedeutung |
+|---|---|---|
+| `retention.ms` | 7 Tage | Danach wird die Nachricht gelöscht – obere Grenze für Wiederholungen. |
+| `max.poll.interval.ms` | 5 Minuten | Braucht der Handler länger, gilt der Consumer als "tot" → Rebalancing, andere Instanz bekommt die Partition. |
+| kafkajs `retries` | 20 (projektspezifisch) | Betrifft **Verbindungs-/Broker-Operationen**, NICHT das fachliche Re-Delivery. |
+
+### Zwei unterschiedliche "Retry"-Ebenen
+
+Ein häufiges Missverständnis – diese beiden Dinge sind klar zu trennen:
+
+| Ebene | Was wird wiederholt | Limit |
+|---|---|---|
+| **kafkajs `retries: 20`** | Netzwerk-/Broker-Operationen (connect, fetch, commit) | 20 Versuche |
+| **Consumer Re-Delivery** | Nicht-committete Nachrichten nach Handler-Fehler | Quasi unbegrenzt (bis Retention) |
+
+In [ai.module.ts](../sprit-scan/backend/src/ai-microservice/ai.module.ts) betrifft die `retry`-Konfiguration also nur die **Verbindung** zum Broker – nicht, wie oft eine fachlich fehlgeschlagene Nachricht erneut verarbeitet wird.
+
+### Beispiel: Die Datenbank fällt aus
+
+Szenario im `history-service`, wenn der DB-Insert scheitert:
+
+1. Handler wirft eine Exception (DB nicht erreichbar).
+2. Der Offset wird **nicht** committet.
+3. Beim nächsten `poll` kommt dieselbe Nachricht erneut → Handler scheitert wieder.
+4. Das wiederholt sich im Poll-Takt, **bis die DB zurück ist** (dann Erfolg + Commit) oder die Retention zuschlägt.
+
+Das ist gewünschtes Verhalten: **keine Nachricht geht verloren**. Nachteil: Da Kafka Nachrichten **pro Partition in Reihenfolge** verarbeitet, blockiert eine hängende Nachricht alle nachfolgenden in derselben Partition (Head-of-line Blocking).
+
+### Deduplizierung: Weil Nachrichten mehrfach kommen können
+
+Weil At-least-once Duplikate zulässt, muss der Consumer **idempotent** sein. In diesem Projekt geschieht das über eine eindeutige `eventId`:
+
+- Der Producer hängt an jedes Event eine `eventId` (UUID).
+- Der Consumer speichert verarbeitete `eventId`s in der Tabelle `processed_events` und überspringt bereits bekannte IDs.
+- History-Eintrag und `eventId`-Marker werden in **einer Transaktion** geschrieben → entweder beides oder nichts.
+
+So führt selbst eine doppelt zugestellte Nachricht nur zu **einem** History-Eintrag.
+
+### Poison Messages und Dead Letter Queue (DLQ)
+
+Weil Kafka selbst nie "aufgibt", muss **die Anwendung** entscheiden, wann eine dauerhaft fehlerhafte Nachricht (poison message) aussortiert wird. Üblich ist ein eigener Retry-Zähler (z. B. im Message-Header) und ein separates DLQ-Topic:
+
+```typescript
+// Pseudocode
+const MAX_RETRIES = 5;
+if (retryCount >= MAX_RETRIES) {
+  await this.publishToDlq(message); // in separates Topic schieben
+  return;                            // Offset committen → weitermachen
+}
+throw error;                         // sonst erneut versuchen
+```
+
+Kafka liefert den Retry-Zähler nicht automatisch mit – man muss ihn selbst führen und bei jeder Wiederholung erhöhen.
+
+## 5. Erklärung der verwendeten Funktionen & Konstanten
 
 ### `Transport.KAFKA`
 Konstante aus `@nestjs/microservices`. Sagt Nest, dass Kafka als Transport-Layer verwendet wird (statt z. B. TCP, Redis, RabbitMQ).
@@ -150,7 +289,7 @@ Nur zur Identifikation/Logging. Hat keinen Einfluss auf Routing oder Gruppenverh
 ### `brokers`
 Liste von `host:port`-Adressen der Kafka-Broker, zu denen sich der Client verbindet (hier: `kafka:9092` aus Docker Compose).
 
-## 4. Ist Kafka ein eigener Microservice (wie Redis)?
+## 6. Ist Kafka ein eigener Microservice (wie Redis)?
 
 Ja. Kafka läuft als **eigenständiger Container/Prozess**, genau wie `redis` in diesem Projekt – kein Teil von `ai-service` oder `history-service`, sondern eine eigene Instanz, mit der sich alle Services nur über das Netzwerk verbinden.
 
@@ -173,7 +312,7 @@ Der Unterschied zu Redis:
 
 Kein Service im Projekt "ist" Kafka – `ai-service` und `history-service` sind nur **Clients**, die sich mit dem Kafka-Broker verbinden (genau wie sie sich mit `redis` über `REDIS_URL` verbinden).
 
-## 5. Wie würde man Kafka skalieren?
+## 7. Wie würde man Kafka skalieren?
 
 ### a) Mehr Broker (horizontale Skalierung des Clusters)
 
@@ -229,7 +368,7 @@ history-service:
 
 Kafka verteilt dann automatisch die Partitionen auf die laufenden Consumer der Gruppe (Rebalancing).
 
-## 6. Wie schützt man Kafka vor unbefugtem Zugriff von außen?
+## 8. Wie schützt man Kafka vor unbefugtem Zugriff von außen?
 
 ### a) Keine öffentlichen Ports exponieren
 
@@ -265,10 +404,14 @@ Selbst mit gültigen Credentials sollte nicht jeder Client alles dürfen:
 
 Falls Kafka irgendwann auf einem eigenen Server/VM läuft (nicht mehr nur im Docker-Netz): Nur die IPs/Security-Groups der bekannten Backend-Services dürfen Port 9092 erreichen, niemand sonst.
 
-## 7. Kurzzusammenfassung
+## 9. Kurzzusammenfassung
 
 - **Producer**: sendet Events, braucht keine Group ID, nutzt `emit()`.
 - **Consumer**: empfängt Events, braucht eine Group ID, nutzt `@EventPattern()`.
+- **Senden/Empfangen**: Producer `emit()` → Broker persistiert mit Offset → Consumer `poll`t aktiv → Handler läuft → Offset wird committet.
+- **Zustellung**: At-least-once – Nachrichten können mehrfach kommen; Kafka wiederholt nicht-committete Nachrichten quasi unbegrenzt (bis Retention/`max.poll.interval.ms`).
+- **Retry-Ebenen**: kafkajs `retries` = Verbindungsfehler; Consumer Re-Delivery = fachliche Wiederholung (unbegrenzt).
+- **Idempotenz**: Deduplizierung über eindeutige `eventId`, damit Duplikate nur einen Eintrag erzeugen.
 - Ein Service kann **beides gleichzeitig** sein, muss es aber nicht (im Projekt: `ai-service` = reiner Producer, `history-service` = reiner Consumer).
 - Kafka ist eine **eigene Instanz/eigener Prozess**, genau wie Redis – kein Teil der Anwendungs-Microservices.
 - **Skalierung**: mehr Broker (Cluster), mehr Partitionen pro Topic, mehr Consumer-Instanzen in derselben Group.
