@@ -43,9 +43,11 @@ export class AiExpertFeature {
       { message: newInput, isUserMessage: true, id: history.length },
     ]);
     this.userInput.set(''); // Clear the input after sending
+    this.isLoading.set(true);
     this.aiFeatureService.expert(newInput).subscribe({
       next: (response: any) => {
         console.log('AI response received:', response);
+        this.isLoading.set(false);
         this.chatHistory.update((history) => [
           ...history,
           { message: response.message, isUserMessage: false, id: history.length },
@@ -54,6 +56,7 @@ export class AiExpertFeature {
       error: (error) => {
         console.error('Error from AI service:', error);
         this.notify.showNotification('Error from AI service: ' + error.message, 'error');
+        this.isLoading.set(false);
       },
     });
   }
@@ -76,9 +79,11 @@ export class AiExpertFeature {
         },
       ]);
       this.userInput.set(''); // Clear the input after sending
+      this.isLoading.set(true);
       this.aiFeatureService.sprits(dataUrl).subscribe({
         next: (response: any) => {
           console.log('AI response for image received:', response);
+          this.isLoading.set(false);
           this.chatHistory.update((history) => [
             ...history,
             { message: response.description, isUserMessage: false, id: history.length },
@@ -86,6 +91,7 @@ export class AiExpertFeature {
         },
         error: (error) => {
           console.error('Error from AI service for image:', error);
+          this.isLoading.set(false);
           this.notify.showNotification(
             'Error from AI service for image: ' + error.message,
             'error',

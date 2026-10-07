@@ -69,4 +69,16 @@
       ></app-button>
     </div>
   </div>
+
+  <!-- Loading modal: overlays everything and brings the spinner to the front -->
+  @if (isLoading()) {
+    <div
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        class="w-14 h-14 border-4 border-red-400 border-t-amber-50 border-b-transparent rounded-full animate-spin"
+      ></div>
+      <p class="text-white font-medium">Thinking...</p>
+    </div>
+  }
 </app-template-page>

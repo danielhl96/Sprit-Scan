@@ -8,15 +8,15 @@
     <div class="flex flex-row gap-1">
       <app-button
         buttonText="Save"
-        buttonColor="btn-success"
-        buttonBorderColor="border-success"
+        buttonColor="btn-ghost"
+        buttonBorderColor="border-error"
         buttonSize="md"
         (buttonClick)="onSaveEmail()"
         [buttonDisabled]="!email() || !password()"
       ></app-button>
       <app-button
         buttonText="Cancel"
-        buttonColor="btn-error"
+        buttonColor="btn-ghost"
         buttonBorderColor="border-error"
         buttonSize="md"
         (buttonClick)="toggleModalChange.emit(false)"
