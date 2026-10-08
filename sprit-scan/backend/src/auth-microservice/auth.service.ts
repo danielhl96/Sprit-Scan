@@ -130,4 +130,12 @@ export class AuthService {
 
     await this.prisma.user.delete({ where: { userId } });
   }
+
+  async getEmail(userId: string): Promise<{ email: string }> {
+    const user = await this.prisma.user.findUnique({ where: { userId } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return { email: user.email };
+  }
 }

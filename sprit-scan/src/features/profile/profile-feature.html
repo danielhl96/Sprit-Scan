@@ -4,7 +4,7 @@
       class="h-[20dvh] w-[80dvw] border-1 border-red-400 rounded-lg flex flex-col items-stretch justify-center px-4 gap-3"
     >
       <div class="flex items-center justify-between">
-        <p class="text-black text-sm">Email: {{ profile.email }}</p>
+        <p class="text-black text-xs">Email: {{ email() }}</p>
         <button
           type="button"
           class="p-1 rounded-md text-red-700 hover:bg-red-100"
@@ -25,7 +25,7 @@
       </div>
 
       <div class="flex items-center justify-between">
-        <p class="text-black text-sm">Password: {{ '*****' }}</p>
+        <p class="text-black text-xs">Password: {{ '*****' }}</p>
         <button
           type="button"
           class="p-1 rounded-md text-red-700 hover:bg-red-100"

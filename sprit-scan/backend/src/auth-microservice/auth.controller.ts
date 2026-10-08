@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   HttpStatus,
   HttpCode,
   Delete,
@@ -39,6 +40,16 @@ export class AuthController {
     return true;
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Get('email')
+  @UseGuards(JwtAuthGuard)
+  async getEmail(@Req() req: AuthenticatedRequest) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('Missing user in token');
+    }
+    return this.authService.getEmail(userId);
+  }
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
   async register(@Body() registerDto: RegisterUserDto) {
