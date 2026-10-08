@@ -35,4 +35,21 @@ export class HistoryConsumerController {
       topic: 'ai.result.created',
     });
   }
+
+  /**
+   * Handles user deletion coming from the auth service.
+   * Removes all history entries that belong to the deleted user.
+   */
+  @EventPattern('auth.user.deleted')
+  async handleUserDeleted(data: any) {
+    const { userId } = data;
+
+    if (!userId) {
+      this.logger.warn('Received "auth.user.deleted" without userId, ignoring');
+      return;
+    }
+
+    const deleted = await this.historyService.deleteAllForUser(userId);
+    this.logger.log(`Deleted ${deleted} history entries for user "${userId}"`);
+  }
 }

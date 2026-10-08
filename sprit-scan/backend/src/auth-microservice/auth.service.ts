@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { InternalServerErrorException } from '@nestjs/common';
+import { AuthKafkaProducerService } from './auth-kafka-producer.service';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
@@ -12,6 +13,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly authKafkaProducerService: AuthKafkaProducerService,
   ) {}
 
   async login(
@@ -127,8 +129,13 @@ export class AuthService {
     if (!passwordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
+    // Delete first, then announce the fact. The event describes something that
+    // has already happened ("user.deleted"), so other services only react once
+    // the deletion actually succeeded.
     await this.prisma.user.delete({ where: { userId } });
+    this.authKafkaProducerService.publish('auth.user.deleted', {
+      userId,
+    });
   }
 
   async getEmail(userId: string): Promise<{ email: string }> {

@@ -117,4 +117,16 @@ export class HistoryService {
       where: { userId, id: entryId },
     });
   }
+
+  /**
+   * Deletes all history entries belonging to a user.
+   * Triggered when the auth service emits an "auth.user.deleted" event,
+   * so a user's data is cleaned up across services (cascade by event).
+   */
+  async deleteAllForUser(userId: string): Promise<number> {
+    const { count } = await this.prisma.history.deleteMany({
+      where: { userId },
+    });
+    return count;
+  }
 }

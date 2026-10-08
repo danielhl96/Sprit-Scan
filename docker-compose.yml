@@ -63,11 +63,14 @@ services:
       - JWT_SECRET=your_jwt_secret_key_here
       - DATABASE_URL=postgresql://authuser:authpassword@auth-db:5432/auth-db?sslmode=disable
       - REDIS_URL=redis://redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_CLIENT_ID=auth-service-consumer
     volumes:
       - ./sprit-scan/backend:/app
       - /app/node_modules
     networks:
       - internal
+      - kafka-network
     depends_on:
       - auth-db
       - redis
@@ -93,6 +96,7 @@ services:
       - /app/node_modules
     networks:
       - app-network
+      - kafka-network
     depends_on:
       - history-db
       - redis

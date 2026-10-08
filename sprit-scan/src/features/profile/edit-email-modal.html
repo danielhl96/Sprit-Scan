@@ -4,6 +4,7 @@
     <app-input-password
       [password]="password()"
       (passwordChange)="onPasswordChange($event)"
+      [passwordValidOn]="false"
     ></app-input-password>
     <div class="flex flex-row gap-1">
       <app-button
