@@ -1,0 +1,198 @@
+version: '3.9'
+
+services:
+
+  # ─────────────────────────────────────────
+  # FRONTEND (Angular)
+  # ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./sprit-scan
+      dockerfile: Dockerfile
+    ports:
+      - '4200:4200'
+    volumes:
+      - ./sprit-scan:/app
+      - /app/node_modules
+    networks:
+      - app-network
+    depends_on:
+      - api-gateway
+
+  # ─────────────────────────────────────────
+  # API GATEWAY – einziger öffentlicher Eingang
+  # ─────────────────────────────────────────
+  api-gateway:
+    build:
+      context: ./sprit-scan/backend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - CORS_ORIGIN=http://localhost:4200
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - JWT_SECRET=your_jwt_secret_key_here
+      - HISTORY_SERVICE_URL=http://history-service:3003
+      - AI_SERVICE_URL=http://ai-service:3004
+      - REDIS_URL=redis://redis:6379
+      - HTTP_TIMEOUT=5000
+    networks:
+      - app-network
+      - internal
+    depends_on:
+      - auth-service
+      - history-service
+      - ai-service
+    command: sh -c "node --watch -r ts-node/register -r tsconfig-paths/register src/api-gateway/main.ts"
+
+  # ─────────────────────────────────────────
+  # AUTH SERVICE
+  # ─────────────────────────────────────────
+  auth-service:
+    build:
+      context: ./sprit-scan/backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - JWT_SECRET=your_jwt_secret_key_here
+      - DATABASE_URL=postgresql://authuser:authpassword@auth-test-db:5432/auth-test-db?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_CLIENT_ID=auth-service-consumer
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
+    networks:
+      - internal
+      - kafka-network
+    depends_on:
+      - auth-test-db
+      - redis
+    command: sh -c "npx prisma generate && npx prisma db push && node --watch -r ts-node/register -r tsconfig-paths/register src/auth-microservice/main.ts"
+
+  # ─────────────────────────────────────────
+  # HISTORY SERVICE
+  # ─────────────────────────────────────────
+  history-service:
+    build:
+      context: ./sprit-scan/backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - DATABASE_URL_HISTORY=postgresql://historyuser:historypassword@history-test-db:5432/history-test-db?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=your_jwt_secret_key_here
+      - KAFKA_GROUP_ID=history-service-consumer
+      - KAFKA_BROKERS=kafka:9092
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+      - kafka-network
+    depends_on:
+      - history-test-db
+      - redis
+    command: sh -c "node node_modules/prisma/build/index.js generate --schema src/history-microservice/prisma/schema.prisma && node node_modules/prisma/build/index.js db push --schema src/history-microservice/prisma/schema.prisma && node --watch -r ts-node/register -r tsconfig-paths/register src/history-microservice/main.ts"
+
+  # ─────────────────────────────────────────
+  # AI SERVICE
+  # ─────────────────────────────────────────
+  ai-service:
+    build:
+      context: ./sprit-scan/backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=your_jwt_secret_key_here
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_CLIENT_ID=ai-microservice
+    volumes:
+      - ./sprit-scan/backend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+      - kafka-network
+    depends_on:
+      - redis
+      - kafka
+    command: sh -c "node --watch -r ts-node/register -r tsconfig-paths/register src/ai-microservice/main.ts"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.7.1
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
+    networks:
+      - kafka-network
+
+  # ─────────────────────────────────────────
+  # DATENBANKEN (je Service eine eigene)
+  # ─────────────────────────────────────────
+  auth-test-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpassword
+      POSTGRES_DB: auth-test-db
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+
+  history-test-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: historyuser
+      POSTGRES_PASSWORD: historypassword
+      POSTGRES_DB: history-test-db
+    volumes:
+      - history-db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # ─────────────────────────────────────────
+  # REDIS – Session / Cache / Message Bus
+  # ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    networks:
+      - app-network
+
+# Networks
+networks:
+  app-network:
+    driver: bridge 
+  internal:
+    driver: bridge
+    internal: true
+  kafka-network:
+    driver: bridge
+    internal: true
+
+# Volumes
+volumes:
+  auth-db-data:
+  history-db-data:
