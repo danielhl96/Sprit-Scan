@@ -107,7 +107,7 @@ describe('AuthService (Unit)', () => {
       };
 
       prismaMock.user.findUnique.mockResolvedValue({
-        id: user.id, // Prisma-Feldname prüfen (id statt userId im DB-Rückgabewert!)
+        id: user.id,
         email: user.email,
         password: user.password,
       });
@@ -125,7 +125,7 @@ describe('AuthService (Unit)', () => {
       };
 
       prismaMock.user.findUnique.mockResolvedValue({
-        id: user.id, // Prisma-Feldname prüfen (id statt userId im DB-Rückgabewert!)
+        id: user.id,
         email: user.email,
         password: user.password,
       });
@@ -138,4 +138,4 @@ describe('AuthService (Unit)', () => {
   afterAll(async () => {
     await app.close();
   });
-}); // Hier schließt der Haupt-Block nun ganz am Ende korrekt ab!
+});
