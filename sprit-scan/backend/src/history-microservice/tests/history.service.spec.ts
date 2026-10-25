@@ -24,6 +24,7 @@ describe('HistoryService (Unit)', () => {
     history: {
       create: jest.fn(),
       findMany: jest.fn(),
+      deleteMany: jest.fn(),
     },
     $transaction: jest.fn((promises) => Promise.all(promises)),
   };
@@ -99,7 +100,7 @@ describe('HistoryService (Unit)', () => {
         });
       });
     });
-    it('should return an existing history entry', async () => {
+    it('should return existing history entries', async () => {
       const userId = 'user123';
       const result = {
         userId,
@@ -150,6 +151,18 @@ describe('HistoryService (Unit)', () => {
           }),
         ]),
       );
+    });
+    it('return the deleted counts of the history entries', async () => {
+      const userId = 'user123';
+
+      prismaMock.history.deleteMany.mockResolvedValue({
+        count: 3,
+        userId: 'user123',
+      });
+
+      const deletedCount = await historyService.deleteAllForUser(userId);
+
+      expect(deletedCount).toBe(3);
     });
   });
 });
