@@ -100,6 +100,7 @@ services:
     depends_on:
       - history-db
       - redis
+      - kafka
     command: sh -c "node node_modules/prisma/build/index.js generate --schema src/history-microservice/prisma/schema.prisma && node node_modules/prisma/build/index.js db push --schema src/history-microservice/prisma/schema.prisma && node --watch -r ts-node/register -r tsconfig-paths/register src/history-microservice/main.ts"
 
   # ─────────────────────────────────────────
@@ -143,6 +144,7 @@ services:
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
       - CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
     networks:
       - kafka-network
