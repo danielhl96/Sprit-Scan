@@ -44,7 +44,7 @@ export class AiService {
     const prompt = this.extractPrompt(body);
 
     const systemPrompt =
-      'You are an expert assistant for spirits and beverages. Answer clearly, factually, and concisely. Return plain text only.';
+      'Du bist ein Experten-Assistent für Spirituosen und Getränke. Antworte immer auf Deutsch, klar, sachlich, kurz und prägnant. Gib ausschließlich reinen Text zurück.';
 
     const message = await this.requestOpenAiText({
       userId,
@@ -66,13 +66,14 @@ export class AiService {
   async spirits(userId: string, body: DataBodySpirits) {
     const imageUrl = body.imageUrl;
     const systemPrompt = [
-      'You are an assistant for structured spirits data extraction.',
-      'Analyze the bottle image and return the requested structured data.',
-      'You MUST actively use web search to verify and enrich the product information.',
-      'There is no internet links allowed in the output; only return factual information.',
-      'Actively search for each field and fill it with factual information when available.',
-      'name and description are required.',
-      'All other fields are optional; use null when unknown.',
+      'Du bist ein Assistent zur strukturierten Extraktion von Spirituosen-Daten.',
+      'Antworte immer auf Deutsch, kurz und prägnant.',
+      'Analysiere das Flaschenbild und gib die angeforderten strukturierten Daten zurück.',
+      'Du MUSST aktiv die Websuche nutzen, um die Produktinformationen zu verifizieren und anzureichern.',
+      'Keine Internet-Links in der Ausgabe erlaubt; gib nur sachliche Informationen zurück.',
+      'Suche aktiv zu jedem Feld und fülle es mit sachlichen Informationen, sofern verfügbar.',
+      'name und description sind erforderlich.',
+      'Alle anderen Felder sind optional; nutze null, wenn unbekannt.',
     ].join(' ');
 
     const result = await this.requestOpenAiStructured({

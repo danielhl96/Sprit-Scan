@@ -54,7 +54,15 @@ services:
       - HISTORY_SERVICE_URL=http://history-service:3003
       - AI_SERVICE_URL=http://ai-service:3004
       - REDIS_URL=redis://redis:6379
-      - HTTP_TIMEOUT=5000
+      # AI requests (OpenAI + web search) can take much longer than typical
+      # REST calls; keep this generous so the gateway doesn't abort the
+      # connection before the ai-service has a chance to respond.
+      - HTTP_TIMEOUT=90000
+      # Base64-encoded images inflate the raw file size by ~1.37x; 50mb keeps
+      # a comfortable margin above the frontend's client-side compression
+      # target. Set explicitly so it never silently falls back to the
+      # body-parser default of 100kb.
+      - BODY_SIZE_LIMIT=50mb
     networks:
       - app-network
       - internal
@@ -132,6 +140,9 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - KAFKA_BROKERS=kafka:9092
       - KAFKA_CLIENT_ID=ai-microservice
+      # Base64-encoded image payloads forwarded by the gateway can be several
+      # MB; set explicitly so the body parser doesn't fall back to 100kb.
+      - BODY_SIZE_LIMIT=50mb
     volumes:
       - ./sprit-scan/backend:/app
       - /app/node_modules
