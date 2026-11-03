@@ -1,227 +1,365 @@
-# Sprit-Scan (updated)
+# Sprit-Scan
 
-Sprit-Scan ist eine Full-Stack-Webanwendung zur Erkennung und Verwaltung von Spirituosen per Bild-Upload.
+Sprit-Scan ist eine Full-Stack-Webanwendung, mit der Benutzer Spirituosen (z. B. Wein oder Whiskey) per Foto scannen, KI-generierte Informationen dazu erhalten, ihren Scan-Verlauf verwalten und mit einem KI-Experten chatten können.
 
-- **Frontend:** Angular SPA inkl. PWA
-- **Backend:** NestJS Microservices hinter einem API-Gateway
-- **Infra:** Docker Compose, PostgreSQL, Redis, Kafka
-- **Optional Public Access:** Cloudflare Tunnel
+- **Frontend:** Angular SPA (Signals, Standalone Components) inkl. PWA
+- **Backend:** NestJS-Microservices hinter einem zentralen API-Gateway
+- **Infrastruktur:** Docker Compose, PostgreSQL (Prisma), Redis, Kafka
+- **Optionaler Public Access:** Cloudflare Tunnel
 
-Das komplette Projekt kann lokal per Docker Compose gestartet werden.
+---
 
+## Inhaltsverzeichnis
 
-## Table of Contents
-
-- [Architecture Overview](#architecture-overview)
+- [Allgemeine Übersicht](#allgemeine-übersicht)
+- [Architektur](#architektur)
+- [Sicherheit](#sicherheit)
+- [Frontend-Architektur](#frontend-architektur)
+- [Backend-Architektur](#backend-architektur)
 - [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Running the Project](#running-the-project)
+- [Projektstruktur](#projektstruktur)
+- [Projekt starten](#projekt-starten)
 - [Cloudflare Tunnel](#cloudflare-tunnel)
-- [PWA](#pwa)
+- [PWA-Konfiguration](#pwa-konfiguration)
 - [Tests](#tests)
-- [CI](#ci)
+- [CI (GitHub Actions)](#ci-github-actions)
+- [Environment Variablen](#environment-variablen)
+- [Weiterführende Doku](#weiterführende-doku)
 
-## Architecture Overview
+---
 
-```
+## Allgemeine Übersicht
+
+Sprit-Scan besteht aus zwei Hauptteilen:
+
+- Einer **Angular-SPA**, die als Progressive Web App installierbar ist.
+- Einem **NestJS-Backend**, das als Microservice-Architektur hinter einem API-Gateway aufgebaut ist.
+
+Kernfunktionen:
+
+- Registrierung/Login mit JWT (als httpOnly-Cookie)
+- Bild-Upload zur KI-gestützten Spirituosen-Erkennung
+- Persönlicher Scan-Verlauf (History)
+- Profilverwaltung (E-Mail/Passwort ändern, Account löschen)
+- Chat mit einem KI-Experten
+
+Events zwischen Services (z. B. Cleanup nach Account-Löschung) laufen über **Kafka**, nicht über direkte Service-zu-Service-Aufrufe.
+
+---
+
+## Architektur
+
+```text
 Frontend (Angular, :4200)
-      |
-      v
-API Gateway (NestJS, :3000)
-  |           |            |
-  v           v            v
+        |
+        v
+API Gateway (NestJS, :3000)   <-- einziger öffentlicher Einstiegspunkt
+   |            |             |
+   v            v             v
 Auth (:3001) History (:3003) AI (:3004)
-  |           |
-  v           v
-Auth-DB     History-DB      + Redis + Kafka
+   |            |
+   v            v
+Auth-DB      History-DB      (+ Redis, + Kafka)
 
-Optional: Cloudflare Tunnel -> frontend/backend Hostnames
+Optional: Cloudflare Tunnel -> frontend.<domain> / backend.<domain>
 ```
 
+Prinzipien:
 
+- Das **Frontend** kommuniziert ausschließlich mit dem **API-Gateway**.
+- Das Gateway leitet Requests über einen generischen `ProxyService` an die passenden Microservices weiter (`/api/auth/*`, `/api/history/*`, `/api/ai/*`).
+- Jeder Microservice ist über interne Docker-Netzwerke isoliert und besitzt bei Bedarf eine eigene PostgreSQL-Datenbank (`auth-db`, `history-db`).
+- **Kafka** wird für asynchrone, ereignisbasierte Kommunikation genutzt (z. B. `auth.user.deleted` → History-Service räumt zugehörige Einträge auf).
+- **Redis** wird u. a. für Token-Blacklisting beim Logout verwendet.
+
+---
+
+## Sicherheit
+
+Wichtige Sicherheitsmechanismen im Projekt:
+
+- **Authentifizierung über JWT**, das als `httpOnly`, `Secure` (in Produktion) und `SameSite=strict` konfiguriertes Cookie gesetzt wird (`access_token`).
+  - `httpOnly` verhindert Zugriff per JavaScript (Schutz gegen XSS-Diebstahl).
+  - `SameSite=strict` reduziert das Risiko von CSRF, da das Cookie bei Cross-Site-Requests nicht automatisch mitgeschickt wird.
+- **Logout mit Token-Blacklisting:** Beim Logout wird das Token in Redis mit verbleibender Gültigkeitsdauer (TTL) gesperrt, damit es nicht weiterverwendet werden kann.
+- **Passwort-Hashing** erfolgt mit `argon2` (nicht reversibel, salted).
+- **Validierung eingehender Daten** über `class-validator` / `class-transformer` sowie eine globale `ValidationPipe` im Gateway.
+- **CORS** wird zentral im Gateway konfiguriert (`CORS_ORIGIN`), sodass nur erlaubte Frontend-Origins zugelassen werden.
+- **Rate Limiting** über `@nestjs/throttler` im Gateway, um Brute-Force- und Abuse-Szenarien zu begrenzen.
+- **Payload-Size-Limits** verhindern überdimensionierte Request-Bodies (z. B. bei Bild-Uploads).
+- **Eventbasierte Datenlöschung:** Wird ein Account gelöscht, wird dies als Kafka-Event (`auth.user.deleted`) propagiert, sodass abhängige Daten (z. B. History) zuverlässig aufgeräumt werden – inklusive Idempotenz über gespeicherte `eventId`s, um doppelte Verarbeitung zu verhindern.
+
+Weiterführende Details (inkl. konkretem CSRF-Angriffsszenario und Begründung für `SameSite=Strict`) stehen in [docs/sicherheit-grundlagen.md](docs/sicherheit-grundlagen.md).
+
+---
+
+## Frontend-Architektur
+
+Das Frontend ist eine **Angular 21**-Anwendung mit Standalone-Components und Signals.
+
+Struktur (`sprit-scan/src/app`):
+
+- `app.routes.ts` – zentrale Route-Konfiguration mit Lazy Loading (`loadComponent`) und `authGuard` für geschützte Routen (`/home`, `/profile`, `/history`, `/ai-expert`).
+- `app.config.ts` – globale Provider, u. a. HTTP-Client mit Interceptors sowie Registrierung des Service Workers (`provideServiceWorker`).
+- `api/` – HTTP-Infrastruktur:
+  - `HttpClientCredentialsInterceptor.ts` – sorgt dafür, dass Cookies (JWT) bei Requests an das Gateway mitgeschickt werden.
+  - `HttpClientErrorHandling.ts` – zentrales Error-Handling für HTTP-Responses.
+  - `api-root-domain.ts` – liest die Backend-Basis-URL aus `NG_APP_ROOT_DOMAIN` (fällt sonst auf die öffentliche Cloudflare-Domain zurück).
+- `guards/` – Route Guards (z. B. `AuthGuard`, der nicht eingeloggte Nutzer zu `/login` umleitet).
+- `features/` – Feature-Module je Seite (Login, Register, Home, Scan, History, Profile, AI-Expert).
+- `shared/` – wiederverwendbare UI-Komponenten und Services (z. B. Notification-Service, Buttons, Modals, Chat-Bubbles, Scan-Animation).
+
+Wichtige Patterns:
+
+- **Signals** (`signal`, `computed`, `effect`) für reaktiven State statt klassischer RxJS-Subjects an vielen Stellen.
+- **Lazy-loaded Routes** reduzieren die initiale Bundle-Größe.
+- **Guards** schützen alle eingeloggten Bereiche serverseitig *und* clientseitig (das Gateway validiert das JWT zusätzlich serverseitig).
+
+---
+
+## Backend-Architektur
+
+Das Backend (`sprit-scan/backend/src`) besteht aus folgenden eigenständigen NestJS-Anwendungen:
+
+| Service               | Zweck                                                      | Port | Datenbank   |
+| --------------------- | ----------------------------------------------------------- | ---- | ----------- |
+| `api-gateway`         | Einziger öffentlicher Einstiegspunkt, Routing, Auth-Check, CORS, Rate Limiting | 3000 | –           |
+| `auth-microservice`   | Registrierung, Login, JWT-Ausstellung, Passwort/E-Mail-Änderung, Account-Löschung | 3001 | `auth-db`   |
+| `history-microservice`| Speichern/Abfragen des persönlichen Scan-Verlaufs, Kafka-Consumer für Cleanup | 3003 | `history-db`|
+| `ai-microservice`     | Bildanalyse und Chat mit KI-Experte über die OpenAI API      | 3004 | – (nutzt Redis) |
+
+Das **API-Gateway**:
+
+1. liest Microservice-URLs aus Umgebungsvariablen (`sprit-scan/backend/src/api-gateway/config/services.config.ts`),
+2. validiert eingehende Requests global,
+3. prüft/verarbeitet JWT-Cookies für geschützte Routen,
+4. leitet Requests über einen generischen `ProxyService` an den passenden Microservice weiter,
+5. übersetzt Fehler der Microservices in passende HTTP-Statuscodes (z. B. `502 Bad Gateway`, wenn ein Service nicht erreichbar ist).
+
+Kommunikationsmuster:
+
+- **Synchron (REST):** Frontend → Gateway → Microservice.
+- **Asynchron (Kafka):** z. B. `auth-microservice` publiziert `auth.user.deleted`, `history-microservice` konsumiert dieses Event und löscht zugehörige Einträge – mit Idempotenz-Schutz über gespeicherte `eventId`s.
+
+---
 
 ## Tech Stack
 
-| Layer        | Technology                                              |
-| ------------ | ------------------------------------------------------- |
-| Frontend     | Angular 21, TypeScript                                  |
-| Styling      | Tailwind CSS 4, DaisyUI                                 |
-| Backend      | NestJS 11 (Node.js 20), TypeScript                      |
-| Gateway HTTP | `@nestjs/axios` (Axios) for REST calls                  |
-| Config       | `@nestjs/config` (env-based)                            |
-| Databases    | PostgreSQL 15 + Prisma                                  |
-| Cache / Bus  | Redis 7 + Kafka                                         |
-| AI           | OpenAI API                                              |
-| Testing      | Jest + Supertest                                        |
-| Container    | Docker & Docker Compose                                 |
+| Layer         | Technologie                              |
+| ------------- | ----------------------------------------- |
+| Frontend      | Angular 21, TypeScript, Signals            |
+| Styling       | Tailwind CSS 4, DaisyUI                    |
+| PWA           | `@angular/service-worker`                  |
+| Backend       | NestJS 11 (Node.js 20), TypeScript         |
+| Gateway-HTTP  | `@nestjs/axios` (Axios)                    |
+| Config        | `@nestjs/config`                           |
+| Auth          | JWT (`@nestjs/jwt`), `argon2` Passwort-Hashing |
+| Datenbanken   | PostgreSQL 15 + Prisma                     |
+| Messaging     | Kafka (`kafkajs`)                          |
+| Cache/Session | Redis                                      |
+| KI            | OpenAI API                                 |
+| Tests         | Jest + Supertest                           |
+| Container     | Docker & Docker Compose                    |
+| CI            | GitHub Actions                             |
 
+---
 
-## Project Structure
+## Projektstruktur
 
-```
+```text
 Sprit-Scan/
-├── docker-compose.yml
-├── docker-compose-test.yml
-├── .github/workflows/backend-ci.yml
+├── docker-compose.yml            # lokale Entwicklungsumgebung (inkl. Cloudflare Tunnel)
+├── docker-compose-test.yml       # isolierte Infrastruktur für E2E-Tests
+├── .github/workflows/
+│   └── backend-ci.yml            # CI-Pipeline (Unit/Integration + E2E)
+├── docs/                         # Vertiefende Grundlagen-Dokumente
 ├── README.md
-├── docs/
 └── sprit-scan/
-  ├── Dockerfile
-  ├── package.json
-  ├── angular.json
-  ├── ngsw-config.json
-  ├── public/manifest.webmanifest
-    ├── src/
+    ├── angular.json
+    ├── ngsw-config.json          # Service-Worker-Caching-Regeln
+    ├── public/manifest.webmanifest
+    ├── src/app/
+    │   ├── app.routes.ts
+    │   ├── app.config.ts
+    │   ├── api/                  # HTTP-Interceptors, Basis-URL
+    │   ├── guards/                # Route Guards
+    │   ├── features/              # Seiten (Login, Home, Scan, History, Profile, AI-Expert, ...)
+    │   └── shared/                 # Wiederverwendbare Komponenten & Services
     └── backend/
-    ├── Dockerfile
         ├── package.json
         └── src/
-      ├── api-gateway/
-      ├── auth-microservice/
-      ├── history-microservice/
-      ├── ai-microservice/
-      └── test/e2e.spec.ts
+            ├── api-gateway/
+            ├── auth-microservice/
+            ├── history-microservice/
+            ├── ai-microservice/
+            ├── redis/
+            ├── resilience/
+            └── test/e2e.spec.ts
 ```
 
+---
 
-## Running the Project
+## Projekt starten
 
-Everything can be started from the repository root:
+Alles lässt sich vom Repository-Root aus starten:
 
 ```bash
 docker compose up -d --build
 ```
 
-Main endpoints:
+Wichtige Endpunkte:
 
 - Frontend: `http://localhost:4200`
-- API Gateway: `http://localhost:3000`
-- Health: `http://localhost:3000/health`
+- API-Gateway: `http://localhost:3000`
+- Health-Check: `http://localhost:3000/health`
 
-Stop:
-
-```bash
-docker compose down
-docker compose down -v
-```
-## Running the Project
-
-Everything can be started from the repository root:
+Stoppen:
 
 ```bash
-docker compose up -d --build
+docker compose down        # Datenbank-Volumes bleiben erhalten
+docker compose down -v     # inkl. Volumes
 ```
 
-Main endpoints:
+### API-Gateway-Routing
 
-- Frontend: `http://localhost:4200`
-- API Gateway: `http://localhost:3000`
-- Health: `http://localhost:3000/health`
+| Gateway-Route     | Weitergeleitet an          | Env-Variable            |
+| ----------------- | --------------------------- | ------------------------ |
+| `/api/auth/*`     | `auth-microservice` (:3001) | `AUTH_SERVICE_URL`       |
+| `/api/history/*`  | `history-microservice` (:3003) | `HISTORY_SERVICE_URL`|
+| `/api/ai/*`       | `ai-microservice` (:3004)   | `AI_SERVICE_URL`         |
+| `/health`         | Gateway selbst               | –                        |
 
-Stop:
+### Frontend-Befehle
 
 ```bash
-docker compose down
-docker compose down -v
-```
-
-### API Gateway Routing
-| `history-microservice` | Storing and querying a user's scan history   | history-db |
-| `ai-microservice`      | AI-based drink recognition & expert chat     | – (Redis)  |
-
-> These folders exist under `backend/src/*-microservice` but are not implemented yet.
-### Backend Commands
-
-```bash
-cd sprit-scan/backend
-### Frontend Commands
-docker compose up -d --build
-```
 cd sprit-scan
-This starts:
-npm start
+npm install
+npm start        # ng serve → http://localhost:4200
 npm run build
 npm test
+```
+
+### Backend-Befehle
 
 ```bash
-### Backend Commands
-
-```json
 cd sprit-scan/backend
 npm install
 npm run start:dev
 npm run build
 npm test
-  "status": "ok",
-  "gateway": "api-gateway",
+```
+
+---
+
 ## Cloudflare Tunnel
 
-`cloudflared` runs as container in `docker-compose.yml`.
+`cloudflared` läuft als eigener Container in `docker-compose.yml` und macht Frontend/Backend öffentlich erreichbar, ohne Ports direkt freizugeben.
 
-If tunnel ingress uses `localhost`, Cloudflare returns `502` because `localhost` points to the `cloudflared` container itself.
+**Wichtig:** Läuft `cloudflared` in Docker, zeigt `localhost` **innerhalb des Containers** auf den Tunnel-Container selbst – nicht auf Frontend oder Gateway. Falsche Ingress-Konfiguration führt daher zu `502 Bad Gateway`.
 
-Use these origins in Cloudflare Zero Trust:
+Korrekte Public-Hostname-Konfiguration in Cloudflare Zero Trust:
 
-- `frontend.danielhennies.com` → `http://frontend:4200`
-- `backend.danielhennies.com` → `http://api-gateway:3000`
+- `frontend.<deine-domain>` → `http://frontend:4200`
+- `backend.<deine-domain>` → `http://api-gateway:3000`
 
-## PWA
+Zusätzlich nötig:
 
-PWA is configured in:
+- `.env` benötigt `CLOUDFLARE_TUNNEL_TOKEN`.
+- `CORS_ORIGIN` im Gateway muss die öffentliche Frontend-Domain enthalten (z. B. `https://frontend.<deine-domain>,http://localhost:4200`).
+- In `sprit-scan/angular.json` muss der öffentliche Hostname unter `serve.options.allowedHosts` erlaubt sein, da der Angular Dev-Server sonst Requests mit fremdem `Host`-Header blockiert.
 
-- `sprit-scan/angular.json` (production service worker activation)
-- `sprit-scan/src/app/app.config.ts` (service worker registration)
-- `sprit-scan/ngsw-config.json` (cache groups)
-- `sprit-scan/public/manifest.webmanifest` (manifest + icons)
+---
+
+## PWA-Konfiguration
+
+Die PWA ist an mehreren Stellen konfiguriert:
+
+- **Build-Aktivierung (Production):** `sprit-scan/angular.json` (`serviceWorker: ngsw-config.json`)
+- **Registrierung zur Laufzeit:** `sprit-scan/src/app/app.config.ts` (`provideServiceWorker`, nur außerhalb von Dev-Mode aktiv)
+- **Caching-Regeln:** `sprit-scan/ngsw-config.json` (Asset-Groups für App-Shell, Icons, sonstige Assets)
+- **Manifest/Icons:** `sprit-scan/public/manifest.webmanifest`
+
+---
 
 ## Tests
 
-Backend E2E with full infrastructure:
-    "ai": "http://ai-service:3004"
-  }
+### Frontend
+
+```bash
+cd sprit-scan
+npm install
+npm test
+```
+
+### Backend (Unit/Integration)
+
+```bash
+cd sprit-scan/backend
+npm install
+npm test
+```
+
+### Backend E2E gegen vollständige Infrastruktur
+
+```bash
+# im Repository-Root
 docker compose -f docker-compose-test.yml up -d --build
+
+# danach
 cd sprit-scan/backend
 npm test -- src/test/e2e.spec.ts
 ```
 
-## CI
+Die E2E-Tests decken u. a. ab:
 
-GitHub Actions workflow:
+- Auth-Flows inkl. Randfälle mit falschem Passwort (Login, E-Mail-/Passwort-Änderung, Account-Löschung)
+- History-CRUD
+- AI-Endpunkt-Grenzfälle (leere Eingabe, zu große Payloads)
+- Rate Limiting
+- Eventual-Consistency-Cleanup über Kafka nach Account-Löschung
 
-- `.github/workflows/backend-ci.yml`
-- Runs on `push` and `pull_request` to `main`
-- Executes unit/integration tests and E2E tests
+---
 
-## Environment Variables
+## CI (GitHub Actions)
 
-Important variables:
+Workflow: [.github/workflows/backend-ci.yml](.github/workflows/backend-ci.yml)
 
-- `CORS_ORIGIN`
-- `OPENAI_API_KEY`
-- `CLOUDFLARE_TUNNEL_TOKEN`
-- `AUTH_SERVICE_URL`
-- `HISTORY_SERVICE_URL`
-- `AI_SERVICE_URL`
+- Trigger: `push` und `pull_request` auf `main`
+- Job 1 (`unit-integration`): Build + Tests ohne E2E
+- Job 2 (`e2e`): startet `docker-compose-test.yml`, wartet auf Gateway-Health, führt E2E-Tests aus, räumt danach auf
 
-## API Overview
+Optionales Secret:
 
-> `node_modules` volumes so the container picks up the new packages:
->
-  "GET /health": "gateway health",
-  "ANY /api/auth/*": "auth-microservice",
-  "ANY /api/history/*": "history-microservice",
-  "ANY /api/ai/*": "ai-microservice"
-docker compose down -v       # also remove database volumes
-```
+- `OPENAI_API_KEY` (für KI-bezogene Testpfade)
 
-## Additional Docs
+---
 
-See `docs/` for architecture and security deep-dives:
+## Environment Variablen
 
-- `docs/microservices-grundlagen.md`
-- `docs/kafka-grundlagen.md`
-- `docs/sicherheit-grundlagen.md`
-- `docs/docker-grundlagen.md`
-- `docs/angular-grundlagen.md`
-- `docs/tailwind-grundlagen.md`
-  }
+Wichtige Variablen (siehe `.env`):
+
+| Variable                  | Beschreibung                                      |
+| -------------------------- | -------------------------------------------------- |
+| `CORS_ORIGIN`              | Erlaubte Frontend-Origins (kommagetrennt)          |
+| `JWT_SECRET`                | Secret zum Signieren der JWTs                      |
+| `OPENAI_API_KEY`            | API-Key für KI-Funktionen                          |
+| `CLOUDFLARE_TUNNEL_TOKEN`   | Token für den Cloudflare Tunnel                    |
+| `AUTH_SERVICE_URL`          | Basis-URL des Auth-Service (intern)                |
+| `HISTORY_SERVICE_URL`       | Basis-URL des History-Service (intern)             |
+| `AI_SERVICE_URL`            | Basis-URL des AI-Service (intern)                  |
+| `DATABASE_URL` / `DATABASE_URL_History` | Verbindungs-Strings der jeweiligen Postgres-DB |
+
+> In Docker Compose werden interne Service-Namen statt `localhost` verwendet (z. B. `http://auth-service:3001`).
+
+---
+
+## Weiterführende Doku
+
+Im Ordner `docs/` liegen vertiefende Grundlagen-Dokumente:
+
+- [docs/microservices-grundlagen.md](docs/microservices-grundlagen.md)
+- [docs/kafka-grundlagen.md](docs/kafka-grundlagen.md)
+- [docs/sicherheit-grundlagen.md](docs/sicherheit-grundlagen.md)
+- [docs/docker-grundlagen.md](docs/docker-grundlagen.md)
+- [docs/angular-grundlagen.md](docs/angular-grundlagen.md)
+- [docs/tailwind-grundlagen.md](docs/tailwind-grundlagen.md)
