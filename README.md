@@ -1,314 +1,227 @@
-# Sprit-Scan
+# Sprit-Scan (updated)
 
-Sprit-Scan is a web application for scanning and exploring alcoholic drinks such as wine or whiskey. A user can scan a bottle (by uploading an image), receive AI-generated details about the drink, keep a personal scan history, manage their profile, and chat with an AI expert for recommendations.
+Sprit-Scan ist eine Full-Stack-Webanwendung zur Erkennung und Verwaltung von Spirituosen per Bild-Upload.
 
-The project is a full-stack application split into two parts:
+- **Frontend:** Angular SPA inkl. PWA
+- **Backend:** NestJS Microservices hinter einem API-Gateway
+- **Infra:** Docker Compose, PostgreSQL, Redis, Kafka
+- **Optional Public Access:** Cloudflare Tunnel
 
-- **Frontend** – an Angular single-page application (the user interface).
-- **Backend** – a NestJS microservice architecture behind a single API Gateway.
+Das komplette Projekt kann lokal per Docker Compose gestartet werden.
 
-Everything can be run together with **Docker Compose**.
-
----
 
 ## Table of Contents
 
 - [Architecture Overview](#architecture-overview)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
-- [Frontend](#frontend)
-- [Backend](#backend)
 - [Running the Project](#running-the-project)
-- [Environment Variables](#environment-variables)
-- [API Overview](#api-overview)
-
----
+- [Cloudflare Tunnel](#cloudflare-tunnel)
+- [PWA](#pwa)
+- [Tests](#tests)
+- [CI](#ci)
 
 ## Architecture Overview
 
 ```
-                    ┌──────────────┐
-                    │   Frontend   │  Angular SPA (port 4200)
-                    └──────┬───────┘
-                           │  REST / HTTP
-                    ┌──────▼───────┐
-                    │ API Gateway  │  NestJS (port 3000) – only public entry
-                    └──────┬───────┘
-          ┌────────────────┼────────────────┬─────────────────┐
-          │ REST           │ REST           │ REST            │ REST
-   ┌──────▼─────┐   ┌──────▼──────┐   ┌─────▼──────┐   ┌──────▼─────┐
-   │   auth     │   │  profile    │   │  history   │   │     ai     │
-   │  service   │   │  service    │   │  service   │   │  service   │
-   │  (3001)    │   │   (3002)    │   │   (3003)   │   │   (3004)   │
-   └──────┬─────┘   └──────┬──────┘   └─────┬──────┘   └────────────┘
-          │                │                │
-     ┌────▼───┐       ┌────▼────┐      ┌────▼─────┐
-     │auth-db │       │profile- │      │history-  │      ┌─────────┐
-     │(Postgres)      │db       │      │db        │      │  Redis  │
-     └────────┘       └─────────┘      └──────────┘      └─────────┘
+Frontend (Angular, :4200)
+      |
+      v
+API Gateway (NestJS, :3000)
+  |           |            |
+  v           v            v
+Auth (:3001) History (:3003) AI (:3004)
+  |           |
+  v           v
+Auth-DB     History-DB      + Redis + Kafka
+
+Optional: Cloudflare Tunnel -> frontend/backend Hostnames
 ```
 
-- The **frontend** only ever talks to the **API Gateway**.
-- The **API Gateway** is the single public entry point. It forwards each request to the correct microservice over **REST (HTTP + JSON)**.
-- Each microservice is isolated on an **internal** Docker network and (where needed) owns its **own PostgreSQL database**.
-- **Redis** is shared for sessions / caching.
 
----
 
 ## Tech Stack
 
 | Layer        | Technology                                              |
 | ------------ | ------------------------------------------------------- |
-| Frontend     | Angular 21 (standalone components, Signals), TypeScript |
+| Frontend     | Angular 21, TypeScript                                  |
 | Styling      | Tailwind CSS 4, DaisyUI                                 |
 | Backend      | NestJS 11 (Node.js 20), TypeScript                      |
 | Gateway HTTP | `@nestjs/axios` (Axios) for REST calls                  |
 | Config       | `@nestjs/config` (env-based)                            |
-| Databases    | PostgreSQL 15 (one per stateful service)                |
-| Cache / Bus  | Redis 7                                                 |
+| Databases    | PostgreSQL 15 + Prisma                                  |
+| Cache / Bus  | Redis 7 + Kafka                                         |
+| AI           | OpenAI API                                              |
+| Testing      | Jest + Supertest                                        |
 | Container    | Docker & Docker Compose                                 |
 
----
 
 ## Project Structure
 
 ```
 Sprit-Scan/
-├── docker-compose.yml          # Orchestrates frontend, gateway, services, DBs, redis
+├── docker-compose.yml
+├── docker-compose-test.yml
+├── .github/workflows/backend-ci.yml
 ├── README.md
+├── docs/
 └── sprit-scan/
-    ├── Dockerfile              # Frontend image
-    ├── package.json            # Frontend dependencies
+  ├── Dockerfile
+  ├── package.json
+  ├── angular.json
+  ├── ngsw-config.json
+  ├── public/manifest.webmanifest
     ├── src/
-    │   ├── app/                # Root app + routes
-    │   ├── features/           # Page-level feature components
-    │   │   ├── login/
-    │   │   ├── register/
-    │   │   ├── home/
-    │   │   ├── scan/
-    │   │   ├── history/
-    │   │   ├── profile/
-    │   │   └── ai-expert/
-    │   └── shared/             # Reusable UI components & services
-    │       ├── button/
-    │       ├── chatbubble/
-    │       ├── dock/
-    │       ├── input-email/
-    │       ├── input-password/
-    │       ├── modal/
-    │       ├── navbar/
-    │       ├── notification/   # Global notification service + component
-    │       ├── result/
-    │       ├── scananimation/  # Scan light-beam animation
-    │       └── template-page/
     └── backend/
-        ├── Dockerfile          # Shared backend image
+    ├── Dockerfile
         ├── package.json
-        ├── .env                # Local env (git-ignored)
-        ├── .env.example        # Documented env template
         └── src/
-            ├── api-gateway/    # The only implemented service so far
-            │   ├── main.ts
-            │   ├── api-gateway-module.ts
-            │   ├── api-gateway.controller.ts   # GET /health
-            │   ├── api-gateway.service.ts
-            │   ├── config/
-            │   │   └── services.config.ts      # Reads service URLs from env
-            │   ├── proxy/
-            │   │   └── proxy.service.ts         # Generic REST forwarder
-            │   └── routes/
-            │       ├── auth.controller.ts       # /api/auth/*
-            │       ├── profile.controller.ts    # /api/profile/*
-            │       ├── history.controller.ts    # /api/history/*
-            │       └── ai.controller.ts         # /api/ai/*
-            ├── auth-microservice/      # (planned – empty)
-            ├── profile-microservice/   # (planned – empty)
-            ├── history-microservice/   # (planned – empty)
-            └── ai-microservice/        # (planned – empty)
+      ├── api-gateway/
+      ├── auth-microservice/
+      ├── history-microservice/
+      ├── ai-microservice/
+      └── test/e2e.spec.ts
 ```
 
----
-
-## Frontend
-
-The frontend is an **Angular 21** single-page application using modern standalone components and **Signals** for reactive state.
-
-### Features (Pages)
-
-| Route        | Component         | Description                                                      |
-| ------------ | ----------------- | --------------------------------------------------------------- |
-| `/login`     | `LoginFeature`    | Email/password login with reactive validation.                  |
-| `/register`  | `RegisterFeature` | Account creation.                                               |
-| `/home`      | `HomeFeature`     | Landing page; start a scan and see the last scans.              |
-| `/scan`      | `ScanFeature`     | Handles file upload and shows the scan animation overlay.       |
-| `/history`   | `HistoryFeature`  | Searchable list of past scans with a details modal.             |
-| `/profile`   | `ProfileFeature`  | View/edit email & password, delete account (modal-based flows). |
-| `/ai-expert` | `AiExpertFeature` | Chat interface with an AI expert, including image upload.        |
-
-Unknown routes and `/` redirect to `/login`.
-
-### Shared Components & Services
-
-- **`button`** – reusable button with optional SVG icon, sizes, disabled/loading states.
-- **`chatbubble`** – chat message bubble (text + optional image), aligned left/right.
-- **`navbar` / `dock`** – top navigation and bottom dock; highlight the active route.
-- **`modal`** – generic dialog wrapper driven by a toggle input/output.
-- **`input-email` / `input-password`** – form fields with validation and a password visibility toggle.
-- **`notification`** – a global `NotificationService` (Signals) plus a component rendered once in the app root, so any feature can show success/error/info toasts.
-- **`scananimation`** – a full-screen modal-style overlay that dims the screen and animates a red scanning light beam over the uploaded image.
-- **`template-page`** – shared page layout with configurable navbar/dock.
-
-### Key Patterns
-
-- **Signals** (`signal`, `computed`, `effect`) for state and reactivity.
-- **`input()` / `output()`** for component communication.
-- **Object URLs** (`URL.createObjectURL`) to preview uploaded images.
-- **Tailwind + DaisyUI** utility-first styling.
-
-### Frontend Commands
-
-```bash
-cd sprit-scan
-npm install
-npm start        # ng serve → http://localhost:4200
-npm run build    # production build
-npm test         # unit tests (Vitest)
-```
-
----
-
-## Backend
-
-The backend follows a **microservice architecture** built with **NestJS**. Currently, only the **API Gateway** is implemented; the individual microservices are scaffolded but intentionally left empty for now.
-
-### API Gateway
-
-The gateway is the **single public entry point**. It:
-
-1. Reads each microservice base URL from **environment variables** (see [`services.config.ts`](sprit-scan/backend/src/api-gateway/config/services.config.ts)).
-2. Exposes a public REST surface under `/api/*`.
-3. Forwards every request to the matching microservice over **REST** using a generic [`ProxyService`](sprit-scan/backend/src/api-gateway/proxy/proxy.service.ts).
-4. Translates downstream errors into proper HTTP status codes (e.g. `502 Bad Gateway` when a service is unreachable).
-5. Enables **CORS** for the Angular frontend.
-
-### Routing Map
-
-| Gateway route    | Forwarded to              | Env variable          |
-| ---------------- | ------------------------- | --------------------- |
-| `/api/auth/*`    | auth-service (`:3001`)    | `AUTH_SERVICE_URL`    |
-| `/api/profile/*` | profile-service (`:3002`) | `PROFILE_SERVICE_URL` |
-| `/api/history/*` | history-service (`:3003`) | `HISTORY_SERVICE_URL` |
-| `/api/ai/*`      | ai-service (`:3004`)      | `AI_SERVICE_URL`      |
-| `/health`        | gateway itself            | –                     |
-
-### Planned Microservices
-
-| Service                | Responsibility                               | Database   |
-| ---------------------- | -------------------------------------------- | ---------- |
-| `auth-microservice`    | Registration, login, JWT/session management  | auth-db    |
-| `profile-microservice` | User profile CRUD (email, password, deletion)| profile-db |
-| `history-microservice` | Storing and querying a user's scan history   | history-db |
-| `ai-microservice`      | AI-based drink recognition & expert chat     | – (Redis)  |
-
-> These folders exist under `backend/src/*-microservice` but are not implemented yet.
-
-### Backend Commands
-
-```bash
-cd sprit-scan/backend
-npm install
-npm run start:dev    # watch mode
-npm run build        # compile → dist/api-gateway/main.js
-npm run start:prod   # node dist/api-gateway/main
-```
-
----
 
 ## Running the Project
 
-The easiest way to run everything is **Docker Compose** from the repository root:
+Everything can be started from the repository root:
 
 ```bash
 docker compose up -d --build
 ```
 
-This starts:
+Main endpoints:
 
-- **frontend** → http://localhost:4200
-- **api-gateway** → http://localhost:3000
-- **auth / profile / history / ai** services (internal network only)
-- **PostgreSQL** databases and **Redis**
+- Frontend: `http://localhost:4200`
+- API Gateway: `http://localhost:3000`
+- Health: `http://localhost:3000/health`
 
-Verify the gateway is up:
+Stop:
 
 ```bash
-curl http://localhost:3000/health
+docker compose down
+docker compose down -v
+```
+## Running the Project
+
+Everything can be started from the repository root:
+
+```bash
+docker compose up -d --build
 ```
 
-Expected response:
+Main endpoints:
+
+- Frontend: `http://localhost:4200`
+- API Gateway: `http://localhost:3000`
+- Health: `http://localhost:3000/health`
+
+Stop:
+
+```bash
+docker compose down
+docker compose down -v
+```
+
+### API Gateway Routing
+| `history-microservice` | Storing and querying a user's scan history   | history-db |
+| `ai-microservice`      | AI-based drink recognition & expert chat     | – (Redis)  |
+
+> These folders exist under `backend/src/*-microservice` but are not implemented yet.
+### Backend Commands
+
+```bash
+cd sprit-scan/backend
+### Frontend Commands
+docker compose up -d --build
+```
+cd sprit-scan
+This starts:
+npm start
+npm run build
+npm test
+
+```bash
+### Backend Commands
 
 ```json
-{
+cd sprit-scan/backend
+npm install
+npm run start:dev
+npm run build
+npm test
   "status": "ok",
   "gateway": "api-gateway",
-  "services": {
-    "auth": "http://auth-service:3001",
-    "profile": "http://profile-service:3002",
-    "history": "http://history-service:3003",
+## Cloudflare Tunnel
+
+`cloudflared` runs as container in `docker-compose.yml`.
+
+If tunnel ingress uses `localhost`, Cloudflare returns `502` because `localhost` points to the `cloudflared` container itself.
+
+Use these origins in Cloudflare Zero Trust:
+
+- `frontend.danielhennies.com` → `http://frontend:4200`
+- `backend.danielhennies.com` → `http://api-gateway:3000`
+
+## PWA
+
+PWA is configured in:
+
+- `sprit-scan/angular.json` (production service worker activation)
+- `sprit-scan/src/app/app.config.ts` (service worker registration)
+- `sprit-scan/ngsw-config.json` (cache groups)
+- `sprit-scan/public/manifest.webmanifest` (manifest + icons)
+
+## Tests
+
+Backend E2E with full infrastructure:
     "ai": "http://ai-service:3004"
   }
-}
+docker compose -f docker-compose-test.yml up -d --build
+cd sprit-scan/backend
+npm test -- src/test/e2e.spec.ts
 ```
 
-> **Tip:** After changing backend dependencies, recreate the anonymous
-> `node_modules` volumes so the container picks up the new packages:
->
-> ```bash
-> docker compose up -d --build --renew-anon-volumes
-> ```
+## CI
 
-To stop everything:
+GitHub Actions workflow:
 
-```bash
-docker compose down          # keep database data
-docker compose down -v       # also remove database volumes
-```
-
----
+- `.github/workflows/backend-ci.yml`
+- Runs on `push` and `pull_request` to `main`
+- Executes unit/integration tests and E2E tests
 
 ## Environment Variables
 
-The gateway is configured via `sprit-scan/backend/.env` (a documented template lives in `.env.example`):
+Important variables:
 
-| Variable              | Default                 | Description                                  |
-| --------------------- | ----------------------- | -------------------------------------------- |
-| `NODE_ENV`            | `development`           | Runtime environment.                         |
-| `PORT`                | `3000`                  | Port the gateway listens on.                 |
-| `CORS_ORIGIN`         | `http://localhost:4200` | Allowed frontend origin(s), comma-separated. |
-| `AUTH_SERVICE_URL`    | `http://localhost:3001` | Base URL of the auth service.                |
-| `PROFILE_SERVICE_URL` | `http://localhost:3002` | Base URL of the profile service.             |
-| `HISTORY_SERVICE_URL` | `http://localhost:3003` | Base URL of the history service.             |
-| `AI_SERVICE_URL`      | `http://localhost:3004` | Base URL of the AI service.                  |
-| `HTTP_TIMEOUT`        | `5000`                  | Timeout (ms) for outgoing service requests.  |
-
-> In Docker Compose these URLs use the service names (e.g. `http://auth-service:3001`) instead of `localhost`.
-
----
+- `CORS_ORIGIN`
+- `OPENAI_API_KEY`
+- `CLOUDFLARE_TUNNEL_TOKEN`
+- `AUTH_SERVICE_URL`
+- `HISTORY_SERVICE_URL`
+- `AI_SERVICE_URL`
 
 ## API Overview
 
-All requests from the frontend go through the gateway under `/api`:
-
-```
-GET  /health                     → gateway health + configured services
-
-ANY  /api/auth/*                 → auth-microservice
-ANY  /api/profile/*              → profile-microservice
-ANY  /api/history/*              → history-microservice
-ANY  /api/ai/*                   → ai-microservice
+> `node_modules` volumes so the container picks up the new packages:
+>
+  "GET /health": "gateway health",
+  "ANY /api/auth/*": "auth-microservice",
+  "ANY /api/history/*": "history-microservice",
+  "ANY /api/ai/*": "ai-microservice"
+docker compose down -v       # also remove database volumes
 ```
 
-Because the microservices are not implemented yet, calls under `/api/*`
-currently return `502 Bad Gateway` (the gateway is working correctly, but the
-target service is not running). Once a microservice is implemented and reachable,
-the gateway will transparently forward the request and return its response.
+## Additional Docs
+
+See `docs/` for architecture and security deep-dives:
+
+- `docs/microservices-grundlagen.md`
+- `docs/kafka-grundlagen.md`
+- `docs/sicherheit-grundlagen.md`
+- `docs/docker-grundlagen.md`
+- `docs/angular-grundlagen.md`
+- `docs/tailwind-grundlagen.md`
+  }
