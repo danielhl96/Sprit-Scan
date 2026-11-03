@@ -20,6 +20,20 @@ services:
       - api-gateway
 
   # ─────────────────────────────────────────
+  # CLOUDFLARE TUNNEL
+  # ─────────────────────────────────────────
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    environment:
+      - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - app-network
+    depends_on:
+      - api-gateway
+
+  # ─────────────────────────────────────────
   # API GATEWAY – einziger öffentlicher Eingang
   # ─────────────────────────────────────────
   api-gateway:
@@ -34,7 +48,7 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
-      - CORS_ORIGIN=http://localhost:4200
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:4200}
       - AUTH_SERVICE_URL=http://auth-service:3001
       - JWT_SECRET=your_jwt_secret_key_here
       - HISTORY_SERVICE_URL=http://history-service:3003
