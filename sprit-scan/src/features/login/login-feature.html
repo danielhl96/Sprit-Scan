@@ -19,8 +19,9 @@
         [buttonBorderColor]="'border-green-400'"
         [buttonColor]="'bg-transparent'"
         [buttonText]="'Login'"
-        [buttonDisabled]="LoginButtonDisabled()"
+        [buttonDisabled]="LoginButtonDisabled() || isLoading()"
         (buttonClick)="login()"
+        (loading)="isLoading()"
       ></app-button>
       <app-button
         (buttonClick)="navigateToRegister()"

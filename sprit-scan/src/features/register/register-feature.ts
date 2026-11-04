@@ -30,7 +30,7 @@ export class RegisterFeature {
 
   register() {
     this.RegisterFeatureService.register(this.emailinput(), this.passwordinput()).subscribe({
-      next: (response) => {
+      next: () => {
         this.NotificationService.showNotification(
           'Registration successful. Please log in.',
           'success',
@@ -44,14 +44,16 @@ export class RegisterFeature {
     });
   }
 
+  protected PasswordsMatch = computed(() => {
+    const password = this.passwordinput();
+    const confirmPassword = this.passwordConfirmInput();
+    return password === confirmPassword;
+  });
+
   protected RegisterButtonDisabled = computed(() => {
     const validEmail = this.emailValid();
     const validPassword = this.passwordValid();
     const validPasswordConfirm = this.passwordConfirmValid();
-    if (validPasswordConfirm != validPassword) {
-      console.log('Password and confirmation do not match');
-      return true;
-    }
-    return !validEmail || !validPassword || !validPasswordConfirm;
+    return !validEmail || !validPassword || !validPasswordConfirm || !this.PasswordsMatch();
   });
 }

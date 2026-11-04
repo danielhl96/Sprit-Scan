@@ -14,6 +14,7 @@ import { NotificationService } from '../../shared/notification/notification-serv
 })
 export class LoginFeature {
   protected readonly title = signal('sprit-scan');
+  protected isLoading = signal(false);
   LoginFeatureService: LoginFeatureService = inject(LoginFeatureService);
   NotificationService = inject(NotificationService);
 
@@ -32,12 +33,14 @@ export class LoginFeature {
   }
 
   protected login() {
+    this.isLoading.set(true);
     this.LoginFeatureService.login(this.emailinput(), this.passwordinput()).subscribe({
       next: (response) => {
         this.navgiateToHome();
+        this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Login failed:', error);
+        this.isLoading.set(false);
         this.NotificationService.showNotification(
           'Login failed. Please check your credentials.',
           'error',

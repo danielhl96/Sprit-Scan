@@ -15,6 +15,9 @@
       (passwordValidityChange)="passwordConfirmValid.set($event)"
       placeholder="Confirm your password"
     ></app-input-password>
+    @if (!PasswordsMatch() && passwordValid() && passwordConfirmValid()) {
+      <p class="text-red-400 text-sm">Passwords do not match</p>
+    }
     <div class="flex flex-row gap-1">
       <app-button
         [buttonBorderColor]="'border-green-400'"

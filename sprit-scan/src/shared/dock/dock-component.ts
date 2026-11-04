@@ -53,20 +53,32 @@ export class DockComponent implements OnInit, OnDestroy {
   ];
   router = inject(Router);
   private routeSubscription?: Subscription;
+  private zoomResetTimeoutId?: number;
+  private pendingScrollTimeoutId?: number;
+  zoomedRoute: string | null = null;
 
   ngOnInit(): void {
     this.updateMarkedRoute(this.router.url);
+    this.scrollDockRouteIntoView(this.getPathWithoutQueryOrHash(this.router.url), false);
 
     this.routeSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event) => {
         const navigation = event as NavigationEnd;
-        this.updateMarkedRoute(navigation.urlAfterRedirects);
+        const route = this.getPathWithoutQueryOrHash(navigation.urlAfterRedirects);
+        this.updateMarkedRoute(route);
+        this.scrollDockRouteIntoView(route, false);
       });
   }
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
+    if (this.zoomResetTimeoutId) {
+      window.clearTimeout(this.zoomResetTimeoutId);
+    }
+    if (this.pendingScrollTimeoutId) {
+      window.clearTimeout(this.pendingScrollTimeoutId);
+    }
   }
 
   openFileInput(): void {
@@ -93,7 +105,10 @@ export class DockComponent implements OnInit, OnDestroy {
   @Output() dockElementClick = new EventEmitter<string>();
   @Input() dockDisabled = true; // Input property to control the disabled state of the dock
 
-  onDockElementClick(element: DockElement): void {
+  onDockElementClick(element: DockElement, event: MouseEvent): void {
+    this.scrollToDockElement(event);
+    this.zoomDockElement(element.route);
+
     if (element.route === '/scan') {
       this.openFileInput();
       return;
@@ -103,6 +118,63 @@ export class DockComponent implements OnInit, OnDestroy {
     this.updateMarkedRoute(element.route);
     this.navigateToRoute(element.route);
   }
+
+  private scrollToDockElement(event: MouseEvent): void {
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    this.scrollElementIntoDockCenter(target, true);
+  }
+
+  private scrollDockRouteIntoView(route: string, smooth: boolean): void {
+    if (this.pendingScrollTimeoutId) {
+      window.clearTimeout(this.pendingScrollTimeoutId);
+    }
+
+    this.pendingScrollTimeoutId = window.setTimeout(() => {
+      const element = document.querySelector(`[data-dock-route="${route}"]`);
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+      this.scrollElementIntoDockCenter(element, smooth);
+    }, 0);
+  }
+
+  private scrollElementIntoDockCenter(element: HTMLElement, smooth: boolean): void {
+    const scroller = element.closest('[data-dock-scroller]');
+    if (!(scroller instanceof HTMLElement)) {
+      element.scrollIntoView({
+        behavior: smooth ? 'smooth' : 'auto',
+        block: 'nearest',
+        inline: 'center',
+      });
+      return;
+    }
+
+    const targetLeft = element.offsetLeft - (scroller.clientWidth - element.offsetWidth) / 2;
+    const maxScrollLeft = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+    const left = Math.min(Math.max(0, targetLeft), maxScrollLeft);
+
+    scroller.scrollTo({
+      left,
+      behavior: smooth ? 'smooth' : 'auto',
+    });
+  }
+
+  private zoomDockElement(route: string): void {
+    this.zoomedRoute = route;
+
+    if (this.zoomResetTimeoutId) {
+      window.clearTimeout(this.zoomResetTimeoutId);
+    }
+
+    this.zoomResetTimeoutId = window.setTimeout(() => {
+      this.zoomedRoute = null;
+    }, 220);
+  }
+
   get DockElements(): DockElement[] {
     return this.dockElements;
   }
