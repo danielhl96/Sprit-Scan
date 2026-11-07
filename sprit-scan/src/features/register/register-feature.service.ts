@@ -7,6 +7,6 @@ export class RegisterFeatureService {
 
   register(email: string, password: string) {
     const body = { email, password };
-    return this.httpClientService.post(`${NG_APP_ROOT_DOMAIN}/api/auth/register`, body);
+    return this.httpClientService.post(`${NG_APP_ROOT_DOMAIN}/auth/register`, body);
   }
 }
