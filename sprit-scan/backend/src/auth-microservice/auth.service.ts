@@ -42,14 +42,17 @@ export class AuthService {
     return { access_token: token };
   }
 
-  async register(email: string, password: string): Promise<string> {
+  async register(
+    email: string,
+    password: string,
+  ): Promise<{ message: string }> {
     const hashedPassword = await argon2.hash(password);
 
     try {
       await this.prisma.user.create({
         data: { email: email.toLowerCase(), password: hashedPassword },
       });
-      return 'User registered successfully';
+      return { message: 'User registered successfully' };
     } catch (error: unknown) {
       if (
         typeof error === 'object' &&
