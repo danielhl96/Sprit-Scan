@@ -78,7 +78,7 @@ describe('AuthService (Unit)', () => {
       });
 
       const result = await authService.register(email, password);
-      expect(result).toBe('User registered successfully');
+      expect(result).toEqual({ message: 'User registered successfully' });
     });
 
     it('should throw ConflictException if user already exists', async () => {
