@@ -47,6 +47,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sprit-scan/backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: sprit-scan/backend
+        run: npm install
+
       - name: Start test stack
         run: docker compose -f docker-compose-test.yml up -d --build
         env:
@@ -65,17 +76,6 @@ jobs:
           echo "Gateway not ready in time"
           docker compose -f docker-compose-test.yml logs
           exit 1
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: sprit-scan/backend/package-lock.json
-
-      - name: Install backend dependencies
-        working-directory: sprit-scan/backend
-        run: npm install
 
       - name: Run E2E tests
         working-directory: sprit-scan/backend
