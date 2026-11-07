@@ -26,12 +26,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: sprit-scan/backend/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build
         run: npm run build
@@ -69,13 +69,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: sprit-scan/backend/package-lock.json
 
       - name: Install backend dependencies
         working-directory: sprit-scan/backend
-        run: npm ci
+        run: npm install
 
       - name: Run E2E tests
         working-directory: sprit-scan/backend
