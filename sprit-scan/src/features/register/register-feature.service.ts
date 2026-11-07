@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { NG_APP_ROOT_DOMAIN } from '../../app/api/api-root-domain';
 @Injectable({ providedIn: 'root' })
 export class RegisterFeatureService {
   constructor(private httpClientService: HttpClient) {}
 
   register(email: string, password: string) {
     const body = { email, password };
-    return this.httpClientService.post('http://localhost:3000/api/auth/register', body);
+    return this.httpClientService.post(`${NG_APP_ROOT_DOMAIN}/api/auth/register`, body);
   }
 }
