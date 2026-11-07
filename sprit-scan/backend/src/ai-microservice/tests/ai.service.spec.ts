@@ -157,6 +157,29 @@ describe('AiService (Unit)', () => {
       expect(mockOpenAIConstructor).not.toHaveBeenCalled();
       expect(mockResponsesCreate).not.toHaveBeenCalled();
     });
+
+    it('should include frontend-provided context turns in the expert request', async () => {
+      mockResponsesCreate.mockResolvedValue({ output_text: 'Antwort 2' });
+
+      await service.expert('context-user', {
+        prompt: 'Und was ist der Unterschied zu Vodka?',
+        context: [
+          { role: 'user', message: 'Was ist Gin?' },
+          { role: 'assistant', message: 'Antwort 1' },
+        ],
+      });
+
+      const payload = mockResponsesCreate.mock.calls[0][0];
+      expect(payload.input).toHaveLength(4);
+      expect(payload.input[1].role).toBe('user');
+      expect(payload.input[1].content[0].text).toBe('Was ist Gin?');
+      expect(payload.input[2].role).toBe('assistant');
+      expect(payload.input[2].content[0].text).toBe('Antwort 1');
+      expect(payload.input[3].role).toBe('user');
+      expect(payload.input[3].content[0].text).toContain(
+        'Und was ist der Unterschied zu Vodka?',
+      );
+    });
   });
 
   describe('spirits()', () => {

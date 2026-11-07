@@ -1,4 +1,4 @@
-import { signal, computed, inject, Component, viewChild, ElementRef, effect } from '@angular/core';
+import { signal, inject, Component, viewChild, ElementRef, effect } from '@angular/core';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { ButtonComponent } from '../../shared/button/button-component';
 import { ChatBubbleComponent } from '../../shared/chatbubble/chatbubble-component';
@@ -10,6 +10,8 @@ import { AiFeatureService } from './ai-expert-feature.service';
   templateUrl: './ai-expert-feature.html',
 })
 export class AiExpertFeature {
+  private static readonly EXPERT_CONTEXT_WINDOW = 6;
+
   chatHistory = signal<
     { message: string; isUserMessage: boolean; id: number; imageUrl?: string }[]
   >([]);
@@ -37,6 +39,8 @@ export class AiExpertFeature {
 
   setUserInput(newInput: string) {
     console.log('User input set to:', newInput);
+    const expertContext = this.buildExpertContext();
+
     this.userInput.set(newInput);
     this.chatHistory.update((history) => [
       ...history,
@@ -44,7 +48,7 @@ export class AiExpertFeature {
     ]);
     this.userInput.set(''); // Clear the input after sending
     this.isLoading.set(true);
-    this.aiFeatureService.expert(newInput).subscribe({
+    this.aiFeatureService.expert(newInput, expertContext).subscribe({
       next: (response: any) => {
         console.log('AI response received:', response);
         this.isLoading.set(false);
@@ -59,6 +63,19 @@ export class AiExpertFeature {
         this.isLoading.set(false);
       },
     });
+  }
+
+  private buildExpertContext(): Array<{ role: 'user' | 'assistant'; message: string }> {
+    const maxMessages = AiExpertFeature.EXPERT_CONTEXT_WINDOW * 2;
+
+    return this.chatHistory()
+      .filter((entry) => !entry.imageUrl)
+      .map((entry) => ({
+        role: entry.isUserMessage ? ('user' as const) : ('assistant' as const),
+        message: entry.message?.trim() ?? '',
+      }))
+      .filter((entry) => entry.message.length > 0)
+      .slice(-maxMessages);
   }
 
   handleImageSelected(file: File | undefined) {

@@ -5,8 +5,8 @@ import { NG_APP_ROOT_DOMAIN } from '../../app/api/api-root-domain';
 export class AiFeatureService {
   constructor(private httpClientService: HttpClient) {}
 
-  expert(prompt: string) {
-    const body = { prompt };
+  expert(prompt: string, context?: Array<{ role: 'user' | 'assistant'; message: string }>) {
+    const body = { prompt, context };
     return this.httpClientService.post(NG_APP_ROOT_DOMAIN + 'ai/expert', body);
   }
 

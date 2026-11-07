@@ -10,6 +10,11 @@ import type { DataBodyExpert, DataBodySpirits } from '../types';
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 
+type ExpertTurn = {
+  userPrompt: string;
+  assistantResponse: string;
+};
+
 @Injectable()
 export class AiService {
   constructor(
@@ -46,10 +51,19 @@ export class AiService {
     const systemPrompt =
       'Du bist ein Experten-Assistent für Spirituosen und Getränke. Antworte immer auf Deutsch, klar, sachlich, kurz und prägnant. Gib ausschließlich reinen Text zurück.';
 
+    const contextTurns = this.buildExpertContextFromBody(body);
+    const expertInput = this.buildExpertContextInput(
+      userId,
+      systemPrompt,
+      contextTurns,
+      prompt,
+    );
+
     const message = await this.requestOpenAiText({
       userId,
       systemPrompt,
       userContent: prompt,
+      input: expertInput,
       temperature: 0.2,
     });
 
@@ -148,6 +162,7 @@ export class AiService {
     userId: string;
     systemPrompt: string;
     userContent: string | Array<Record<string, unknown>>;
+    input?: Array<Record<string, unknown>>;
     temperature: number;
   }): Promise<string> {
     const openai = this.createOpenAiClient();
@@ -156,7 +171,7 @@ export class AiService {
       model: this.getModel(),
       temperature: options.temperature,
       tools: [{ type: 'web_search_preview' }],
-      input: this.buildResponsesInput(options) as any,
+      input: (options.input ?? this.buildResponsesInput(options)) as any,
     });
 
     const content = response.output_text;
@@ -251,5 +266,85 @@ export class AiService {
         content: userContent,
       },
     ];
+  }
+
+  /**
+   * Builds a role-based conversation input with a temporary per-user context
+   * window, so follow-up questions can rely on recent history.
+   */
+  private buildExpertContextInput(
+    userId: string,
+    systemPrompt: string,
+    contextTurns: ExpertTurn[],
+    prompt: string,
+  ): Array<Record<string, unknown>> {
+    const input: Array<Record<string, unknown>> = [
+      {
+        role: 'system',
+        content: [{ type: 'input_text', text: systemPrompt }],
+      },
+    ];
+
+    for (const turn of contextTurns) {
+      input.push({
+        role: 'user',
+        content: [{ type: 'input_text', text: turn.userPrompt }],
+      });
+
+      input.push({
+        role: 'assistant',
+        content: [{ type: 'input_text', text: turn.assistantResponse }],
+      });
+    }
+
+    input.push({
+      role: 'user',
+      content: [
+        {
+          type: 'input_text',
+          text: `UserId: ${userId}. Task: ${prompt}`,
+        },
+      ],
+    });
+
+    return input;
+  }
+
+  private buildExpertContextFromBody(body: DataBodyExpert): ExpertTurn[] {
+    const context = Array.isArray(body.context) ? body.context : [];
+    const parsedWindow = Number(process.env.EXPERT_CONTEXT_WINDOW ?? '6');
+    const maxTurns =
+      Number.isFinite(parsedWindow) && parsedWindow > 0
+        ? Math.floor(parsedWindow)
+        : 6;
+
+    const normalized = context
+      .filter((item) => item && typeof item.message === 'string')
+      .map((item) => ({
+        role: item.role === 'assistant' ? 'assistant' : 'user',
+        message: item.message.trim(),
+      }))
+      .filter((item) => item.message.length > 0)
+      .slice(-maxTurns * 2);
+
+    const turns: ExpertTurn[] = [];
+    let pendingUserPrompt: string | null = null;
+
+    for (const item of normalized) {
+      if (item.role === 'user') {
+        pendingUserPrompt = item.message;
+        continue;
+      }
+
+      if (pendingUserPrompt) {
+        turns.push({
+          userPrompt: pendingUserPrompt,
+          assistantResponse: item.message,
+        });
+        pendingUserPrompt = null;
+      }
+    }
+
+    return turns;
   }
 }

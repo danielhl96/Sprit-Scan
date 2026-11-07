@@ -10,6 +10,10 @@ export type JwtPayload = {
 
 export type DataBodyExpert = {
   prompt: string;
+  context?: Array<{
+    role: 'user' | 'assistant';
+    message: string;
+  }>;
 };
 
 export type DataBodySpirits = {
