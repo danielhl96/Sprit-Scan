@@ -11,6 +11,7 @@ export class InputPasswordComponent {
   @Input() password: string = '';
   @Input() placeholder: string = 'Enter your password';
   @Input() passwordValidOn: boolean = true;
+  @Input() passwordLabel: string = 'Password';
   @Output() passwordChange = new EventEmitter<string>();
   @Output() passwordValidityChange = new EventEmitter<boolean>();
   passwordVisible = signal(false);

@@ -7,11 +7,13 @@
     ></app-input-email>
     <app-input-password
       [(password)]="passwordinput"
+      [passwordLabel]="'Password'"
       (passwordValidityChange)="passwordValid.set($event)"
       placeholder="Enter your password"
     ></app-input-password>
     <app-input-password
       [(password)]="passwordConfirmInput"
+      [passwordLabel]="'Confirm Password'"
       (passwordValidityChange)="passwordConfirmValid.set($event)"
       placeholder="Confirm your password"
     ></app-input-password>
