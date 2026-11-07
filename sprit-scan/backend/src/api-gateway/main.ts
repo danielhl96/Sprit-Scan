@@ -14,7 +14,7 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('gateway.port') ?? 3000;
+  const port = configService.get<number>('gateway.port') ?? 3010;
   const corsOrigin = configService.get<string[]>('gateway.corsOrigin') ?? [
     'http://localhost:4200',
   ];
