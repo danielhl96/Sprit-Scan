@@ -287,7 +287,7 @@ export class AiService {
 
       input.push({
         role: 'assistant',
-        content: [{ type: 'input_text', text: turn.assistantResponse }],
+        content: [{ type: 'output_text', text: turn.assistantResponse }],
       });
     }
 

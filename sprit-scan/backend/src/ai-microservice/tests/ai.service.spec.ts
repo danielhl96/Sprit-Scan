@@ -174,6 +174,7 @@ describe('AiService (Unit)', () => {
       expect(payload.input[1].role).toBe('user');
       expect(payload.input[1].content[0].text).toBe('Was ist Gin?');
       expect(payload.input[2].role).toBe('assistant');
+      expect(payload.input[2].content[0].type).toBe('output_text');
       expect(payload.input[2].content[0].text).toBe('Antwort 1');
       expect(payload.input[3].role).toBe('user');
       expect(payload.input[3].content[0].text).toContain(
