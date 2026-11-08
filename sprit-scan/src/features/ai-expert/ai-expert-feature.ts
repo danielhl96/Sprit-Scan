@@ -10,7 +10,7 @@ import { AiFeatureService } from './ai-expert-feature.service';
   templateUrl: './ai-expert-feature.html',
 })
 export class AiExpertFeature {
-  private static readonly EXPERT_CONTEXT_WINDOW = 6;
+  private static readonly EXPERT_CONTEXT_WINDOW = 20;
 
   chatHistory = signal<
     { message: string; isUserMessage: boolean; id: number; imageUrl?: string }[]

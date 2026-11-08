@@ -60,9 +60,6 @@ export class AiService {
     );
 
     const message = await this.requestOpenAiText({
-      userId,
-      systemPrompt,
-      userContent: prompt,
       input: expertInput,
       temperature: 0.2,
     });
@@ -159,10 +156,7 @@ export class AiService {
    * Web search is always enabled. Used for free-form answers (expert).
    */
   private async requestOpenAiText(options: {
-    userId: string;
-    systemPrompt: string;
-    userContent: string | Array<Record<string, unknown>>;
-    input?: Array<Record<string, unknown>>;
+    input: Array<Record<string, unknown>>;
     temperature: number;
   }): Promise<string> {
     const openai = this.createOpenAiClient();
@@ -171,7 +165,7 @@ export class AiService {
       model: this.getModel(),
       temperature: options.temperature,
       tools: [{ type: 'web_search_preview' }],
-      input: (options.input ?? this.buildResponsesInput(options)) as any,
+      input: options.input as any,
     });
 
     const content = response.output_text;
@@ -312,12 +306,11 @@ export class AiService {
 
   private buildExpertContextFromBody(body: DataBodyExpert): ExpertTurn[] {
     const context = Array.isArray(body.context) ? body.context : [];
-    const parsedWindow = Number(process.env.EXPERT_CONTEXT_WINDOW ?? '6');
+    const parsedWindow = Number(process.env.EXPERT_CONTEXT_WINDOW ?? '20');
     const maxTurns =
       Number.isFinite(parsedWindow) && parsedWindow > 0
         ? Math.floor(parsedWindow)
-        : 6;
-
+        : 20;
     const normalized = context
       .filter((item) => item && typeof item.message === 'string')
       .map((item) => ({
