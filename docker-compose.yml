@@ -10,7 +10,7 @@ services:
       context: ./sprit-scan
       dockerfile: Dockerfile
     ports:
-      - '4200:4200'
+      - '4200:80' 
     volumes:
       - ./sprit-scan:/app
       - /app/node_modules
