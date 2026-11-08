@@ -9,6 +9,7 @@ services:
     build:
       context: ./sprit-scan
       dockerfile: Dockerfile
+      target: dev
     ports:
       - '4200:4200'
     volumes:
