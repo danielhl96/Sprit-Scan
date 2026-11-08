@@ -112,6 +112,34 @@ Gibt an, aus welchem Ordner (`context`) und mit welcher Datei (`dockerfile`) das
 #### `ports`
 Format: `"HOST:CONTAINER"`. `'3000:3000'` bedeutet: Port 3000 auf deinem Mac wird auf Port 3000 im Container weitergeleitet. Nur Services mit `ports:` sind **von außerhalb von Docker** (z. B. vom Browser) erreichbar. Services ohne `ports:` (wie `auth-service`, `kafka`) sind nur **innerhalb des Docker-Netzwerks** für andere Container erreichbar.
 
+**Wichtiger Unterschied (Host-Port vs. Container-Port):**
+
+- **Container-Port** (rechts) = Port, auf dem die App **im Container** lauscht (z. B. Nginx auf `80`, Node auf `3000`).
+- **Host-Port** (links) = Port, unter dem du die App **auf deinem Rechner** erreichst (z. B. `localhost:4200`).
+
+Beispiele:
+
+- `4200:80` → Browser ruft `http://localhost:4200` auf, Docker leitet intern auf Container-Port `80` weiter.
+- `3010:3000` → Browser ruft `http://localhost:3010` auf, App läuft intern weiterhin auf `3000`.
+
+Warum ist das notwendig?
+
+1. **Container sind isoliert**: Ohne `ports:` ist ein Service von außen nicht erreichbar.
+2. **Port-Konflikte vermeiden**: Mehrere Container können intern denselben Port nutzen (z. B. überall `3000`), aber am Host unterschiedlich gemappt werden (`3000:3000`, `3010:3000`, ...).
+3. **Klare Trennung intern/extern**: Intern sprechen Container über Service-Namen (`http://api-gateway:3000`), extern nutzt der Browser Host-Ports (`http://localhost:3010`).
+
+**Kann ich denselben Host-Port mehrfach verwenden?**
+
+- **Nein, nicht gleichzeitig.** Ein Host-Port kann zur selben Zeit nur einmal gebunden werden.
+- Beispiel: Wenn bereits ein Container `4200:80` nutzt, schlägt ein zweiter Container mit `4200:3000` fehl.
+- Lösung: Unterschiedliche Host-Ports verwenden, z. B. `4200:80` und `4201:80`.
+- Wichtig: Der **Container-Port** darf in mehreren Containern gleich sein (z. B. intern überall `3000`), kritisch ist nur die Kollision auf dem **Host-Port**.
+
+**Typischer Denkfehler:**
+
+- `EXPOSE 3000` im Dockerfile öffnet **keinen** Host-Port.
+- Erst `ports:` in Compose macht den Dienst auf `localhost:<host-port>` erreichbar.
+
 #### `volumes`
 ```yaml
 volumes:
