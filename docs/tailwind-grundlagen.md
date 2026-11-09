@@ -69,6 +69,41 @@ Tailwind-Klassen werden beim Build nur dann beibehalten, wenn sie im Code erkann
 
 ---
 
+## 3.0) HTML/CSS-Basics im Kontext dieser Datei
+
+### `div` – Struktur- und Layout-Container
+
+- `div` ist ein **Block-Element** und startet in der Regel in einer neuen Zeile.
+- Es wird für größere Layout-Bereiche verwendet (z. B. Navbar-Container, Dock-Container, Menüblöcke).
+- In Kombination mit Tailwind-Klassen wie `flex`, `fixed`, `w-full`, `h-12` steuert ein `div` meist die Hauptstruktur.
+
+### `span` – Inline-Container für kleine Teile
+
+- `span` ist ein **Inline-Element** und bleibt im Textfluss.
+- Es eignet sich für kleine Inhalte wie einzelne Textteile, Badges oder Icons innerhalb einer Zeile.
+- Typisch: gezielte Formatierung ohne zusätzlichen Blockumbruch.
+
+### `relative` – Bezugspunkt für Kinder
+
+- `position: relative` lässt ein Element im normalen Layoutfluss.
+- Der wichtigste Zweck: Es dient als **Anker/Bezugsebene** für absolut positionierte Kinder.
+- Ohne diesen Bezug richtet sich ein absolut positioniertes Kind oft am Viewport oder einem anderen Vorfahren aus.
+
+### `absolute` – gezielte Positionierung
+
+- `position: absolute` nimmt ein Element aus dem normalen Dokumentfluss.
+- Positionierung erfolgt über `top/right/bottom/left` relativ zum nächsten Vorfahren mit `position` ungleich `static` (typisch `relative`).
+- In eurem UI: Menü-Panel, das exakt unter einer Navbar erscheint (`absolute top-12 right-0`).
+
+### Merksatz für eure Komponenten
+
+- Große Bereiche: `div`
+- Kleine Inline-Anpassungen: `span`
+- Eltern-Container als Referenz: `relative`
+- Schwebende Panels/Overlays: `absolute`
+
+---
+
 ## 3.1) Wichtigste Tailwind-Klassen (Cheat Sheet)
 
 Die folgende Liste erklärt die zentralen Klassen, die im Projekt (vor allem in Navbar und Dock) häufig vorkommen.
