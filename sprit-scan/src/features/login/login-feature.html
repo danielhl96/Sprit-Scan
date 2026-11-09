@@ -17,19 +17,24 @@
     ></app-input-password>
     <div class="flex flex-row gap-1">
       <app-button
-        [buttonBorderColor]="'border-green-400'"
+        [buttonBorderColor]="'border-black-500'"
         [buttonColor]="'bg-transparent'"
+        [buttonSize]="'sm'"
         [buttonText]="'Login'"
         [buttonDisabled]="LoginButtonDisabled() || isLoading()"
         (buttonClick)="login()"
-        (loading)="isLoading()"
+        [loading]="isLoading()"
+        [buttonImgSrc]="'/login-icon.svg'"
+        [buttonImgAlt]="'Login'"
       ></app-button>
       <app-button
         (buttonClick)="navigateToRegister()"
         [buttonColor]="'bg-transparent'"
-        [buttonSvgPath]="'M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0Z'"
-        [buttonBorderColor]="'border-red-400'"
+        [buttonImgSrc]="'/register-icon.svg'"
+        [buttonImgAlt]="'Register'"
+        [buttonBorderColor]="'border-black-500'"
         [buttonText]="'Sign-up'"
+        [buttonSize]="'sm'"
       ></app-button>
     </div>
 

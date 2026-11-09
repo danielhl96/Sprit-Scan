@@ -16,6 +16,8 @@ export class ButtonComponent {
   @Input() buttonDisabled = false;
   @Input() buttonIcon = '';
   @Input() buttonSvgPath = '';
+  @Input() buttonImgSrc = '';
+  @Input() buttonImgAlt = '';
   @Input() loading = false;
 
   onButtonClick(): void {

@@ -1,6 +1,6 @@
 <button
   class="btn text-black rounded-lg border-1"
-  [class]="[
+  [ngClass]="[
     buttonColor,
     buttonDisabled || loading ? 'border-transparent' : buttonBorderColor,
     'btn-' + buttonSize,
@@ -23,6 +23,14 @@
       >
         <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="buttonSvgPath" />
       </svg>
+    }
+    @if (buttonImgSrc) {
+      <img
+        [src]="buttonImgSrc"
+        [alt]="buttonImgAlt"
+        class="w-5 h-5"
+        [class.opacity-40]="buttonDisabled"
+      />
     }
     @if (buttonIcon) {
       <span [class.text-gray-400]="buttonDisabled">{{ buttonIcon }}</span>
