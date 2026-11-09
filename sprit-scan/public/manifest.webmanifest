@@ -2,11 +2,11 @@
   "name": "AlcScanner",
   "short_name": "AlcScanner",
   "display": "standalone",
-  "scope": "./",
-  "start_url": "./",
+  "scope": "/",
+  "start_url": "/",
   "icons": [
     {
-      "src": "appicon-landing.svg",
+      "src": "/appicon-landing.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable any"
