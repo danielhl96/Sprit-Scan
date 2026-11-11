@@ -23,4 +23,7 @@ export class HistoryFeatureService {
   getHistory() {
     return this.httpClientService.get<HistoryEntry[]>(NG_APP_ROOT_DOMAIN + 'history/entries');
   }
+  deleteHistoryEntry(id: number) {
+    return this.httpClientService.delete(NG_APP_ROOT_DOMAIN + `history/entry/${id}`);
+  }
 }

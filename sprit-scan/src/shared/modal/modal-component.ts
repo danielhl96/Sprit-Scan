@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, NgModule, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ButtonComponent } from '../button/button-component';
 
 @Component({
   selector: 'app-modal',
   templateUrl: './modal-component.html',
   standalone: true,
-  imports: [CommonModule],
+  imports: [ButtonComponent],
 })
 export class ModalComponent {
   @Input() toggleModal: boolean = false;

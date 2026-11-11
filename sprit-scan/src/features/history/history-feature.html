@@ -41,8 +41,18 @@
   </div>
 
   <app-modal [toggleModal]="toggleModal()" (toggleModalChange)="toggleModal.set($event)">
-    @if (selectedEntry(); as entry) {
-      <result [entry]="entry"></result>
-    }
+    <div class="flex flex-col items-center gap-1">
+      @if (selectedEntry(); as entry) {
+        <result [entry]="entry"></result>
+      }
+      <app-button
+        buttonText="Delete"
+        buttonImgSrc="/delete-icon.svg"
+        buttonColor="btn-ghost"
+        buttonBorderColor="border-error"
+        buttonSize="md"
+        (buttonClick)="deleteEntry(selectedEntry()!.id); toggleModal.set(false)"
+      ></app-button>
+    </div>
   </app-modal>
 </app-template-page>

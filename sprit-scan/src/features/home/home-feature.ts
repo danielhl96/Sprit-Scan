@@ -6,6 +6,9 @@ import { ScanFeature } from '../scan/scan-feature';
 import { HistoryFeatureService, HistoryEntry } from '../history/history-feature.service';
 import { DatePipe } from '@angular/common';
 import { HistoryEntryComponent } from '../../shared/historyentry/history-entry-component';
+import { NotificationService } from '../../shared/notification/notification-service';
+import { ButtonComponent } from '../../shared/button/button-component';
+
 @Component({
   selector: 'home-feature',
   imports: [
@@ -15,6 +18,7 @@ import { HistoryEntryComponent } from '../../shared/historyentry/history-entry-c
     ScanFeature,
     DatePipe,
     HistoryEntryComponent,
+    ButtonComponent,
   ],
   templateUrl: './home-feature.html',
 })
@@ -24,6 +28,7 @@ export class HomeFeature {
   toggleModalChange = output<boolean>();
   selectedEntry = signal<HistoryEntry | null>(null);
   isLoading = signal(false);
+  NotificationService = inject(NotificationService);
   ngOnInit(): void {
     this.isLoading.set(true);
     this.historyFeatureService.getHistory().subscribe({
@@ -34,6 +39,22 @@ export class HomeFeature {
       error: (error) => {
         console.error('Error fetching history entries:', error);
         this.isLoading.set(false);
+      },
+    });
+  }
+
+  deleteEntry(id: number): void {
+    this.historyFeatureService.deleteHistoryEntry(id).subscribe({
+      next: () => {
+        const updatedEntries = this.lastScans().filter((entry) => entry.id !== id);
+        this.lastScans.set(updatedEntries);
+        this.NotificationService.showNotification('Entry deleted successfully', 'success');
+      },
+      error: (error) => {
+        this.NotificationService.showNotification(
+          'Failed to delete entry. Please try again.',
+          'error',
+        );
       },
     });
   }
