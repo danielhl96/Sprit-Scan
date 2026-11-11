@@ -11,20 +11,22 @@
 
     <div class="flex flex-row gap-1">
       <app-button
-        buttonText="Delete"
+        buttonText="Account"
         buttonColor="btn-error"
         buttonBorderColor="border-error"
         buttonSize="md"
         (buttonClick)="onConfirmDelete()"
         [buttonDisabled]="!password()"
+        buttonImgSrc="/delete-icon.svg"
       ></app-button>
 
       <app-button
-        buttonText="Cancel"
+        buttonText=""
         buttonColor="btn-ghost"
         buttonBorderColor="border-error"
         buttonSize="md"
         (buttonClick)="toggleModalChange.emit(false)"
+        buttonImgSrc="/cancel-icon.svg"
       ></app-button>
     </div>
   </div>
