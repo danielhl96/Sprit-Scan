@@ -4,10 +4,10 @@ import { ModalComponent } from '../../shared/modal/modal-component';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { Result } from '../../shared/result/result';
 import { HistoryFeatureService, HistoryEntry } from './history-feature.service';
-
+import { HistoryEntryComponent } from '../../shared/historyentry/history-entry-component';
 @Component({
   selector: 'history-feature',
-  imports: [ModalComponent, TemplatePageComponent, Result, DatePipe],
+  imports: [ModalComponent, TemplatePageComponent, Result, DatePipe, HistoryEntryComponent],
   templateUrl: './history-feature.html',
   standalone: true,
 })

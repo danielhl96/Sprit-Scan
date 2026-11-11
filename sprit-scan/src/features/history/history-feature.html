@@ -27,13 +27,11 @@
       <div class="overflow-y-auto max-h-[60dvh]">
         <div class="grid grid-cols-2 grid-rows-2 gap-3 max-w-full">
           @for (entry of HistoryEntry(); track entry.id) {
-            <div
-              (click)="selectModal(entry.id)"
-              class="items-center h-[10dvh] rounded-2xl border-1 bg-red-50/70 border-red-400 shadow-xl active:scale-95 transition cursor-pointer border-1 border-red-400"
-            >
-              <p class="text-black text-center">{{ entry.name.substring(0, 20) }}</p>
-              <p class="text-black text-xs text-center">{{ entry.date | date: 'dd.MM.yyyy' }}</p>
-            </div>
+            <history-entry-component
+              [entryText]="entry.name"
+              [entryDate]="entry.date"
+              (click)="selectedEntry.set(entry); toggleModal.set(true)"
+            ></history-entry-component>
           }
         </div>
       </div>
