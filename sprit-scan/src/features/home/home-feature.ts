@@ -5,9 +5,17 @@ import { Result } from '../../shared/result/result';
 import { ScanFeature } from '../scan/scan-feature';
 import { HistoryFeatureService, HistoryEntry } from '../history/history-feature.service';
 import { DatePipe } from '@angular/common';
+import { HistoryEntryComponent } from '../../shared/historyentry/history-entry-component';
 @Component({
   selector: 'home-feature',
-  imports: [TemplatePageComponent, ModalComponent, Result, ScanFeature, DatePipe],
+  imports: [
+    TemplatePageComponent,
+    ModalComponent,
+    Result,
+    ScanFeature,
+    DatePipe,
+    HistoryEntryComponent,
+  ],
   templateUrl: './home-feature.html',
 })
 export class HomeFeature {
