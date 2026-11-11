@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, OnInit, inject, Input, Output } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
@@ -12,6 +12,39 @@ export type DockElement = {
   marked?: boolean; // Optional property to indicate if the element is marked
 };
 
+const DEFAULT_DOCK_ELEMENTS: DockElement[] = [
+  {
+    name: 'Home',
+    route: '/home',
+    icon: ICONS.home,
+    marked: false,
+  },
+  {
+    name: 'Scan',
+    route: '/scan',
+    icon: ICONS.scan,
+    marked: false,
+  },
+  {
+    name: 'Profile',
+    route: '/profile',
+    icon: ICONS.profile,
+    marked: false,
+  },
+  {
+    name: 'AI',
+    route: '/ai-expert',
+    icon: ICONS.ai,
+    marked: false,
+  },
+  {
+    name: 'History',
+    route: '/history',
+    icon: ICONS.history,
+    marked: false,
+  },
+];
+
 @Component({
   selector: 'app-dock',
   templateUrl: './dock-component.html',
@@ -19,45 +52,23 @@ export type DockElement = {
   imports: [CommonModule],
 })
 export class DockComponent implements OnInit, OnDestroy {
-  @Input() dockElements: DockElement[] = [
-    {
-      name: 'Home',
-      route: '/home',
-      icon: ICONS.home,
-      marked: false,
-    },
-    {
-      name: 'Scan',
-      route: '/scan',
-      icon: ICONS.scan,
-      marked: false,
-    },
-    {
-      name: 'Profile',
-      route: '/profile',
-      icon: ICONS.profile,
-      marked: false,
-    },
-    {
-      name: 'AI',
-      route: '/ai-expert',
-      icon: ICONS.ai,
-      marked: false,
-    },
-    {
-      name: 'History',
-      route: '/history',
-      icon: ICONS.history,
-      marked: false,
-    },
-  ];
+  // Input: externe Konfiguration der Dock-Elemente (readonly Signal-Input).
+  dockElements = input<DockElement[]>(DEFAULT_DOCK_ELEMENTS);
+  // Interner, veränderbarer State für Anzeige + markierte Route.
+  protected readonly elements = signal<DockElement[]>([]);
+  // Route wird emittiert, wenn ein Dock-Element geklickt wird.
+  dockElementClick = output<string>();
+  // Steuert den deaktivierten Zustand des Docks.
+  dockDisabled = input(true);
+
   router = inject(Router);
   private routeSubscription?: Subscription;
   private zoomResetTimeoutId?: number;
   private pendingScrollTimeoutId?: number;
-  zoomedRoute: string | null = null;
+  protected readonly zoomedRoute = signal<string | null>(null);
 
   ngOnInit(): void {
+    this.elements.set(this.dockElements().map((element) => ({ ...element })));
     this.updateMarkedRoute(this.router.url);
     this.scrollDockRouteIntoView(this.getPathWithoutQueryOrHash(this.router.url), false);
 
@@ -88,10 +99,12 @@ export class DockComponent implements OnInit, OnDestroy {
   private updateMarkedRoute(url: string): void {
     const currentPath = this.getPathWithoutQueryOrHash(url);
 
-    this.dockElements = this.dockElements.map((element) => ({
-      ...element,
-      marked: currentPath === element.route,
-    }));
+    this.elements.update((items) =>
+      items.map((element) => ({
+        ...element,
+        marked: currentPath === element.route,
+      })),
+    );
   }
 
   private getPathWithoutQueryOrHash(url: string): string {
@@ -101,9 +114,6 @@ export class DockComponent implements OnInit, OnDestroy {
   navigateToRoute(route: string): void {
     this.router.navigate([route]);
   }
-  //Route will be emitted when a dock element is clicked, so the parent component can handle the navigation
-  @Output() dockElementClick = new EventEmitter<string>();
-  @Input() dockDisabled = true; // Input property to control the disabled state of the dock
 
   onDockElementClick(element: DockElement, event: MouseEvent): void {
     this.scrollToDockElement(event);
@@ -164,18 +174,18 @@ export class DockComponent implements OnInit, OnDestroy {
   }
 
   private zoomDockElement(route: string): void {
-    this.zoomedRoute = route;
+    this.zoomedRoute.set(route);
 
     if (this.zoomResetTimeoutId) {
       window.clearTimeout(this.zoomResetTimeoutId);
     }
 
     this.zoomResetTimeoutId = window.setTimeout(() => {
-      this.zoomedRoute = null;
+      this.zoomedRoute.set(null);
     }, 220);
   }
 
   get DockElements(): DockElement[] {
-    return this.dockElements;
+    return this.elements();
   }
 }

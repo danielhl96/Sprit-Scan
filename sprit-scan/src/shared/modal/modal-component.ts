@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, NgModule, Output } from '@angular/core';
+import { Component, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../button/button-component';
 
@@ -9,11 +9,9 @@ import { ButtonComponent } from '../button/button-component';
   imports: [ButtonComponent],
 })
 export class ModalComponent {
-  @Input() toggleModal: boolean = false;
-  @Output() toggleModalChange = new EventEmitter<boolean>();
+  toggleModal = model<boolean>(false);
 
   toggleChange(): void {
-    this.toggleModal = !this.toggleModal;
-    this.toggleModalChange.emit(this.toggleModal);
+    this.toggleModal.set(!this.toggleModal());
   }
 }

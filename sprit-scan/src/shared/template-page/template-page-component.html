@@ -1,13 +1,13 @@
 @if (isMobile()) {
   <div class="min-h-screen flex flex-col bg-white">
-    <app-navbar [navbarDisabled]="NavbarDisabled"> </app-navbar>
+    <app-navbar [navbarDisabled]="NavbarDisabled()"> </app-navbar>
 
     <div class="flex-1">
       <div class="pt-12">
-        <div class="divider divider-error text-black">{{ title }}</div>
+        <div class="divider divider-error text-black">{{ title() }}</div>
         <ng-content></ng-content>
         <app-dock
-          [dockDisabled]="DockDisabled"
+          [dockDisabled]="DockDisabled()"
           (dockElementClick)="onDockElementClick($event)"
         ></app-dock>
       </div>

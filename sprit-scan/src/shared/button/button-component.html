@@ -1,17 +1,17 @@
 <button
   class="btn text-black rounded-lg border-1"
   [ngClass]="[
-    buttonColor,
-    buttonDisabled || loading ? 'border-transparent' : buttonBorderColor,
-    'btn-' + buttonSize,
+    buttonColor(),
+    buttonDisabled() || loading() ? 'border-transparent' : buttonBorderColor(),
+    'btn-' + buttonSize(),
   ]"
   (click)="onButtonClick()"
-  [disabled]="buttonDisabled || loading"
+  [disabled]="buttonDisabled() || loading()"
 >
-  @if (loading) {
+  @if (loading()) {
     <span class="loading loading-spinner loading-sm"></span>
   } @else {
-    @if (buttonSvgPath) {
+    @if (buttonSvgPath()) {
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -19,22 +19,22 @@
         stroke-width="1.5"
         stroke="currentColor"
         class="w-5 h-5"
-        [class.text-gray-400]="buttonDisabled"
+        [class.text-gray-400]="buttonDisabled()"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="buttonSvgPath" />
+        <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="buttonSvgPath()" />
       </svg>
     }
-    @if (buttonImgSrc) {
+    @if (buttonImgSrc()) {
       <img
-        [src]="buttonImgSrc"
-        [alt]="buttonImgAlt"
+        [src]="buttonImgSrc()"
+        [alt]="buttonImgAlt()"
         class="w-5 h-5"
-        [class.opacity-40]="buttonDisabled"
+        [class.opacity-40]="buttonDisabled()"
       />
     }
-    @if (buttonIcon) {
-      <span [class.text-gray-400]="buttonDisabled">{{ buttonIcon }}</span>
+    @if (buttonIcon()) {
+      <span [class.text-gray-400]="buttonDisabled()">{{ buttonIcon() }}</span>
     }
-    {{ buttonText }}
+    {{ buttonText() }}
   }
 </button>

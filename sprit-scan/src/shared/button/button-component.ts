@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,17 +8,17 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
 })
 export class ButtonComponent {
-  @Output() buttonClick = new EventEmitter<void>();
-  @Input() buttonText = 'Click Me';
-  @Input() buttonColor = 'btn-primary';
-  @Input() buttonBorderColor = 'border-primary';
-  @Input() buttonSize: 'xs' | 'sm' | 'md' | 'lg' = 'md';
-  @Input() buttonDisabled = false;
-  @Input() buttonIcon = '';
-  @Input() buttonSvgPath = '';
-  @Input() buttonImgSrc = '';
-  @Input() buttonImgAlt = '';
-  @Input() loading = false;
+  buttonClick = output<void>();
+  buttonText = input('Click Me');
+  buttonColor = input('btn-primary');
+  buttonBorderColor = input('border-primary');
+  buttonSize = input<'xs' | 'sm' | 'md' | 'lg'>('md');
+  buttonDisabled = input(false);
+  buttonIcon = input('');
+  buttonSvgPath = input('');
+  buttonImgSrc = input('');
+  buttonImgAlt = input('');
+  loading = input(false);
 
   onButtonClick(): void {
     this.buttonClick.emit();

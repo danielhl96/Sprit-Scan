@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, NgModule, Output, signal } from '@angular/core';
+import { Component, input, model, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,28 +8,26 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
 })
 export class InputPasswordComponent {
-  @Input() password: string = '';
-  @Input() placeholder: string = 'Enter your password';
-  @Input() passwordValidOn: boolean = true;
-  @Input() passwordLabel: string = 'Password';
-  @Output() passwordChange = new EventEmitter<string>();
-  @Output() passwordValidityChange = new EventEmitter<boolean>();
+  password = model<string>('');
+  placeholder = input<string>('Enter your password');
+  passwordValidOn = input<boolean>(true);
+  passwordLabel = input<string>('Password');
+  passwordValidityChange = output<boolean>();
   passwordVisible = signal(false);
 
   onPasswordChange(newPassword: string): void {
-    this.password = newPassword;
-    this.passwordChange.emit(this.password);
+    this.password.set(newPassword);
     this.passwordValidityChange.emit(this.checkPasswordValidity());
   }
   checkPasswordValidity(): boolean {
     // Mind. 8 Zeichen, je ein Buchstabe, eine Ziffer und ein Sonderzeichen
     const passwordRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`])[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]{8,}$/;
-    return passwordRegex.test(this.password);
+    return passwordRegex.test(this.password());
   }
 
   get placeholderText(): string {
-    return this.placeholder || 'Enter your password';
+    return this.placeholder() || 'Enter your password';
   }
 
   togglePasswordVisibility(event?: MouseEvent): boolean {

@@ -1,4 +1,4 @@
-@if (!dockDisabled) {
+@if (!dockDisabled()) {
   <div class="w-full h-18 bg-red-700 fixed bottom-0 z-50 shadow-md">
     <div
       class="overflow-x-auto overflow-y-hidden flex items-center justify-between h-full px-3"
@@ -9,7 +9,7 @@
           class="flex flex-col items-center gap-1 px-5 py-2 rounded-md transition-colors transition-transform duration-200"
           [class.text-amber-200]="item.marked"
           [class.text-amber-50]="!item.marked"
-          [class.scale-125]="zoomedRoute === item.route"
+          [class.scale-125]="zoomedRoute() === item.route"
           [attr.data-dock-route]="item.route"
           (click)="onDockElementClick(item, $event)"
         >

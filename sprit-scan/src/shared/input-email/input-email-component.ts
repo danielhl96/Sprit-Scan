@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, NgModule, Output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,22 +8,18 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
 })
 export class InputEmailComponent {
-  @Input() email: string = '';
-  @Input() validEmailOn: boolean = true;
-  @Input() label: string = 'Email';
-  @Output() emailChange = new EventEmitter<string>();
-  @Output() emailValidityChange = new EventEmitter<boolean>();
+  email = model<string>('');
+  validEmailOn = input<boolean>(true);
+  label = input<string>('Email');
+  emailValidityChange = output<boolean>();
 
   checkEmailValidity(): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isValid = emailRegex.test(this.email);
-
-    return isValid;
+    return emailRegex.test(this.email());
   }
 
   onEmailChange(newEmail: string): void {
-    this.email = newEmail;
-    this.emailChange.emit(this.email);
+    this.email.set(newEmail);
     this.emailValidityChange.emit(this.checkEmailValidity());
   }
 }

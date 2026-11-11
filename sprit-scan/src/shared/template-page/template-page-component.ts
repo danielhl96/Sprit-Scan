@@ -1,4 +1,4 @@
-import { Component, HostListener, signal, Input, Output, EventEmitter } from '@angular/core';
+import { Component, HostListener, signal, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar-component';
 import { DockComponent } from '../dock/dock-component';
@@ -16,20 +16,13 @@ export class TemplatePageComponent {
 
   readonly isMobile = signal(this.checkIsMobile());
 
-  @Input() title = 'Template Page';
-  @Input() DockDisabled = false; // Input property to control the disabled state of the dock
-  @Input() NavbarDisabled = false; // Input property to control the disabled state of the navbar
-  @Output() dockElementClick = new EventEmitter<string>();
+  title = input('Template Page');
+  DockDisabled = input(false); // steuert den deaktivierten Zustand des Docks
+  NavbarDisabled = input(false); // steuert den deaktivierten Zustand der Navbar
+  dockElementClick = output<string>();
 
   onDockElementClick(route: string): void {
     this.dockElementClick.emit(route);
-  }
-
-  setTitle(title: string): void {
-    this.title = title;
-  }
-  getTitle(): string {
-    return this.title;
   }
 
   @HostListener('window:resize')
