@@ -1,25 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { ScanAnimationService } from '../../shared/scananimation/scan-animation-service';
 import { ScanAnimationComponent } from '../../shared/scananimation/scan-animation-component';
 import { AiFeatureService } from '../ai-expert/ai-expert-feature.service';
 import { Result } from '../../shared/result/result';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import imageCompression from 'browser-image-compression';
-
-type ScanResultEntry = {
-  id: number;
-  name: string;
-  date: string;
-  description: string;
-  taste?: string;
-  origin?: string;
-  recommendation?: string;
-  year?: string;
-  customerreview?: string;
-  rawmaterials?: string;
-  alternative?: string;
-  price?: string;
-};
+import { HistoryEntry } from '../history/history-feature.service';
+import { ScanStore } from '../../shared/scan-store/scan-store';
 
 @Component({
   selector: 'scan-feature',
@@ -30,10 +17,11 @@ type ScanResultEntry = {
 export class ScanFeature {
   imageUrl = signal<string>('');
   toggleModal = signal(false);
-  selectedEntry = signal<ScanResultEntry | null>(null);
-
+  inputId = input('fileInput');
+  selectedEntry = signal<HistoryEntry | null>(null);
   private readonly scanAnimationService = inject(ScanAnimationService);
   private readonly aiFeatureService = inject(AiFeatureService);
+  private readonly scanStore = inject(ScanStore);
 
   protected async handleFileSelected(file: File): Promise<void> {
     if (!file) {
@@ -78,8 +66,12 @@ export class ScanFeature {
       next: (response: any) => {
         console.log('AI response received:', response);
         this.scanAnimationService.showAnimation(false);
-        this.selectedEntry.set(this.mapResponseToEntry(response));
+        const entry = this.mapResponseToEntry(response);
+        this.selectedEntry.set(entry);
         this.toggleModal.set(true);
+        // In den geteilten Store schreiben -> wirkt sofort in Home und History,
+        // egal ob der Scan aus Home, Navbar oder Dock gestartet wurde.
+        this.scanStore.addEntry(entry);
       },
       error: (error) => {
         console.error('Error from AI service:', error);
@@ -88,7 +80,7 @@ export class ScanFeature {
     });
   }
 
-  private mapResponseToEntry(response: Record<string, unknown>): ScanResultEntry {
+  private mapResponseToEntry(response: Record<string, unknown>): HistoryEntry {
     return {
       id: Date.now(),
       date: new Date().toISOString(),

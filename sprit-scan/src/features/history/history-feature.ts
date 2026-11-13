@@ -1,12 +1,12 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import { TemplatePageComponent } from '../../shared/template-page/template-page-component';
 import { Result } from '../../shared/result/result';
-import { HistoryFeatureService, HistoryEntry } from './history-feature.service';
+import { HistoryEntry } from './history-feature.service';
 import { HistoryEntryComponent } from '../../shared/historyentry/history-entry-component';
 import { ButtonComponent } from '../../shared/button/button-component';
-import { NotificationService } from '../../shared/notification/notification-service';
+import { ScanStore } from '../../shared/scan-store/scan-store';
 @Component({
   selector: 'history-feature',
   imports: [
@@ -24,53 +24,30 @@ export class HistoryFeature {
   toggleModal = signal(false);
   inputSearch = signal('');
   selectedEntry = signal<HistoryEntry | null>(null);
-  NotificationService = inject(NotificationService);
-  private readonly historyFeatureService = inject(HistoryFeatureService);
+  private readonly scanStore = inject(ScanStore);
 
   ngOnInit(): void {
-    this.historyFeatureService.getHistory().subscribe({
-      next: (entries) => {
-        this.listOfHistoryEntries.set(entries);
-      },
-      error: (error) => {
-        console.error('Error fetching history entries:', error);
-      },
-    });
+    this.scanStore.load();
   }
-
-  toggleModalChange = output<boolean>();
-  listOfHistoryEntries = signal<HistoryEntry[]>([]);
 
   inputSearchValue(value: string) {
     this.inputSearch.set(value);
   }
 
   deleteEntry(id: number): void {
-    this.historyFeatureService.deleteHistoryEntry(id).subscribe({
-      next: () => {
-        const updatedEntries = this.listOfHistoryEntries().filter((entry) => entry.id !== id);
-        this.listOfHistoryEntries.set(updatedEntries);
-        this.NotificationService.showNotification('Entry deleted successfully', 'success');
-      },
-      error: (error) => {
-        this.NotificationService.showNotification(
-          'Failed to delete entry. Please try again.',
-          'error',
-        );
-      },
-    });
+    this.scanStore.deleteEntry(id);
   }
 
   selectModal(id: number) {
-    this.selectedEntry.set(this.listOfHistoryEntries().find((entry) => entry.id === id) || null);
+    this.selectedEntry.set(this.scanStore.entries().find((entry) => entry.id === id) || null);
     if (this.selectedEntry()) {
       this.toggleModal.set(true);
     }
   }
 
   HistoryEntry = computed(() => {
-    return this.listOfHistoryEntries().filter((entry) =>
-      entry.name.toLowerCase().includes(this.inputSearch().toLowerCase()),
-    );
+    return this.scanStore
+      .entries()
+      .filter((entry) => entry.name.toLowerCase().includes(this.inputSearch().toLowerCase()));
   });
 }

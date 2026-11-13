@@ -27,8 +27,6 @@ export class HistoryEntryComponent {
   // Ab diesem Fortschritt gilt das Element als "zum Löschen freigegeben".
   private static readonly DELETE_THRESHOLD = 1.0;
 
-  // Icon wird von rechts hereingeschoben: bei progress 0 → 100% nach rechts raus.
-  iconTranslate = computed(() => (1 - this.revealProgress()) * 100);
   // Text blendet beim Ziehen aus.
   textOpacity = computed(() => 1 - this.revealProgress());
 
