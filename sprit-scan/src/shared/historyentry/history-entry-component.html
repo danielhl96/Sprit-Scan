@@ -16,8 +16,8 @@
 
   <!-- Delete-Icon: wird von rechts hereingeschoben -->
   <div
-    class="absolute inset-0 flex items-center justify-center bg-red-100"
-    [style.transform]="'translateX(' + iconTranslate() + '%)'"
+    class="absolute inset-0 flex items-center justify-center bg-red-500/70 transition-transform duration-75"
+    [style.transform]="'translate3d(' + (1 - revealProgress()) * 100 + '%, 0, 0)'"
   >
     <img src="/delete-icon.svg" alt="Delete entry" class="h-[4dvh]" />
   </div>
