@@ -28,6 +28,7 @@
               [entryText]="scan.name"
               [entryDate]="scan.date"
               (click)="selectedEntry.set(scan); toggleModal.set(true)"
+              [entryId]="scan.id"
             ></history-entry-component>
           }
         </div>
