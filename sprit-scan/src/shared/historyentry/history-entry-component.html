@@ -11,7 +11,14 @@
     [style.opacity]="textOpacity()"
   >
     <p class="text-black text-center">{{ entryText().substring(0, 20) }}</p>
-    <p class="text-black text-xs text-center">{{ entryDate() | date: 'dd.MM.yyyy' }}</p>
+    <p class="text-black text-xs text-center">
+      {{
+        entryDate()
+          | date
+            : 'dd.MM
+      .yyyy'
+      }}
+    </p>
   </div>
 
   <!-- Delete-Icon: wird von rechts hereingeschoben -->
