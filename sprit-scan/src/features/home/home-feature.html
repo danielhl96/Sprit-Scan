@@ -29,6 +29,7 @@
               [entryDate]="scan.date"
               (click)="selectedEntry.set(scan); toggleModal.set(true)"
               [entryId]="scan.id"
+              (deleted)="deleteEntry($event)"
             ></history-entry-component>
           }
         </div>

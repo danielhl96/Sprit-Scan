@@ -31,6 +31,8 @@
               [entryText]="entry.name"
               [entryDate]="entry.date"
               (click)="selectedEntry.set(entry); toggleModal.set(true)"
+              [entryId]="entry.id"
+              (deleted)="deleteEntry($event)"
             ></history-entry-component>
           }
         </div>
