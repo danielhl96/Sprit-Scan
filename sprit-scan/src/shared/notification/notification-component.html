@@ -1,13 +1,24 @@
 @if (isVisible()) {
   <div
-    class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 rounded-lg shadow-lg p-4 w-50 z-40"
+    class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 bg-gradient-to-br from-amber-50/95 via-orange-50/90 to-amber-100/85 shadow-xl shadow-amber-900/20 backdrop-blur-md p-4 w-50 z-40 overflow-hidden"
     [class.border-green-500]="notificationType() === 'success'"
     [class.border-red-500]="notificationType() === 'error'"
-    [class.border-gray-300]="notificationType() === 'info'"
+    [class.border-amber-400]="notificationType() === 'info'"
   >
+    <!-- Dekorativer Akzent-Streifen oben -->
+    <div
+      class="absolute left-0 top-0 h-1 w-full"
+      [class.bg-green-500]="notificationType() === 'success'"
+      [class.bg-red-500]="notificationType() === 'error'"
+      [class.bg-gradient-to-r]="notificationType() === 'info'"
+      [class.from-amber-500]="notificationType() === 'info'"
+      [class.via-orange-400]="notificationType() === 'info'"
+      [class.to-amber-600]="notificationType() === 'info'"
+    ></div>
+
     <div class="flex justify-between items-center mb-2">
-      <h3 class="text-lg text-black font-semibold">Notification</h3>
+      <h3 class="text-lg text-amber-950 font-semibold tracking-wide">Notification</h3>
     </div>
-    <p class="text-black text-xs">{{ notificationMessage() }}</p>
+    <p class="text-amber-900/80 text-xs">{{ notificationMessage() }}</p>
   </div>
 }

@@ -1,6 +1,13 @@
 <div [class]="isUserMessage() ? 'flex flex-col items-end' : 'flex flex-col items-start'">
   <div class="relative w-[50dvw]">
-    <div class="p-2 w-full max-h-[40dvh] h-auto border-1 border-red-500 rounded-md overflow-y-auto">
+    <div
+      class="p-3 w-full max-h-[40dvh] h-auto overflow-y-auto shadow-sm shadow-amber-900/10 backdrop-blur-sm"
+      [class]="
+        isUserMessage()
+          ? 'rounded-3xl rounded-br-md border-2 border-amber-600/80 bg-gradient-to-br from-amber-200/80 to-orange-200/70'
+          : 'rounded-3xl rounded-bl-md border-2 border-amber-700/60 bg-white/80'
+      "
+    >
       @if (imageUrl()) {
         <img
           [src]="imageUrl()"
@@ -9,7 +16,7 @@
         />
       }
       @if (message()) {
-        <p class="text-black text-sm whitespace-pre-wrap break-words">{{ message() }}</p>
+        <p class="text-amber-950 text-sm whitespace-pre-wrap break-words">{{ message() }}</p>
       }
     </div>
   </div>

@@ -1,14 +1,16 @@
 @if (!dockDisabled()) {
-  <div class="w-full h-18 bg-red-700 fixed bottom-0 z-50 shadow-md">
+  <div
+    class="w-full h-18 fixed bottom-0 z-50 bg-gradient-to-t from-amber-950 to-amber-900 border-t border-amber-700/50 shadow-[0_-4px_12px_rgba(120,53,15,0.3)] backdrop-blur-md"
+  >
     <div
       class="overflow-x-auto overflow-y-hidden flex items-center justify-between h-full px-3"
       data-dock-scroller
     >
       @for (item of DockElements; track item.route) {
         <a
-          class="flex flex-col items-center gap-1 px-5 py-2 rounded-md transition-colors transition-transform duration-200"
-          [class.text-amber-200]="item.marked"
-          [class.text-amber-50]="!item.marked"
+          class="flex flex-col items-center gap-1 px-5 py-2 rounded-xl transition-colors transition-transform duration-200"
+          [class.text-amber-400]="item.marked"
+          [class.text-amber-100/70]="!item.marked"
           [class.scale-125]="zoomedRoute() === item.route"
           [attr.data-dock-route]="item.route"
           (click)="onDockElementClick(item, $event)"
@@ -20,12 +22,12 @@
             stroke-width="1.5"
             stroke="currentColor"
             class="w-6 h-6 shrink-0"
-            [class.text-amber-200]="item.marked"
-            [class.text-amber-50]="!item.marked"
+            [class.text-amber-400]="item.marked"
+            [class.text-amber-100/70]="!item.marked"
           >
             <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icon" />
           </svg>
-          <span class="text-sm" [class.text-amber-200]="item.marked">{{ item.name }}</span>
+          <span class="text-sm" [class.text-amber-400]="item.marked">{{ item.name }}</span>
         </a>
       }
     </div>

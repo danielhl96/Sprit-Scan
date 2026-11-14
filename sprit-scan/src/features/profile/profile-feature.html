@@ -1,13 +1,18 @@
 <app-template-page [NavbarDisabled]="false" [DockDisabled]="false" title="Your profile">
   <div class="p-5 flex flex-col gap-2 items-center">
     <div
-      class="h-[20dvh] w-[80dvw] border-1 border-red-400 rounded-lg flex flex-col items-stretch justify-center px-4 gap-3"
+      class="relative overflow-hidden h-[20dvh] w-[80dvw] rounded-2xl border border-amber-300/60 bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-amber-100/70 shadow-md shadow-amber-900/10 backdrop-blur-sm flex flex-col items-stretch justify-center px-4 gap-3"
     >
+      <!-- Dekorativer Akzent-Streifen links (wie ein Flaschenetikett) -->
+      <div
+        class="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-amber-500 via-orange-400 to-amber-600"
+      ></div>
+
       <div class="flex items-center justify-between">
-        <p class="text-black text-xs">Email: {{ email() }}</p>
+        <p class="text-amber-950 text-xs font-medium">Email: {{ email() }}</p>
         <button
           type="button"
-          class="p-1 rounded-md text-red-700 hover:bg-red-100"
+          class="p-1.5 rounded-lg text-amber-800 hover:bg-amber-200/60 hover:text-amber-950 transition-colors active:scale-95"
           aria-label="Edit email"
           (click)="onEditEmail()"
         >
@@ -25,10 +30,10 @@
       </div>
 
       <div class="flex items-center justify-between">
-        <p class="text-black text-xs">Password: {{ '*****' }}</p>
+        <p class="text-amber-950 text-xs font-medium">Password: {{ '*****' }}</p>
         <button
           type="button"
-          class="p-1 rounded-md text-red-700 hover:bg-red-100"
+          class="p-1.5 rounded-lg text-amber-800 hover:bg-amber-200/60 hover:text-amber-950 transition-colors active:scale-95"
           aria-label="Edit password"
           (click)="onEditPassword()"
         >

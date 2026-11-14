@@ -1,10 +1,14 @@
 @if (isMobile()) {
-  <div class="min-h-screen flex flex-col bg-white">
+  <div
+    class="min-h-screen flex flex-col bg-gradient-to-b from-orange-50 via-amber-50 to-amber-100/60"
+  >
     <app-navbar [navbarDisabled]="NavbarDisabled()"> </app-navbar>
 
     <div class="flex-1">
       <div class="pt-12">
-        <div class="divider divider-error text-black">{{ title() }}</div>
+        <div class="divider divider-warning text-amber-950 font-semibold tracking-wide">
+          {{ title() }}
+        </div>
         <ng-content></ng-content>
         <app-dock
           [dockDisabled]="DockDisabled()"

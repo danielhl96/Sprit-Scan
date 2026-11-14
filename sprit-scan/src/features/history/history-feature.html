@@ -7,7 +7,7 @@
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-5 h-5 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+        class="w-5 h-5 text-amber-800/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10"
       >
         <path
           stroke-linecap="round"
@@ -19,7 +19,7 @@
       <input
         type="text"
         placeholder="Search..."
-        class="w-full text-black pl-10 pr-2 py-2 border-2 border-black rounded-lg"
+        class="w-full pl-10 pr-2 py-2 rounded-xl border border-amber-300/60 bg-amber-50/90 text-amber-950 placeholder:text-amber-800/50 shadow-sm shadow-amber-900/10 backdrop-blur-sm focus:border-amber-500 focus:outline-none transition-colors"
         (input)="inputSearchValue($any($event.target).value)"
       />
     </div>
@@ -38,7 +38,7 @@
         </div>
       </div>
     } @else {
-      <p class="text-black text-center">No history entries yet</p>
+      <p class="text-amber-900/70 text-center">No history entries yet</p>
     }
   </div>
 

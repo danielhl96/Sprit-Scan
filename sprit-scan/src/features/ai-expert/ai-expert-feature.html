@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-6 items-center p-5">
     <div
       #chatContainer
-      class="flex flex-col gap-5 w-[90dvw] h-[60dvh] border-1 border-red-400 rounded-md p-3 bg-white overflow-y-auto"
+      class="relative flex flex-col gap-5 w-[90dvw] h-[60dvh] rounded-2xl border border-amber-300/60 bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-amber-100/70 shadow-md shadow-amber-900/10 backdrop-blur-sm p-3 overflow-y-auto"
     >
       <chatbubble-component
         [message]="'Hello! I am your AI expert. How can I assist you today?'"
@@ -23,7 +23,7 @@
         <input
           type="text"
           placeholder="Ask a question..."
-          class="input bg-white flex rounded-lg border-black text-black items-center pr-10"
+          class="input flex rounded-xl border border-amber-300/60 bg-amber-50/90 text-amber-950 placeholder:text-amber-800/50 shadow-sm shadow-amber-900/10 backdrop-blur-sm items-center pr-10 focus:border-amber-500 focus:outline-none transition-colors"
           (input)="userInput.set($any($event.target).value)"
           [value]="userInput()"
         />
@@ -38,7 +38,7 @@
         <!-- Paperclip button -->
         <button
           type="button"
-          class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition cursor-pointer"
+          class="absolute right-2 top-1/2 -translate-y-1/2 text-amber-800/60 hover:text-amber-950 transition cursor-pointer active:scale-95"
           aria-label="Bild hochladen"
           (click)="imageInput.click()"
         >
@@ -60,8 +60,8 @@
       </div>
       <app-button
         [buttonDisabled]="userInput().length === 0"
-        [buttonBorderColor]="'border-black '"
-        [buttonColor]="'bg-transparent'"
+        [buttonBorderColor]="'border-amber-400'"
+        [buttonColor]="'bg-amber-50/80'"
         [buttonSvgPath]="'M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0Z'"
         [buttonSize]="'md'"
         [buttonText]="' '"
@@ -73,12 +73,12 @@
   <!-- Loading modal: overlays everything and brings the spinner to the front -->
   @if (isLoading()) {
     <div
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black/50 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-amber-950/50 backdrop-blur-sm"
     >
       <div
-        class="w-14 h-14 border-4 border-red-400 border-t-amber-50 border-b-transparent rounded-full animate-spin"
+        class="w-14 h-14 border-4 border-amber-400 border-t-amber-50 border-b-transparent rounded-full animate-spin"
       ></div>
-      <p class="text-white font-medium">Thinking...</p>
+      <p class="text-amber-50 font-medium">Thinking...</p>
     </div>
   }
 </app-template-page>

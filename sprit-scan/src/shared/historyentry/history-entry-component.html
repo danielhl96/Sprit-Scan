@@ -1,31 +1,33 @@
 <div
-  class="relative h-[10dvh] w-[40dvw] rounded-2xl border-1 bg-red-50/70 border-red-400 shadow-xl overflow-hidden cursor-pointer flex flex-col items-center justify-center select-none touch-pan-y"
+  class="group relative h-[10dvh] w-[40dvw] rounded-2xl overflow-hidden cursor-pointer select-none touch-pan-y bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-amber-100/70 border border-amber-300/60 shadow-md shadow-amber-900/10 backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-amber-900/20 hover:border-amber-400/80 hover:-translate-y-0.5 active:scale-[0.98]"
   (pointerdown)="onPointerDown($event)"
   (pointermove)="onMove($event)"
   (pointerup)="onPointerUp()"
   (pointercancel)="onPointerUp()"
 >
+  <!-- Dekorativer Akzent-Streifen links (wie ein Flaschenetikett) -->
+  <div
+    class="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-amber-500 via-orange-400 to-amber-600"
+  ></div>
+
   <!-- Text (blendet beim Ziehen aus) -->
   <div
-    class="flex flex-col items-center justify-center transition-opacity duration-75"
+    class="h-full flex flex-col items-center justify-center gap-0.5 px-3 transition-opacity duration-75"
     [style.opacity]="textOpacity()"
   >
-    <p class="text-black text-center">{{ entryText().substring(0, 20) }}</p>
-    <p class="text-black text-xs text-center">
-      {{
-        entryDate()
-          | date
-            : 'dd.MM
-      .yyyy'
-      }}
+    <p class="text-amber-950 font-semibold text-sm text-center leading-tight tracking-wide">
+      {{ entryText().substring(0, 20) }}
+    </p>
+    <p class="text-amber-800/60 text-[0.65rem] font-medium uppercase tracking-widest text-center">
+      {{ entryDate() | date: 'dd.MM.yyyy' }}
     </p>
   </div>
 
   <!-- Delete-Icon: wird von rechts hereingeschoben -->
   <div
-    class="absolute inset-0 flex items-center justify-center bg-red-500/70 transition-transform duration-75"
+    class="absolute inset-0 flex items-center justify-center gap-2 bg-gradient-to-l from-red-600/90 to-red-500/80 backdrop-blur-sm transition-transform duration-75"
     [style.transform]="'translate3d(' + (1 - revealProgress()) * 100 + '%, 0, 0)'"
   >
-    <img src="/delete-icon.svg" alt="Delete entry" class="h-[4dvh]" />
+    <img src="/delete-icon.svg" alt="Delete entry" class="h-[4dvh] drop-shadow" />
   </div>
 </div>

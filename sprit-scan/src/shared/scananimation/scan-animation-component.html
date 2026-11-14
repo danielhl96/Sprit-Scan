@@ -1,15 +1,17 @@
 @if (animationVisible()) {
   <!-- Dark backdrop that covers the whole screen like a modal -->
-  <div class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"></div>
+  <div class="fixed inset-0 z-40 bg-amber-950/50 backdrop-blur-sm"></div>
 
   <!-- Centered content above the backdrop -->
   <div class="fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 transform space-y-2">
     @if (imageUrl()) {
-      <div class="scan-wrapper relative overflow-hidden rounded-md">
+      <div
+        class="scan-wrapper relative overflow-hidden rounded-2xl border-2 border-amber-400/70 shadow-xl shadow-amber-900/30"
+      >
         <img
           [src]="imageUrl()"
           alt="uploaded image"
-          class="max-w-70 max-h-70 object-contain rounded-md"
+          class="max-w-70 max-h-70 object-contain rounded-2xl"
         />
         <!-- Moving shadow that sweeps across the image -->
         <div class="scan-shadow pointer-events-none absolute inset-0"></div>
@@ -18,8 +20,8 @@
         <app-button
           [buttonText]="'Cancel'"
           [buttonSize]="'sm'"
-          [buttonBorderColor]="'border-black '"
-          [buttonColor]="'bg-red-500'"
+          [buttonBorderColor]="'border-amber-400'"
+          [buttonColor]="'bg-amber-50/90'"
           class="fixed left-1/2 z-50 -translate-x-1/2 transform"
           (click)="closeAnimation()"
         >
