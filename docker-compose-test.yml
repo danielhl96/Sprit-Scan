@@ -28,13 +28,13 @@ services:
       context: ./sprit-scan/backend
       dockerfile: Dockerfile
     ports:
-      - '3010:3000'
+      - '3000:3000'
     volumes:
       - ./sprit-scan/backend:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - PORT=3010
+      - PORT=3000
       - CORS_ORIGIN=http://localhost:4200
       - AUTH_SERVICE_URL=http://auth-service:3001
       - JWT_SECRET=your_jwt_secret_key_here
