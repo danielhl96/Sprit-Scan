@@ -21,7 +21,7 @@
         [buttonColor]="'bg-transparent'"
         [buttonSize]="'sm'"
         [buttonText]="'Login'"
-        [buttonDisabled]="LoginButtonDisabled() || isLoading()"
+        [buttonDisabled]="isLoading()"
         (buttonClick)="login()"
         [loading]="isLoading()"
         [buttonImgSrc]="'/login-icon.svg'"

@@ -17,6 +17,7 @@ export class EditEmailModal {
   notificationService: NotificationService = inject(NotificationService);
 
   email = signal('');
+  emailCheck = signal(false);
   password = signal('');
 
   onPasswordChange = (newPassword: string) => {

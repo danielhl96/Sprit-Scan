@@ -110,6 +110,16 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
+    if (
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        newPassword,
+      ) === false
+    ) {
+      throw new UnauthorizedException(
+        'Password does not meet complexity requirements',
+      );
+    }
+
     const passwordValid = await argon2.verify(user.password, oldPassword);
     if (!passwordValid) {
       throw new UnauthorizedException('Invalid credentials');
