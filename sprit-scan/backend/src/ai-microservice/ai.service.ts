@@ -200,6 +200,11 @@ export class AiService {
     });
 
     const parsed = response.output_parsed;
+    if (parsed?.name === null || parsed?.description === null) {
+      throw new InternalServerErrorException(
+        'OpenAI did not return required fields: name and description',
+      );
+    }
     if (!parsed) {
       throw new InternalServerErrorException(
         'OpenAI did not return structured output',
