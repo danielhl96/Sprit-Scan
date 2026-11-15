@@ -23,7 +23,7 @@ export class AuthController {
   constructor(private readonly proxy: ProxyService) {}
 
   private isProduction(): boolean {
-    return process.env.NODE_ENV === 'production';
+    return process.env.NODE_ENV === 'PRODUCTION';
   }
 
   private getCookieOptions() {

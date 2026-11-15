@@ -48,7 +48,7 @@ services:
       - ./sprit-scan/backend:/app
       - /app/node_modules
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=PRODUCTION
       - PORT=3000
       - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:4200}
       - AUTH_SERVICE_URL=http://auth-service:3001
