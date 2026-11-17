@@ -47,13 +47,13 @@ export class AiService {
    */
   async expert(userId: string, body: DataBodyExpert) {
     const prompt = this.extractPrompt(body);
-
     const systemPrompt =
-      'Du bist ein Experten-Assistent für Spirituosen und Getränke. Antworte immer auf Deutsch, klar, sachlich, kurz und prägnant. Gib ausschließlich reinen Text zurück.';
+      'Du bist ein Experten-Assistent für Spirituosen und Getränke. Antworte immer auf Deutsch, klar, sachlich, kurz und prägnant. Gib ausschließlich reinen Text zurück. Berücksichtige die bisherigen Konversationen im Kontext, um die Antwort zu verbessern.';
 
     const contextTurns = this.buildExpertContextFromBody(body);
+    console.log('Expert context turns built:', contextTurns);
+
     const expertInput = this.buildExpertContextInput(
-      userId,
       systemPrompt,
       contextTurns,
       prompt,
@@ -272,7 +272,6 @@ export class AiService {
    * window, so follow-up questions can rely on recent history.
    */
   private buildExpertContextInput(
-    userId: string,
     systemPrompt: string,
     contextTurns: ExpertTurn[],
     prompt: string,
@@ -301,7 +300,7 @@ export class AiService {
       content: [
         {
           type: 'input_text',
-          text: `UserId: ${userId}. Task: ${prompt}`,
+          text: prompt,
         },
       ],
     });
@@ -323,7 +322,7 @@ export class AiService {
         message: item.message.trim(),
       }))
       .filter((item) => item.message.length > 0)
-      .slice(-maxTurns * 2);
+      .slice(-maxTurns);
 
     const turns: ExpertTurn[] = [];
     let pendingUserPrompt: string | null = null;
