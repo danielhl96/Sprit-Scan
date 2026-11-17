@@ -38,19 +38,15 @@ export class AiExpertFeature {
   }
 
   setUserInput(newInput: string) {
-    console.log('User input set to:', newInput);
     const expertContext = this.buildExpertContext();
-
-    this.userInput.set(newInput);
     this.chatHistory.update((history) => [
       ...history,
       { message: newInput, isUserMessage: true, id: history.length },
     ]);
-    this.userInput.set(''); // Clear the input after sending
     this.isLoading.set(true);
+    this.userInput.set(''); // Clear the input after sending
     this.aiFeatureService.expert(newInput, expertContext).subscribe({
       next: (response: any) => {
-        console.log('AI response received:', response);
         this.isLoading.set(false);
         this.chatHistory.update((history) => [
           ...history,
@@ -58,7 +54,6 @@ export class AiExpertFeature {
         ]);
       },
       error: (error) => {
-        console.error('Error from AI service:', error);
         this.notify.showNotification('Error from AI service: ' + error.message, 'error');
         this.isLoading.set(false);
       },
@@ -66,10 +61,9 @@ export class AiExpertFeature {
   }
 
   private buildExpertContext(): Array<{ role: 'user' | 'assistant'; message: string }> {
-    const maxMessages = AiExpertFeature.EXPERT_CONTEXT_WINDOW * 2;
+    const maxMessages = AiExpertFeature.EXPERT_CONTEXT_WINDOW;
 
     return this.chatHistory()
-      .filter((entry) => !entry.imageUrl)
       .map((entry) => ({
         role: entry.isUserMessage ? ('user' as const) : ('assistant' as const),
         message: entry.message?.trim() ?? '',
