@@ -1,8 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
-import { NotificationService } from '../../shared/notification/notification-service';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { of, throwError } from 'rxjs';
 import { HistoryFeature } from './history-feature';
 
 describe('HistoryFeature (Unit)', () => {
