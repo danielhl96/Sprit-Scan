@@ -27,6 +27,9 @@ describe('AiExpertFeature (Unit)', () => {
   it('should handle api responses correctly', () => {
     const mockResponse = { message: 'This is a response from the AI service.' };
     const mockError = new Error('This is a simulated error.');
+    const mockResponseforSprits = {
+      description: 'This is a response from the AI service for sprits.',
+    };
 
     // Mock the expert method to simulate a successful response
     jest.spyOn(feature['aiFeatureService'], 'expert').mockReturnValue(of(mockResponse));
@@ -43,6 +46,18 @@ describe('AiExpertFeature (Unit)', () => {
     expect(feature.isLoading()).toBe(false);
     expect(feature.chatHistory().length).toBe(1);
     expect(feature.chatHistory()[0].message).toBe(mockResponse.message);
+
+    jest.spyOn(feature['aiFeatureService'], 'sprits').mockReturnValue(of(mockResponseforSprits));
+    feature.handleAiFeatureSprits('data:image/png;base64,...');
+    expect(feature.isLoading()).toBe(false);
+    expect(feature.chatHistory().length).toBe(2);
+    expect(feature.chatHistory()[1].message).toBe(mockResponseforSprits.description);
+
+    jest.spyOn(feature['aiFeatureService'], 'sprits').mockReturnValue(throwError(() => mockError));
+    feature.handleAiFeatureSprits('data:image/png;base64,...');
+    expect(feature.isLoading()).toBe(false);
+    expect(feature.chatHistory().length).toBe(2);
+    expect(feature.chatHistory()[1].message).toBe(mockResponseforSprits.description);
   });
 
   it('should build expert context correctly and keep text from image messages', () => {
@@ -111,7 +126,6 @@ describe('AiExpertFeature (Unit)', () => {
     ]);
 
     const context = feature['buildExpertContext']();
-    console.log('Context:', context);
 
     expect(context).toEqual([
       { role: 'assistant', message: 'Hi there!' },
