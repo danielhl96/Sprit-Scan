@@ -348,7 +348,98 @@ email = model<string>('');   // erstellt "email" + "emailChange"
 - `(xChange)` = nur melden (raus)
 - `[(x)]` = beides → **Two-Way**
 
-## 8. Zusammenfassung
+## 8. Grundlagen zum Testen (Jest + Angular)
+
+Dein Projekt nutzt für Frontend-Tests **Jest** mit Angular TestBed.
+
+### 8.1 Testarten kurz erklärt
+
+- **Unit-Test**: Testet eine Klasse/Methode isoliert (z. B. Feature-Komponente, Store, Helper).
+- **Integrationstest**: Mehrere Teile zusammen (z. B. Komponente + Service + Router-Mock).
+- **E2E-Test**: Test über komplette App-Flows im Browser (nicht Teil von Jest-Unit-Tests).
+
+### 8.2 Grundstruktur einer Spec-Datei
+
+```typescript
+import { TestBed } from '@angular/core/testing';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+
+describe('LoginFeature (Unit)', () => {
+  let feature: LoginFeature;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: Router, useValue: { navigate: jest.fn() } },
+      ],
+    });
+
+    feature = TestBed.runInInjectionContext(() => new LoginFeature());
+  });
+});
+```
+
+Wichtig:
+
+- `configureTestingModule(...)` registriert Provider/Mocks.
+- `runInInjectionContext(...)` ist nötig, wenn die Klasse intern `inject(...)` nutzt.
+
+### 8.3 Mocks und Spies
+
+- **Mock-Objekt**: Ersetzt echte Abhängigkeiten (z. B. Router, API-Service).
+- **`jest.fn()`**: Dummy-Funktion, die Aufrufe protokolliert.
+- **`jest.spyOn(obj, 'methode')`**: Überwacht oder überschreibt eine konkrete Methode.
+
+Beispiel:
+
+```typescript
+const deleteSpy = jest.spyOn(feature['scanStore'], 'deleteEntry');
+feature.deleteEntry(1);
+expect(deleteSpy).toHaveBeenCalledWith(1);
+```
+
+Damit prüfst du, ob die Komponente korrekt an den Store delegiert.
+
+### 8.4 Async/RxJS in Tests
+
+Für Services mit Observables:
+
+- Erfolg simulieren: `of(data)`
+- Fehler simulieren: `throwError(() => error)`
+
+```typescript
+jest.spyOn(service, 'expert').mockReturnValue(of({ message: 'ok' }));
+jest.spyOn(service, 'expert').mockReturnValue(throwError(() => new Error('fail')));
+```
+
+So testest du `next`- und `error`-Zweige in `subscribe(...)`.
+
+### 8.5 Häufige Fehlerquellen
+
+1. **`inject()` ohne Injection-Context**
+   - Lösung: Objekt über `TestBed.runInInjectionContext(...)` erzeugen.
+
+2. **`protected` Member im Test nicht direkt zugreifbar**
+   - Besser: Über öffentliches Verhalten testen.
+   - Falls nötig im Unit-Test: `(feature as any).LoginButtonDisabled()`.
+
+### 8.6 Frontend-Tests im Projekt ausführen
+
+- Nur Frontend:
+
+```bash
+npm run test:frontend
+```
+
+- Backend separat:
+
+```bash
+npm run test:backend
+```
+
+Damit vermeidest du, dass Frontend-Jest versehentlich Backend-Specs mit falscher Umgebung ausführt.
+
+## 9. Zusammenfassung
 
 - **Standalone Components**: Keine `NgModule`s mehr nötig, Komponenten importieren ihre Abhängigkeiten direkt.
 - **Signals (`signal`, `computed`)**: Moderner, performanter State-Management-Ansatz in Angular.
