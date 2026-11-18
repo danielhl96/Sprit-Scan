@@ -6,5 +6,8 @@
     "browser-image-compression": "^2.0.2",
     "cockatiel": "^4.0.0",
     "graphql": "^16.14.2"
+  },
+  "devDependencies": {
+    "jest-preset-angular": "^17.0.3"
   }
 }

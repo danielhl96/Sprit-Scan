@@ -37,14 +37,10 @@ export class AiExpertFeature {
     });
   }
 
-  setUserInput(newInput: string) {
-    const expertContext = this.buildExpertContext();
-    this.chatHistory.update((history) => [
-      ...history,
-      { message: newInput, isUserMessage: true, id: history.length },
-    ]);
-    this.isLoading.set(true);
-    this.userInput.set(''); // Clear the input after sending
+  handleAiFeatureExpert(
+    newInput: string,
+    expertContext: Array<{ role: 'user' | 'assistant'; message: string }>,
+  ) {
     this.aiFeatureService.expert(newInput, expertContext).subscribe({
       next: (response: any) => {
         this.isLoading.set(false);
@@ -58,6 +54,35 @@ export class AiExpertFeature {
         this.isLoading.set(false);
       },
     });
+  }
+
+  handleAiFeatureSprits(dataUrl: string) {
+    this.aiFeatureService.sprits(dataUrl).subscribe({
+      next: (response: any) => {
+        console.log('AI response for image received:', response);
+        this.isLoading.set(false);
+        this.chatHistory.update((history) => [
+          ...history,
+          { message: response.description, isUserMessage: false, id: history.length },
+        ]);
+      },
+      error: (error) => {
+        console.error('Error from AI service for image:', error);
+        this.isLoading.set(false);
+        this.notify.showNotification('Error from AI service for image: ' + error.message, 'error');
+      },
+    });
+  }
+
+  setUserInput(newInput: string) {
+    const expertContext = this.buildExpertContext();
+    this.chatHistory.update((history) => [
+      ...history,
+      { message: newInput, isUserMessage: true, id: history.length },
+    ]);
+    this.isLoading.set(true);
+    this.userInput.set(''); // Clear the input after sending
+    this.handleAiFeatureExpert(newInput, expertContext);
   }
 
   private buildExpertContext(): Array<{ role: 'user' | 'assistant'; message: string }> {
@@ -76,7 +101,6 @@ export class AiExpertFeature {
     if (!file) {
       return;
     }
-    console.log('Image selected:', file.name);
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
@@ -91,24 +115,7 @@ export class AiExpertFeature {
       ]);
       this.userInput.set(''); // Clear the input after sending
       this.isLoading.set(true);
-      this.aiFeatureService.sprits(dataUrl).subscribe({
-        next: (response: any) => {
-          console.log('AI response for image received:', response);
-          this.isLoading.set(false);
-          this.chatHistory.update((history) => [
-            ...history,
-            { message: response.description, isUserMessage: false, id: history.length },
-          ]);
-        },
-        error: (error) => {
-          console.error('Error from AI service for image:', error);
-          this.isLoading.set(false);
-          this.notify.showNotification(
-            'Error from AI service for image: ' + error.message,
-            'error',
-          );
-        },
-      });
+      this.handleAiFeatureSprits(dataUrl);
     };
     reader.readAsDataURL(file);
   }
