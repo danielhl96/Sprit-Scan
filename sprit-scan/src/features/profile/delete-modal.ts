@@ -26,9 +26,9 @@ export class DeleteModal {
     this.password.set(newPassword);
   };
 
-  onConfirmDelete(): void {
+  deleteUser(): void {
     this.deleteService.deleteUser(this.password()).subscribe({
-      next: (response) => {
+      next: () => {
         this.notificationService.showNotification('User deleted successfully', 'success');
         this.toggleModalChange.emit(false);
         this.router.navigate(['/login']);

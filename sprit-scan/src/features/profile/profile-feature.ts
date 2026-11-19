@@ -21,11 +21,10 @@ export class ProfileFeature implements OnInit {
   ngOnInit(): void {
     this.emailService.getEmail().subscribe({
       next: (entry) => {
-        console.log('Fetched email:', entry?.email);
         this.email.set(entry?.email);
       },
       error: (error) => {
-        console.error('Error fetching email:', error);
+        this.email.set('Error fetching email');
       },
     });
   }
