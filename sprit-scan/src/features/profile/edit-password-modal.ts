@@ -11,6 +11,7 @@ import { NotificationService } from '../../shared/notification/notification-serv
 })
 export class EditPasswordModal {
   toggleModal = input(false);
+  checkPasswordValidity = signal(false);
   toggleModalChange = output<boolean>();
   editPasswordService: EditPasswordService = inject(EditPasswordService);
   notificationService: NotificationService = inject(NotificationService);
