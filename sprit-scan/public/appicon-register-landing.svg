@@ -1,23 +1,57 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="none">
   <defs>
     <!-- Glas -->
-    <linearGradient id="bottle" x2="1" y2="1">
-      <stop stop-color="#f2b45d" />
-      <stop offset=".45" stop-color="#9b4b15" />
+    <linearGradient id="bottle" x2="1" y2="0">
+      <stop stop-color="#f8d08a" />
+      <stop offset=".5" stop-color="#e2a04a" />
+      <stop offset="1" stop-color="#b9691f" />
+    </linearGradient>
+
+    <!-- Whisky -->
+    <linearGradient id="liquid" x2="1" y2="1">
+      <stop stop-color="#e08a2c" />
+      <stop offset=".5" stop-color="#a8501a" />
       <stop offset="1" stop-color="#5e2608" />
     </linearGradient>
 
-    <!-- Handy -->
-    <linearGradient id="phone" x2="1" y2="1">
-      <stop stop-color="#555" />
-      <stop offset=".5" stop-color="#111" />
-      <stop offset="1" stop-color="#333" />
+    <!-- Gold (Folie, Akzente) -->
+    <linearGradient id="gold" x2="1" y2="0">
+      <stop stop-color="#b8862f" />
+      <stop offset=".5" stop-color="#fde08a" />
+      <stop offset="1" stop-color="#b8862f" />
     </linearGradient>
+
+    <!-- Etikett -->
+    <linearGradient id="label" x2="0" y2="1">
+      <stop stop-color="#fdf6dc" />
+      <stop offset="1" stop-color="#efdfae" />
+    </linearGradient>
+
+    <!-- Handy-Rahmen (Titan) -->
+    <linearGradient id="phone" x2="1" y2="1">
+      <stop stop-color="#8a8580" />
+      <stop offset=".5" stop-color="#2a2826" />
+      <stop offset="1" stop-color="#6b6661" />
+    </linearGradient>
+
+    <!-- Display (helle App-Ansicht) -->
+    <linearGradient id="screen" x2="0" y2="1">
+      <stop stop-color="#fffaf0" />
+      <stop offset="1" stop-color="#fbe3ae" />
+    </linearGradient>
+
+    <!-- Formen -->
+    <path
+      id="bottleShape"
+      d="M192 108 H248 V172 C248 200 300 208 300 252 V398 Q300 426 272 426 H168 Q140 426 140 398 V252 C140 208 192 200 192 172 Z"
+    />
+    <clipPath id="bottleClip"><use href="#bottleShape" /></clipPath>
+    <clipPath id="screenClip"><rect x="299" y="149" width="114" height="244" rx="22" /></clipPath>
 
     <!-- Register-Badge -->
     <linearGradient id="registerBadge" x2="1" y2="1">
-      <stop stop-color="#ef4444" />
-      <stop offset="1" stop-color="#991b1b" />
+      <stop stop-color="#f59e0b" />
+      <stop offset="1" stop-color="#b45309" />
     </linearGradient>
 
     <!-- Schatten -->
@@ -31,63 +65,172 @@
     </filter>
   </defs>
 
-  <!-- Schatten Flasche -->
-  <ellipse cx="205" cy="430" rx="108" ry="22" fill="#000" opacity=".14" filter="url(#shadow)" />
+  <!-- Bodenschatten -->
+  <ellipse cx="220" cy="436" rx="104" ry="16" fill="#000" opacity=".16" />
+  <ellipse cx="372" cy="410" rx="74" ry="11" fill="#000" opacity=".14" />
 
-  <!-- Flasche -->
-  <g stroke="#24170c" stroke-width="6" filter="url(#softGlow)">
-    <path
-      d="M140 190 C120 230 125 390 150 415 C175 440 265 440 290 415 C315 390 320 230 300 190 Z"
-      fill="url(#bottle)"
-    />
+  <!-- ============ FLASCHE ============ -->
+  <g filter="url(#softGlow)">
+    <!-- Glas -->
+    <use href="#bottleShape" fill="url(#bottle)" />
 
-    <!-- Hals -->
-    <path d="M185 190 L185 105 Q220 75 255 105 L255 190 Z" fill="url(#bottle)" />
+    <!-- Whisky-Füllung -->
+    <g clip-path="url(#bottleClip)">
+      <rect x="136" y="226" width="168" height="204" fill="url(#liquid)" />
+      <rect x="136" y="226" width="168" height="4" fill="#fde08a" opacity=".55" />
+      <rect x="272" y="200" width="32" height="230" fill="#3a1605" opacity=".28" />
+      <ellipse cx="220" cy="426" rx="70" ry="10" fill="#3a1605" opacity=".35" />
+    </g>
 
-    <!-- Korken -->
-    <rect x="193" y="65" width="54" height="40" rx="8" fill="#2b2117" />
+    <!-- Kontur -->
+    <use href="#bottleShape" stroke="#24170c" stroke-width="5" stroke-linejoin="round" />
+
+    <!-- Lichtreflexe -->
+    <path d="M158 256 V392" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".3" />
+    <path d="M172 236 V246" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".3" />
+    <path d="M203 140 V176" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".35" />
+
+    <!-- Goldfolie am Hals -->
+    <rect x="190" y="104" width="60" height="30" fill="url(#gold)" stroke="#24170c" stroke-width="4" />
+    <path d="M190 126 H250" stroke="#8a5a1c" stroke-width="2" />
+
+    <!-- Verschluss -->
+    <rect x="186" y="60" width="68" height="46" rx="8" fill="#2b1a0e" stroke="#24170c" stroke-width="4" />
+    <path d="M200 68 V98 M212 68 V98 M224 68 V98 M236 68 V98" stroke="#4a2f1a" stroke-width="3" stroke-linecap="round" />
+    <path d="M188 98 H252" stroke="url(#gold)" stroke-width="3" />
 
     <!-- Etikett -->
-    <rect x="155" y="255" width="130" height="90" rx="10" fill="#f7edc8" />
+    <rect x="154" y="258" width="132" height="118" rx="10" fill="url(#label)" stroke="#24170c" stroke-width="4" />
+    <rect x="161" y="265" width="118" height="104" rx="6" stroke="#b8862f" stroke-width="1.5" />
+
+    <!-- Emblem -->
+    <path d="M220 272 l5 6 -5 6 -5 -6 z" fill="#b8862f" />
+    <path d="M192 278 H209 M231 278 H248" stroke="#b8862f" stroke-width="1.5" stroke-linecap="round" />
+
+    <!-- Schriftzug -->
+    <g font-family="Georgia, 'Times New Roman', serif" text-anchor="middle">
+      <text x="221" y="310" font-size="24" font-weight="700" letter-spacing="3" fill="#3a1f0b">SPRIT</text>
+      <path d="M180 318 H260" stroke="#b8862f" stroke-width="1.2" />
+      <circle cx="220" cy="318" r="2.2" fill="#b8862f" />
+      <text x="221" y="332" font-size="9" font-weight="700" letter-spacing="2" fill="#7a4a14">SINGLE MALT</text>
+      <text x="221" y="344" font-size="6.5" letter-spacing="1.5" fill="#7a4a14">AGED 12 YEARS</text>
+
+      <!-- Banderole -->
+      <rect x="161" y="351" width="118" height="14" fill="#78350f" />
+      <text x="220" y="361" font-size="7" letter-spacing="1" fill="#fde9b0">40% VOL · 0,7 L</text>
+    </g>
   </g>
 
-  <!-- iPhone ähnliches Gerät -->
-  <g stroke="#111" stroke-width="6" filter="url(#shadow)">
-    <rect x="292" y="148" width="126" height="248" rx="34" fill="url(#phone)" />
+  <!-- ============ IPHONE ============ -->
+  <g transform="translate(8 -2)">
+    <g filter="url(#shadow)">
+      <!-- Seitentasten -->
+      <rect x="287" y="196" width="4" height="14" rx="2" fill="#4a4643" />
+      <rect x="287" y="218" width="4" height="24" rx="2" fill="#4a4643" />
+      <rect x="287" y="248" width="4" height="24" rx="2" fill="#4a4643" />
+      <rect x="421" y="226" width="4" height="38" rx="2" fill="#4a4643" />
+
+      <!-- Rahmen + Bezel -->
+      <rect x="290" y="140" width="132" height="262" rx="31" fill="url(#phone)" stroke="#111" stroke-width="3" />
+      <rect x="295" y="145" width="122" height="252" rx="26" fill="#050505" />
+    </g>
 
     <!-- Display -->
-    <rect x="306" y="163" width="98" height="212" rx="24" fill="#9edcf0" />
+    <g clip-path="url(#screenClip)" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+      <rect x="299" y="149" width="114" height="244" fill="url(#screen)" />
 
-    <!-- Dynamic Island -->
-    <rect x="333" y="178" width="45" height="12" rx="8" fill="#050505" />
+      <!-- Statusleiste -->
+      <text x="311" y="165" font-size="8" font-weight="700" fill="#3a1f0b">9:41</text>
+      <rect x="337" y="156" width="38" height="11" rx="5.5" fill="#000" />
+      <circle cx="367" cy="161.5" r="2" fill="#1c1c2e" />
+      <path d="M381 165 v-2 M384 165 v-4 M387 165 v-6" stroke="#3a1f0b" stroke-width="1.8" stroke-linecap="round" />
+      <rect x="391.5" y="158.5" width="12" height="6.5" rx="2" stroke="#3a1f0b" stroke-width="1" opacity=".8" />
+      <rect x="393" y="160" width="7" height="3.5" rx="1" fill="#3a1f0b" />
+      <rect x="404.5" y="160.5" width="1.5" height="2.5" rx=".7" fill="#3a1f0b" opacity=".8" />
 
-    <!-- Anmeldung: Avatar -->
-    <circle cx="355" cy="224" r="14" fill="#e8f6fb" stroke="#ffffff" stroke-width="3" />
-    <path d="M336 250 C342 240 368 240 374 250" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+      <!-- Titel -->
+      <g text-anchor="middle">
+        <text x="356" y="187" font-size="9" font-weight="700" fill="#3a1f0b">Create account</text>
+        <text x="356" y="197" font-size="5.5" fill="#8a6a45">Join Sprit-Scan</text>
+      </g>
 
-    <!-- Anmeldung: Eingabefelder -->
-    <rect x="322" y="262" width="66" height="16" rx="7" fill="#dff3fa" stroke="#ffffff" stroke-width="3" />
-    <rect x="322" y="287" width="66" height="16" rx="7" fill="#dff3fa" stroke="#ffffff" stroke-width="3" />
+      <!-- Avatar mit Plus -->
+      <circle cx="356" cy="217" r="13" fill="#f3d9a0" stroke="#b8862f" stroke-width="1.2" />
+      <circle cx="356" cy="213" r="4" fill="#b8862f" />
+      <path d="M348.5 224 q7.5 -9 15 0" stroke="#b8862f" stroke-width="2.5" stroke-linecap="round" />
+      <circle cx="366" cy="226" r="5" fill="#35c759" stroke="#fff" stroke-width="1" />
+      <path d="M366 223.5 v5 M363.5 226 h5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" />
 
-    <!-- Anmeldung: Passwort (Lock) -->
-    <rect x="344" y="313" width="22" height="16" rx="4" fill="#ffffff" stroke="#e53935" stroke-width="3" />
-    <path d="M348 313 V309 C348 304 352 300 355 300 C358 300 362 304 362 309 V313" stroke="#e53935" stroke-width="3" stroke-linecap="round" />
+      <!-- E-Mail-Feld -->
+      <rect x="311" y="238" width="90" height="20" rx="8" fill="#fff" stroke="#e6c988" stroke-width="1.2" />
+      <rect x="317" y="244" width="10" height="8" rx="1.5" stroke="#b8862f" stroke-width="1.2" />
+      <path d="M317.5 245 l4.5 3.5 l4.5 -3.5" stroke="#b8862f" stroke-width="1.2" stroke-linejoin="round" />
+      <text x="332" y="250.5" font-size="6.5" fill="#3a1f0b">mail@sprit.de</text>
+      <circle cx="393" cy="248" r="4" fill="#35c759" />
+      <path d="M391 248 l1.5 1.5 l2.5 -3" stroke="#fff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" />
 
-    <!-- Anmeldung: Zustimmung Checkbox -->
-    <rect x="324" y="338" width="14" height="14" rx="3" fill="#ffffff" stroke="#35c759" stroke-width="3" />
-    <path d="M327 345 L331 349 L336 342" stroke="#35c759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-    <line x1="343" y1="345" x2="384" y2="345" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+      <!-- Passwort-Feld -->
+      <rect x="311" y="262" width="90" height="20" rx="8" fill="#fff" stroke="#e6c988" stroke-width="1.2" />
+      <rect x="318" y="271" width="8" height="6.5" rx="1.5" fill="#b8862f" />
+      <path d="M319.8 271 v-2 a2.2 2.2 0 0 1 4.4 0 v2" stroke="#b8862f" stroke-width="1.2" />
+      <g fill="#3a1f0b">
+        <circle cx="334" cy="272" r="1.6" />
+        <circle cx="340" cy="272" r="1.6" />
+        <circle cx="346" cy="272" r="1.6" />
+        <circle cx="352" cy="272" r="1.6" />
+        <circle cx="358" cy="272" r="1.6" />
+        <circle cx="364" cy="272" r="1.6" />
+      </g>
+      <circle cx="393" cy="272" r="4" fill="#35c759" />
+      <path d="M391 272 l1.5 1.5 l2.5 -3" stroke="#fff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- Passwort bestätigen (fokussiert) -->
+      <rect x="311" y="286" width="90" height="20" rx="8" fill="#fff" stroke="#f59e0b" stroke-width="1.6" />
+      <rect x="318" y="295" width="8" height="6.5" rx="1.5" fill="#b8862f" />
+      <path d="M319.8 295 v-2 a2.2 2.2 0 0 1 4.4 0 v2" stroke="#b8862f" stroke-width="1.2" />
+      <g fill="#3a1f0b">
+        <circle cx="334" cy="296" r="1.6" />
+        <circle cx="340" cy="296" r="1.6" />
+        <circle cx="346" cy="296" r="1.6" />
+        <circle cx="352" cy="296" r="1.6" />
+        <circle cx="358" cy="296" r="1.6" />
+        <circle cx="364" cy="296" r="1.6" />
+      </g>
+      <circle cx="393" cy="296" r="4" fill="#35c759" />
+      <path d="M391 296 l1.5 1.5 l2.5 -3" stroke="#fff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- Passwort-Stärke -->
+      <rect x="311" y="311" width="21" height="3" rx="1.5" fill="#35c759" />
+      <rect x="334" y="311" width="21" height="3" rx="1.5" fill="#35c759" />
+      <rect x="357" y="311" width="21" height="3" rx="1.5" fill="#35c759" />
+      <rect x="380" y="311" width="21" height="3" rx="1.5" fill="#e6c988" />
+      <text x="311" y="321.5" font-size="4.8" fill="#2f9e4f">Strong password</text>
+
+      <!-- Zustimmung -->
+      <rect x="311" y="326" width="9" height="9" rx="2.5" fill="#35c759" />
+      <path d="M313 330.5 l2 2 l3.2 -3.8" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="324" y="332.5" font-size="5.2" fill="#8a6a45">I accept the terms</text>
+
+      <!-- Register-Button -->
+      <rect x="311" y="341" width="90" height="24" rx="12" fill="url(#gold)" stroke="#8a5a1c" stroke-width="1" />
+      <text x="356" y="356" font-size="8.5" font-weight="700" fill="#3a1f0b" text-anchor="middle">Register</text>
+
+      <text x="356" y="377" font-size="5" fill="#b45309" text-anchor="middle">Already registered? Login</text>
+
+      <!-- Home-Indikator -->
+      <rect x="338" y="387" width="36" height="3" rx="1.5" fill="#3a1f0b" opacity=".5" />
+
+      <!-- Display-Spiegelung -->
+      <path d="M299 149 H360 L299 290 Z" fill="#fff" opacity=".18" />
+    </g>
   </g>
 
-  <!-- Datenfluss Verbindung -->
-  <line x1="285" y1="302" x2="323" y2="282" stroke="#ff3030" stroke-width="4" stroke-linecap="round" />
-
   <!-- Register-Indikator (Plus) -->
-  <circle cx="432" cy="410" r="24" fill="url(#registerBadge)" filter="url(#shadow)" />
+  <circle cx="440" cy="404" r="22" fill="url(#registerBadge)" stroke="#fff" stroke-width="4" filter="url(#shadow)" />
   <path
-    d="M432 397 V423 M419 410 H445"
+    d="M440 392 V416 M428 404 H452"
     stroke="white"
-    stroke-width="6"
+    stroke-width="5"
     stroke-linecap="round"
     stroke-linejoin="round"
   />

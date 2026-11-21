@@ -41,8 +41,8 @@ export class HistoryConsumerController {
    * Removes all history entries that belong to the deleted user.
    */
   @EventPattern('auth.user.deleted')
-  async handleUserDeleted(data: any) {
-    const { userId } = data;
+  async handleUserDeleted(data: string) {
+    const { userId } = JSON.parse(data);
 
     if (!userId) {
       this.logger.warn('Received "auth.user.deleted" without userId, ignoring');

@@ -1,18 +1,67 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="none">
   <defs>
     <!-- Glas -->
-    <linearGradient id="bottle" x2="1" y2="1">
-      <stop stop-color="#f2b45d" />
-      <stop offset=".45" stop-color="#9b4b15" />
+    <linearGradient id="bottle" x2="1" y2="0">
+      <stop stop-color="#f8d08a" />
+      <stop offset=".5" stop-color="#e2a04a" />
+      <stop offset="1" stop-color="#b9691f" />
+    </linearGradient>
+
+    <!-- Whisky -->
+    <linearGradient id="liquid" x2="1" y2="1">
+      <stop stop-color="#e08a2c" />
+      <stop offset=".5" stop-color="#a8501a" />
       <stop offset="1" stop-color="#5e2608" />
     </linearGradient>
 
-    <!-- Handy -->
-    <linearGradient id="phone" x2="1" y2="1">
-      <stop stop-color="#555" />
-      <stop offset=".5" stop-color="#111" />
-      <stop offset="1" stop-color="#333" />
+    <!-- Gold (Folie, Akzente) -->
+    <linearGradient id="gold" x2="1" y2="0">
+      <stop stop-color="#b8862f" />
+      <stop offset=".5" stop-color="#fde08a" />
+      <stop offset="1" stop-color="#b8862f" />
     </linearGradient>
+
+    <!-- Etikett -->
+    <linearGradient id="label" x2="0" y2="1">
+      <stop stop-color="#fdf6dc" />
+      <stop offset="1" stop-color="#efdfae" />
+    </linearGradient>
+
+    <!-- Handy-Rahmen (Titan) -->
+    <linearGradient id="phone" x2="1" y2="1">
+      <stop stop-color="#8a8580" />
+      <stop offset=".5" stop-color="#2a2826" />
+      <stop offset="1" stop-color="#6b6661" />
+    </linearGradient>
+
+    <!-- Display (Kamera-Ansicht) -->
+    <linearGradient id="screen" x2="0" y2="1">
+      <stop stop-color="#3b2412" />
+      <stop offset="1" stop-color="#120a05" />
+    </linearGradient>
+
+    <!-- Scan-Strahl -->
+    <linearGradient id="beam" x2="1" y2="0">
+      <stop stop-color="#fbbf24" stop-opacity="0" />
+      <stop offset=".5" stop-color="#fde68a" />
+      <stop offset="1" stop-color="#fbbf24" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="beamFade" x2="0" y2="1">
+      <stop stop-color="#fbbf24" stop-opacity="0" />
+      <stop offset="1" stop-color="#fbbf24" stop-opacity=".35" />
+    </linearGradient>
+
+    <!-- Formen -->
+    <path
+      id="bottleShape"
+      d="M192 108 H248 V172 C248 200 300 208 300 252 V398 Q300 426 272 426 H168 Q140 426 140 398 V252 C140 208 192 200 192 172 Z"
+    />
+    <path
+      id="miniBottle"
+      d="M351 204 h10 v16 c0 8 10 10 10 22 v42 q0 6 -6 6 h-18 q-6 0 -6 -6 v-42 c0 -12 10 -14 10 -22 z"
+    />
+    <clipPath id="bottleClip"><use href="#bottleShape" /></clipPath>
+    <clipPath id="screenClip"><rect x="299" y="149" width="114" height="244" rx="22" /></clipPath>
 
     <!-- Schatten -->
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -25,50 +74,177 @@
     </filter>
   </defs>
 
-  <!-- Schatten Flasche -->
-  <ellipse cx="205" cy="430" rx="108" ry="22" fill="#000" opacity=".14" filter="url(#shadow)" />
+  <!-- Bodenschatten -->
+  <ellipse cx="220" cy="436" rx="104" ry="16" fill="#000" opacity=".16" />
+  <ellipse cx="372" cy="410" rx="74" ry="11" fill="#000" opacity=".14" />
 
-  <!-- Flasche -->
-  <g stroke="#24170c" stroke-width="6" filter="url(#softGlow)">
-    <path
-      d="M140 190 C120 230 125 390 150 415 C175 440 265 440 290 415 C315 390 320 230 300 190 Z"
-      fill="url(#bottle)"
-    />
+  <!-- ============ FLASCHE ============ -->
+  <g filter="url(#softGlow)">
+    <!-- Glas -->
+    <use href="#bottleShape" fill="url(#bottle)" />
 
-    <!-- Hals -->
-    <path d="M185 190 L185 105 Q220 75 255 105 L255 190 Z" fill="url(#bottle)" />
+    <!-- Whisky-Füllung -->
+    <g clip-path="url(#bottleClip)">
+      <rect x="136" y="226" width="168" height="204" fill="url(#liquid)" />
+      <!-- Füllstand-Kante -->
+      <rect x="136" y="226" width="168" height="4" fill="#fde08a" opacity=".55" />
+      <!-- Dunkler Rand rechts für Tiefe -->
+      <rect x="272" y="200" width="32" height="230" fill="#3a1605" opacity=".28" />
+      <!-- Bodenwölbung -->
+      <ellipse cx="220" cy="426" rx="70" ry="10" fill="#3a1605" opacity=".35" />
+    </g>
 
-    <!-- Korken -->
-    <rect x="193" y="65" width="54" height="40" rx="8" fill="#2b2117" />
+    <!-- Kontur -->
+    <use href="#bottleShape" stroke="#24170c" stroke-width="5" stroke-linejoin="round" />
+
+    <!-- Lichtreflexe -->
+    <path d="M158 256 V392" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".3" />
+    <path d="M172 236 V246" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".3" />
+    <path d="M203 140 V176" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".35" />
+
+    <!-- Goldfolie am Hals -->
+    <rect x="190" y="104" width="60" height="30" fill="url(#gold)" stroke="#24170c" stroke-width="4" />
+    <path d="M190 126 H250" stroke="#8a5a1c" stroke-width="2" />
+
+    <!-- Verschluss -->
+    <rect x="186" y="60" width="68" height="46" rx="8" fill="#2b1a0e" stroke="#24170c" stroke-width="4" />
+    <path d="M200 68 V98 M212 68 V98 M224 68 V98 M236 68 V98" stroke="#4a2f1a" stroke-width="3" stroke-linecap="round" />
+    <path d="M188 98 H252" stroke="url(#gold)" stroke-width="3" />
 
     <!-- Etikett -->
-    <rect x="155" y="255" width="130" height="90" rx="10" fill="#f7edc8" />
+    <rect x="154" y="258" width="132" height="118" rx="10" fill="url(#label)" stroke="#24170c" stroke-width="4" />
+    <rect x="161" y="265" width="118" height="104" rx="6" stroke="#b8862f" stroke-width="1.5" />
+
+    <!-- Emblem -->
+    <path d="M220 272 l5 6 -5 6 -5 -6 z" fill="#b8862f" />
+    <path d="M192 278 H209 M231 278 H248" stroke="#b8862f" stroke-width="1.5" stroke-linecap="round" />
+
+    <!-- Schriftzug -->
+    <g font-family="Georgia, 'Times New Roman', serif" text-anchor="middle">
+      <text x="221" y="310" font-size="24" font-weight="700" letter-spacing="3" fill="#3a1f0b">SPRIT</text>
+      <path d="M180 318 H260" stroke="#b8862f" stroke-width="1.2" />
+      <circle cx="220" cy="318" r="2.2" fill="#b8862f" />
+      <text x="221" y="332" font-size="9" font-weight="700" letter-spacing="2" fill="#7a4a14">SINGLE MALT</text>
+      <text x="221" y="344" font-size="6.5" letter-spacing="1.5" fill="#7a4a14">AGED 12 YEARS</text>
+
+      <!-- Banderole -->
+      <rect x="161" y="351" width="118" height="14" fill="#78350f" />
+      <text x="220" y="361" font-size="7" letter-spacing="1" fill="#fde9b0">40% VOL · 0,7 L</text>
+    </g>
   </g>
 
-  <!-- iPhone ähnliches Gerät -->
-  <g stroke="#111" stroke-width="6" filter="url(#shadow)">
-    <rect x="292" y="148" width="126" height="248" rx="34" fill="url(#phone)" />
+  <!-- Scan-Rahmen um das Etikett -->
+  <path
+    d="M146 266 V258 Q146 250 154 250 H162 M278 250 H286 Q294 250 294 258 V266 M294 368 V376 Q294 384 286 384 H278 M162 384 H154 Q146 384 146 376 V368"
+    stroke="#fbbf24"
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+
+  <!-- ============ IPHONE ============ -->
+  <g transform="translate(8 -2)">
+    <g filter="url(#shadow)">
+      <!-- Seitentasten -->
+      <rect x="287" y="196" width="4" height="14" rx="2" fill="#4a4643" />
+      <rect x="287" y="218" width="4" height="24" rx="2" fill="#4a4643" />
+      <rect x="287" y="248" width="4" height="24" rx="2" fill="#4a4643" />
+      <rect x="421" y="226" width="4" height="38" rx="2" fill="#4a4643" />
+
+      <!-- Rahmen + Bezel -->
+      <rect x="290" y="140" width="132" height="262" rx="31" fill="url(#phone)" stroke="#111" stroke-width="3" />
+      <rect x="295" y="145" width="122" height="252" rx="26" fill="#050505" />
+    </g>
 
     <!-- Display -->
-    <rect x="306" y="163" width="98" height="212" rx="24" fill="#9edcf0" />
+    <g clip-path="url(#screenClip)">
+      <rect x="299" y="149" width="114" height="244" fill="url(#screen)" />
 
-    <!-- Dynamic Island -->
-    <rect x="333" y="178" width="45" height="12" rx="8" fill="#050505" />
+      <!-- Statusleiste -->
+      <g font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+        <text x="311" y="165" font-size="8" font-weight="700" fill="#fff">9:41</text>
+      </g>
+      <rect x="337" y="156" width="38" height="11" rx="5.5" fill="#000" />
+      <circle cx="367" cy="161.5" r="2" fill="#1c1c2e" />
+      <!-- Signal -->
+      <path d="M381 165 v-2 M384 165 v-4 M387 165 v-6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" />
+      <!-- Akku -->
+      <rect x="391.5" y="158.5" width="12" height="6.5" rx="2" stroke="#fff" stroke-width="1" opacity=".8" />
+      <rect x="393" y="160" width="7" height="3.5" rx="1" fill="#fff" />
+      <rect x="404.5" y="160.5" width="1.5" height="2.5" rx=".7" fill="#fff" opacity=".8" />
 
-    <!-- Scan Rahmen -->
-    <rect x="323" y="243" width="64" height="79" rx="6" fill="none" stroke="white" stroke-width="4" />
+      <!-- App-Titel -->
+      <g font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" text-anchor="middle">
+        <text x="356" y="186" font-size="8.5" font-weight="700" letter-spacing=".5" fill="#fbbf24">Sprit-Scan</text>
+      </g>
 
-    <!-- Scanlinie -->
-    <line x1="323" y1="282" x2="387" y2="282" stroke="#ff3030" stroke-width="5" />
+      <!-- Flasche im Sucher -->
+      <use href="#miniBottle" fill="url(#liquid)" stroke="#f8d08a" stroke-width="1.5" />
+      <rect x="351" y="200" width="10" height="6" rx="1.5" fill="#2b1a0e" stroke="#f8d08a" stroke-width="1" />
+      <rect x="345" y="252" width="22" height="20" rx="2" fill="#fdf6dc" />
+      <path d="M349 258 H363 M351 263 H361 M353 267 H359" stroke="#7a4a14" stroke-width="1.3" stroke-linecap="round" />
+      <path d="M345 246 V282" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".3" />
+
+      <!-- Sucher-Ecken -->
+      <path
+        d="M313 208 V202 Q313 196 319 196 H325 M387 196 H393 Q399 196 399 202 V208 M399 288 V294 Q399 300 393 300 H387 M325 300 H319 Q313 300 313 294 V288"
+        stroke="#fff"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+
+      <!-- Scan-Strahl -->
+      <rect x="315" y="226" width="82" height="22" fill="url(#beamFade)" />
+      <rect x="311" y="246" width="90" height="3" rx="1.5" fill="url(#beam)" />
+
+      <!-- Ergebnis-Karte -->
+      <rect x="306" y="308" width="100" height="44" rx="10" fill="#fdf6dc" />
+      <rect x="312" y="314" width="22" height="32" rx="5" fill="#f3d9a0" />
+      <use href="#miniBottle" transform="translate(209.1 251.2) scale(.32)" fill="url(#liquid)" />
+      <g font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+        <text x="339" y="324" font-size="7.5" font-weight="700" fill="#3a1f0b">Single Malt</text>
+        <text x="339" y="334" font-size="7" fill="#f59e0b">★★★★★</text>
+        <text x="339" y="344" font-size="5.5" fill="#8a6a45">40% · Scotland</text>
+      </g>
+      <circle cx="396" cy="318" r="5.5" fill="#35c759" />
+      <path d="M393.4 318 l1.9 2 l3.3 -4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- Tab-Leiste -->
+      <rect x="306" y="357" width="100" height="26" rx="13" fill="#fff" opacity=".12" />
+      <g stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".75">
+        <!-- Home -->
+        <path d="M316 371 l5 -5 l5 5 v5 h-10 z" />
+        <!-- History -->
+        <circle cx="338" cy="370" r="5" />
+        <path d="M338 367 v3 l2 2" />
+        <!-- AI-Chat -->
+        <rect x="369" y="365.5" width="10" height="8" rx="2.5" />
+        <path d="M372 373.5 v2.5 l3 -2.5" />
+        <!-- Profil -->
+        <circle cx="392" cy="367.5" r="2.5" />
+        <path d="M387 375.5 q5 -6 10 0" />
+      </g>
+      <!-- Scan-Button (Mitte) -->
+      <circle cx="356" cy="370" r="10" fill="url(#gold)" />
+      <path
+        d="M352 368 v-2 h2 M358 366 h2 v2 M360 372 v2 h-2 M354 374 h-2 v-2"
+        stroke="#3a1f0b"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+
+      <!-- Home-Indikator -->
+      <rect x="338" y="387" width="36" height="3" rx="1.5" fill="#fff" opacity=".6" />
+
+      <!-- Display-Spiegelung -->
+      <path d="M299 149 H360 L299 290 Z" fill="#fff" opacity=".05" />
+    </g>
   </g>
 
-  <!-- Scan Verbindung -->
-  <line x1="285" y1="302" x2="323" y2="282" stroke="#ff3030" stroke-width="4" stroke-linecap="round" />
-
   <!-- Erfolgsindikator -->
-  <circle cx="432" cy="410" r="22" fill="#35c759" filter="url(#shadow)" />
+  <circle cx="440" cy="404" r="22" fill="#35c759" stroke="#fff" stroke-width="4" filter="url(#shadow)" />
   <path
-    d="M422 410 L430 418 L445 398"
+    d="M430 404 L438 412 L452 394"
     stroke="white"
     stroke-width="5"
     stroke-linecap="round"
