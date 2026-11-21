@@ -2,7 +2,7 @@
   @if (entry(); as entry) {
     <p class="text-black text-center text-lg font-bold">Details</p>
     @for (item of fields; track item.key) {
-      @if (entry[item.key] != null) {
+      @if (entry[item.key]) {
         <p class="text-black text-sm flex flex-col items-start gap-2">
           <span>
             <img src="{{ item.key }}-icon.svg" alt="{{ item.label }}" class="inline w-4 h-4" />
