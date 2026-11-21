@@ -48,8 +48,17 @@ export class HistoryConsumerController {
       this.logger.warn('Received "auth.user.deleted" without userId, ignoring');
       return;
     }
+    try {
+      const deleted = await this.historyService.deleteAllForUser(userId);
 
-    const deleted = await this.historyService.deleteAllForUser(userId);
-    this.logger.log(`Deleted ${deleted} history entries for user "${userId}"`);
+      this.logger.log(
+        `Deleted ${deleted} history entries for user "${userId}"`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to delete history entries for user "${userId}": ${error.message}`,
+        error.stack,
+      );
+    }
   }
 }
