@@ -4,6 +4,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import express from 'express';
 import { AiModule } from './ai.module';
+import { retry } from 'cockatiel';
 
 async function bootstrap() {
   // Disable Nest's built-in body parser so we can register our own with a
@@ -25,9 +26,17 @@ async function bootstrap() {
       client: {
         clientId: 'ai-microservice',
         brokers: [process.env.KAFKA_BROKERS ?? 'localhost:9092'],
+        retry: {
+          initialRetryTime: 3000, // Waits initially 3 seconds
+          retries: 15, // Tries up to 15 times (with exponential backoff)
+        },
       },
       consumer: {
         groupId: 'ai-microservice-consumer',
+        retry: {
+          retries: 15,
+          initialRetryTime: 3000,
+        },
       },
     },
   });

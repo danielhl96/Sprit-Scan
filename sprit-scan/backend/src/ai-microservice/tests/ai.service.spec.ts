@@ -98,7 +98,7 @@ describe('AiService (Unit)', () => {
       expect(createPayload.input[0].role).toBe('system');
       expect(createPayload.input[1].role).toBe('user');
       expect(createPayload.input[1].content[0].text).toContain(
-        'Task: What is single malt whisky?',
+        'What is single malt whisky?',
       );
     });
 
@@ -119,9 +119,7 @@ describe('AiService (Unit)', () => {
 
       expect(result).toEqual({ message: 'Fallback response' });
       const createPayload = mockResponsesCreate.mock.calls[0][0];
-      expect(createPayload.input[1].content[0].text).toBe(
-        'UserId: edge-user. Task: ',
-      );
+      expect(createPayload.input[1].content[0].text).toBe('');
     });
 
     it('should handle a very long prompt (boundary value)', async () => {

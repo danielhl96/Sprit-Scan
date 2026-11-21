@@ -11,9 +11,17 @@ async function bootstrap() {
     options: {
       client: {
         brokers: [process.env.KAFKA_BROKERS ?? 'localhost:9092'],
+        retry: {
+          initialRetryTime: 3000, // Wartet anfangs 3 Sekunden
+          retries: 15, // Versucht es bis zu 15-mal (mit exponentiellem Backoff)
+        },
       },
       consumer: {
         groupId: process.env.KAFKA_GROUP_ID ?? 'history-service-consumer',
+      },
+      retry: {
+        retries: 15,
+        initialRetryTime: 3000,
       },
     },
   });
