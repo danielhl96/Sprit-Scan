@@ -23,6 +23,18 @@ type HistoryEntry = {
   templateUrl: './result.html',
 })
 export class Result {
+  fields: { label: string; key: keyof HistoryEntry }[] = [
+    { label: 'Name', key: 'name' },
+    { label: 'Taste', key: 'taste' },
+    { label: 'Origin', key: 'origin' },
+    { label: 'Recommendation', key: 'recommendation' },
+    { label: 'Year', key: 'year' },
+    { label: 'Customer Review', key: 'customerreview' },
+    { label: 'Raw Materials', key: 'rawmaterials' },
+    { label: 'Alternative', key: 'alternative' },
+    { label: 'Price', key: 'price' },
+  ];
+
   entry = input<HistoryEntry>({
     id: 0,
     name: '',
