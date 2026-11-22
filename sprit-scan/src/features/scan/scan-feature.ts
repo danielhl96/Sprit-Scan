@@ -2,6 +2,7 @@ import { Component, inject, input, signal } from '@angular/core';
 import { ScanAnimationService } from '../../shared/scananimation/scan-animation-service';
 import { ScanAnimationComponent } from '../../shared/scananimation/scan-animation-component';
 import { AiFeatureService } from '../ai-expert/ai-expert-feature.service';
+import { NotificationService } from '../../shared/notification/notification-service';
 import { Result } from '../../shared/result/result';
 import { ModalComponent } from '../../shared/modal/modal-component';
 import imageCompression from 'browser-image-compression';
@@ -22,6 +23,7 @@ export class ScanFeature {
   private readonly scanAnimationService = inject(ScanAnimationService);
   private readonly aiFeatureService = inject(AiFeatureService);
   private readonly scanStore = inject(ScanStore);
+  private readonly notificationService = inject(NotificationService);
 
   protected async handleFileSelected(file: File): Promise<void> {
     if (!file) {
@@ -42,11 +44,12 @@ export class ScanFeature {
 
     try {
       const compressedFile = await imageCompression(file, options);
-      console.log(`Original file size: ${file.size / 1024 / 1024} MB`);
-      console.log(`Compressed file size: ${compressedFile.size / 1024 / 1024} MB`);
       return compressedFile;
     } catch (error) {
-      console.error('Error compressing image:', error);
+      this.notificationService.showNotification(
+        'Error compressing image. Please try again.',
+        'error',
+      );
       throw error;
     }
   }
@@ -76,6 +79,10 @@ export class ScanFeature {
       error: (error) => {
         console.error('Error from AI service:', error);
         this.scanAnimationService.showAnimation(false);
+        this.notificationService.showNotification(
+          'Error scanning image. Please try again.',
+          'error',
+        );
       },
     });
   }
@@ -84,8 +91,8 @@ export class ScanFeature {
     return {
       id: Date.now(),
       date: new Date().toISOString(),
-      name: this.textValue(response['name'], 'Unknown Spirit'),
-      description: this.textValue(response['description'], 'No Description'),
+      name: this.textValue(response['name'], ''),
+      description: this.textValue(response['description'], ''),
       taste: this.optionalTextValue(response['taste']),
       origin: this.optionalTextValue(response['origin']),
       recommendation: this.optionalTextValue(response['recommendation']),
