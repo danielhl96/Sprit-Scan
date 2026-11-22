@@ -21,7 +21,7 @@
         [buttonColor]="'bg-transparent'"
         [buttonSize]="'sm'"
         [buttonText]="'Login'"
-        [buttonDisabled]="isLoading()"
+        [buttonDisabled]="isLoading() || !emailValid() || !passwordValid()"
         (buttonClick)="login()"
         [loading]="isLoading()"
         [buttonImgSrc]="'/login-icon.svg'"

@@ -29,12 +29,18 @@ export class ScanFeature {
     if (!file) {
       return;
     }
-    const compressedImage = await this.compressImage(file);
-    const dataUrl = await this.readFileAsDataUrl(compressedImage);
-    this.imageUrl.set(dataUrl);
-    this.scanFile(dataUrl);
+    try {
+      const compressedImage = await this.compressImage(file);
+      const dataUrl = await this.readFileAsDataUrl(compressedImage);
+      this.imageUrl.set(dataUrl);
+      this.scanFile(dataUrl);
+    } catch (error) {
+      this.notificationService.showNotification(
+        'Error processing image. Please try again.',
+        'error',
+      );
+    }
   }
-
   private async compressImage(file: File): Promise<File> {
     const options = {
       maxSizeMB: 5,
@@ -72,8 +78,6 @@ export class ScanFeature {
         const entry = this.mapResponseToEntry(response);
         this.selectedEntry.set(entry);
         this.toggleModal.set(true);
-        // In den geteilten Store schreiben -> wirkt sofort in Home und History,
-        // egal ob der Scan aus Home, Navbar oder Dock gestartet wurde.
         this.scanStore.addEntry(entry);
       },
       error: (error) => {
