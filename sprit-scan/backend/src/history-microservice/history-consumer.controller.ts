@@ -42,7 +42,9 @@ export class HistoryConsumerController {
    */
   @EventPattern('auth.user.deleted')
   async handleUserDeleted(data: string) {
-    const { userId } = JSON.parse(data);
+    const payload = typeof data === 'string' ? JSON.parse(data) : data;
+
+    const { userId } = payload;
 
     if (!userId) {
       this.logger.warn('Received "auth.user.deleted" without userId, ignoring');

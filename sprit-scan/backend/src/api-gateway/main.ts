@@ -33,7 +33,7 @@ async function bootstrap() {
   // Body size limit large enough for base64-encoded images sent to the AI
   // service, while still rejecting obviously abusive payloads (see the
   // dedicated 413 boundary test in the AI e2e suite).
-  const bodyLimit = process.env.BODY_SIZE_LIMIT ?? '50mb';
+  const bodyLimit = process.env.BODY_SIZE_LIMIT ?? '10mb';
   app.use(express.json({ limit: bodyLimit }));
   app.use(express.urlencoded({ extended: true, limit: bodyLimit }));
 

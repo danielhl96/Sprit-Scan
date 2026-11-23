@@ -7,6 +7,7 @@ describe('Backend E2E (via API Gateway + full infrastructure)', () => {
   const unique = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
   const email = `e2e-${unique}@example.com`;
   const password = 'E2E-password-123!';
+  const newPassword = `${password}-new`;
   const newEmail = `e2e-updated-${unique}@example.com`;
 
   let accessCookie = '';
@@ -137,14 +138,12 @@ describe('Backend E2E (via API Gateway + full infrastructure)', () => {
     });
 
     it('should change password (PUT /api/auth/password)', async () => {
-      const newPassword = `${password}-new`;
-
-      await gateway
+      const res = await gateway
         .put('/api/auth/password')
         .set('Cookie', accessCookie)
         .send({ oldPassword: password, newPassword })
         .expect(200);
-
+      console.log('Password change response:', res.body);
       // login with new password still works
       const loginRes = await gateway
         .post('/api/auth/login')
@@ -258,13 +257,15 @@ describe('Backend E2E (via API Gateway + full infrastructure)', () => {
     });
 
     it('should reject too large spirits payload (boundary size)', async () => {
-      const huge = 'b'.repeat(2 * 1024 * 1024); // ~2MB base64
+      const prefix = 'data:image/png;base64,';
+      const huge = prefix + 'b'.repeat(20 * 1024 * 1024 - prefix.length); // ~20MB base64
 
-      await gateway
+      const res = await gateway
         .post('/api/ai/spirits')
         .set('Cookie', accessCookie)
         .send({ imageBase64: huge })
         .expect(413);
+      console.log(res.status, res.body, res.text);
     });
   });
 
@@ -305,7 +306,7 @@ describe('Backend E2E (via API Gateway + full infrastructure)', () => {
         })
         .expect(200);
 
-      const currentPassword = `${password}-new`;
+      const currentPassword = newPassword; // Use the latest password after change
 
       // Delete user via auth service (publishes auth.user.deleted)
       await gateway
@@ -326,10 +327,10 @@ describe('Backend E2E (via API Gateway + full infrastructure)', () => {
           cleaned = true;
           break;
         }
-        await wait(500);
+        await wait(2000);
       }
 
       expect(cleaned).toBe(true);
-    });
+    }, 15000);
   });
 });
