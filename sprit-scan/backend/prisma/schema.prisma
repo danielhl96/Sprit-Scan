@@ -19,3 +19,17 @@ model User {
 
   @@map("users")
 }
+
+
+model OutboxEvent {
+  id        Int      @id @default(autoincrement())
+  eventType String
+  producer String
+  payload Json
+  timestamp DateTime @default(now())
+  retryCount    Int          @default(0)
+  errorMessage  String?
+  createdAt     DateTime     @default(now())
+  processedAt   DateTime?
+
+}
