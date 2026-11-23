@@ -14,7 +14,8 @@ export class InputEmailComponent {
   emailValidityChange = output<boolean>();
 
   checkEmailValidity(): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^(?!.*\.\.)(?!\.)[^\s@]+(?<!\.)@[^\s@]+\.[^\s@]+$/;
+
     return emailRegex.test(this.email());
   }
 

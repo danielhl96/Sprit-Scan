@@ -73,7 +73,6 @@ export class ScanFeature {
     this.scanAnimationService.showAnimation(true);
     this.aiFeatureService.sprits(imageUrl).subscribe({
       next: (response: any) => {
-        console.log('AI response received:', response);
         this.scanAnimationService.showAnimation(false);
         const entry = this.mapResponseToEntry(response);
         this.selectedEntry.set(entry);
@@ -118,7 +117,7 @@ export class ScanFeature {
 
   private optionalTextValue(value: unknown): string | undefined {
     if (typeof value !== 'string') {
-      return undefined;
+      return '';
     }
     const trimmed = value.trim();
     return trimmed.length > 0 ? trimmed : undefined;
